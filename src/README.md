@@ -7,8 +7,8 @@ This directory contains all the source code for the 360+AI Planner application, 
 ```
 src/
 ├── frontend/           # Frontend application (React/Vue/Angular)
-├── backend/            # Backend API server (Node.js/Python/Java)
-├── database/           # Database schemas, migrations, and queries
+├── backend/            # Backend API server (Python/Flask)
+├── database/           # Database schemas, migrations, and queries (MongoDB)
 ├── shared/             # Shared code between frontend and backend
 ├── tests/              # Test suites (unit, integration, e2e)
 └── docs/               # Technical documentation

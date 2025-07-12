@@ -40,11 +40,36 @@ A comprehensive 360-degree feedback and AI-powered personalized learning platfor
 
 ## 🛠️ Technology Stack
 
-- **Frontend**: Modern web application with responsive design
-- **Backend**: Scalable API architecture
-- **AI/ML**: Advanced algorithms for feedback analysis and recommendation generation
-- **Database**: Secure data storage with privacy compliance
-- **Security**: Enterprise-grade security measures and data protection
+### Frontend
+- **Framework**: React/Vue.js/Angular (modern web application)
+- **Styling**: Responsive design with CSS frameworks
+- **State Management**: Context API or Redux
+- **Testing**: Jest and Cypress
+
+### Backend
+- **Runtime**: Python
+- **Framework**: Flask
+- **Authentication**: JWT (JSON Web Tokens)
+- **Testing**: Pytest
+- **Documentation**: OpenAPI/Swagger
+
+### Database & Storage
+- **Primary Database**: MongoDB
+- **ORM**: SQLAlchemy
+- **Caching**: Redis
+- **Data Security**: Encryption in transit and at rest
+
+### AI/ML & Analytics
+- **AI Engine**: Ollama (Local LLM integration)
+- **Data Processing**: Python-based analytics
+- **Feedback Analysis**: Natural language processing
+- **Learning Recommendations**: Machine learning algorithms
+
+### Infrastructure & Security
+- **Containerization**: Docker
+- **Security**: Enterprise-grade security measures
+- **Privacy Compliance**: GDPR compliant
+- **Monitoring**: Application performance monitoring
 
 ## 🚀 Getting Started
 

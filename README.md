@@ -10,7 +10,7 @@ A comprehensive 360-degree feedback and AI-powered personalized learning platfor
 
 ### 🔐 User Management
 - **Secure Registration & Authentication**: Easy onboarding with robust security measures
-- **Role-based Access Control**: Different permissions for administrators, managers, and participants
+- **Role-based Access Control**: Three distinct user personas (Assessee, Coach, Admin)
 - **Profile Management**: Comprehensive user profiles with professional information
 
 ### 📊 360-Degree Feedback System
@@ -31,19 +31,34 @@ A comprehensive 360-degree feedback and AI-powered personalized learning platfor
 - **Progress Metrics**: Quantifiable measures of improvement over time
 - **Export Capabilities**: Generate reports for HR and management review
 
-## 🎯 Target Users
+## 👥 User Personas
 
-- **Individual Professionals**: Seeking structured feedback and development guidance
-- **HR Departments**: Managing organization-wide talent development programs
-- **Team Leaders**: Supporting team member growth and performance improvement
-- **Learning & Development Teams**: Implementing data-driven development strategies
+### 🎯 Assessee
+- **Primary user** receiving 360-degree feedback
+- **Personal dashboard** with development journey tracking
+- **Access to** feedback results and AI-generated learning plans
+- **Progress monitoring** and goal setting capabilities
+
+### 👨‍💼 Coach
+- **Guides and supports** assessees through development
+- **Aggregated insights** (no raw feedback data for privacy)
+- **Coaching tools** and AI-powered recommendations
+- **Team progress** monitoring and reporting
+
+### ⚙️ Admin
+- **System administration** and user management
+- **Platform-wide analytics** and reporting
+- **Configuration** of feedback forms and competency frameworks
+- **System health** monitoring and maintenance
 
 ## 🛠️ Technology Stack
 
 ### Frontend
-- **Framework**: React/Vue.js/Angular (modern web application)
-- **Styling**: Responsive design with CSS frameworks
-- **State Management**: Context API or Redux
+- **Framework**: React with Vite
+- **Styling**: Custom CSS with magenta theme
+- **State Management**: React Context API
+- **Routing**: React Router
+- **Icons**: Heroicons
 - **Testing**: Jest and Cypress
 
 ### Backend
@@ -71,18 +86,86 @@ A comprehensive 360-degree feedback and AI-powered personalized learning platfor
 - **Privacy Compliance**: GDPR compliant
 - **Monitoring**: Application performance monitoring
 
+## 📁 Project Structure
+
+```
+360+AI-Planner/
+├── README.md                    # This file
+├── .gitignore                   # Git ignore rules
+└── src/
+    ├── frontend/                # React frontend application
+    │   ├── components/          # Reusable React components
+    │   ├── contexts/            # React context providers
+    │   ├── pages/               # Page components
+    │   ├── assets/              # Static assets
+    │   ├── App.jsx              # Main application component
+    │   ├── main.jsx             # Application entry point
+    │   └── index.html           # HTML template
+    ├── backend/                 # Python/Flask backend API
+    │   ├── config/              # Configuration files
+    │   ├── controllers/         # API route handlers
+    │   ├── models/              # Data models
+    │   ├── services/            # Business logic
+    │   └── utils/               # Utility functions
+    ├── database/                # MongoDB schemas and migrations
+    │   ├── schemas/             # Database schemas
+    │   ├── migrations/          # Database migrations
+    │   └── seeds/               # Sample data
+    ├── shared/                  # Shared code and utilities
+    │   ├── constants/           # Application constants
+    │   ├── types/               # Type definitions
+    │   └── validators/          # Data validation
+    ├── tests/                   # Test suites
+    │   ├── unit/                # Unit tests
+    │   ├── integration/         # Integration tests
+    │   └── e2e/                 # End-to-end tests
+    └── docs/                    # Technical documentation
+        ├── api/                 # API documentation
+        ├── architecture/        # System architecture
+        └── deployment/          # Deployment guides
+```
+
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Modern web browser (Chrome, Firefox, Safari, Edge)
-- Internet connection
-- Valid email address for registration
+- **Node.js** (v18 or higher)
+- **Python** (v3.9 or higher)
+- **MongoDB** (v5.0 or higher)
+- **Git** for version control
 
-### Installation & Setup
-1. Visit the 360+AI Planner platform
-2. Click "Register" to create your account
-3. Complete your profile setup
-4. Begin your first 360-degree feedback cycle
+### Development Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/balu72/360-Plus-AI-Planner.git
+   cd 360+AI-Planner
+   ```
+
+2. **Frontend Setup**
+   ```bash
+   cd src/frontend
+   npm install
+   npm run dev
+   ```
+
+3. **Backend Setup** (Coming Soon)
+   ```bash
+   cd src/backend
+   pip install -r requirements.txt
+   python app.py
+   ```
+
+4. **Database Setup** (Coming Soon)
+   ```bash
+   # MongoDB setup instructions
+   ```
+
+### Demo Access
+
+The frontend includes demo credentials for testing:
+- **Assessee**: assessee@example.com / password
+- **Coach**: coach@example.com / password
+- **Admin**: admin@example.com / password
 
 ## 📋 How It Works
 
@@ -108,6 +191,17 @@ A comprehensive 360-degree feedback and AI-powered personalized learning platfor
 - Set goals and track progress over time
 - Schedule follow-up feedback cycles for continuous improvement
 
+## 🏗️ Architecture Overview
+
+The 360+AI Planner follows a layered architecture pattern:
+
+1. **Presentation Layer** (`frontend/`) - User interface and user experience
+2. **Business Logic Layer** (`backend/`) - API endpoints, business rules, and data processing
+3. **Data Layer** (`database/`) - Data storage, retrieval, and management
+4. **Shared Layer** (`shared/`) - Common utilities, types, and constants
+5. **Testing Layer** (`tests/`) - Comprehensive test coverage
+6. **Documentation Layer** (`docs/`) - Technical specifications and guides
+
 ## 🔒 Privacy & Security
 
 - **Data Encryption**: All data encrypted in transit and at rest
@@ -116,22 +210,41 @@ A comprehensive 360-degree feedback and AI-powered personalized learning platfor
 - **Access Controls**: Strict role-based access to sensitive information
 - **Audit Trails**: Complete logging of all system activities
 
-## 📞 Support & Contact
+## 🧪 Development Guidelines
 
-- **Documentation**: Comprehensive user guides and tutorials
-- **Help Center**: FAQ and troubleshooting resources
-- **Customer Support**: Dedicated support team for technical assistance
-- **Training**: Onboarding and training sessions for organizations
+- Each layer should be loosely coupled and highly cohesive
+- Use the shared directory for code that needs to be used across multiple layers
+- Follow consistent naming conventions across all directories
+- Maintain comprehensive test coverage for all business logic
+- Document all APIs and architectural decisions
 
 ## 🔄 Roadmap
 
-### Upcoming Features
+### ✅ Completed
+- Frontend application with role-based authentication
+- User persona system (Assessee, Coach, Admin)
+- Responsive UI with magenta theme
+- Basic navigation and dashboard structure
+
+### 🚧 In Progress
+- Backend API development
+- Database schema implementation
+- AI integration with Ollama
+
+### 📅 Upcoming Features
 - Mobile application for iOS and Android
 - Integration with popular HRIS systems
 - Advanced AI coaching recommendations
 - Team-based feedback and development plans
 - Multi-language support
 - API for third-party integrations
+
+## 📞 Support & Contact
+
+- **Documentation**: Comprehensive user guides and tutorials
+- **Help Center**: FAQ and troubleshooting resources
+- **Customer Support**: Dedicated support team for technical assistance
+- **Training**: Onboarding and training sessions for organizations
 
 ## 📄 License
 

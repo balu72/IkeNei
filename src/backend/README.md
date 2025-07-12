@@ -44,40 +44,40 @@ backend/
 
 ## Technology Stack
 
-- **Runtime**: Node.js/Python/Java (to be determined)
-- **Framework**: Express.js/FastAPI/Spring Boot
-- **Database**: PostgreSQL/MongoDB
-- **ORM**: Prisma/Sequelize/SQLAlchemy
-- **Authentication**: JWT/OAuth 2.0
-- **AI/ML**: TensorFlow/PyTorch/Scikit-learn
-- **Testing**: Jest/Pytest/JUnit
-- **Documentation**: Swagger/OpenAPI
+- **Runtime**: Python
+- **Framework**: Flask
+- **Database**: MongoDB
+- **ORM**: SQLAlchemy
+- **Authentication**: JWT
+- **AI/ML**: Ollama
+- **Testing**: Pytest
+- **Documentation**: OpenAPI
 
 ## API Architecture
 
 ### Controllers Directory
-- `authController.js` - Authentication and authorization
-- `userController.js` - User management operations
-- `feedbackController.js` - 360-degree feedback operations
-- `learningController.js` - Learning plan management
-- `analyticsController.js` - Analytics and reporting
-- `adminController.js` - Administrative functions
+- `auth_controller.py` - Authentication and authorization
+- `user_controller.py` - User management operations
+- `feedback_controller.py` - 360-degree feedback operations
+- `learning_controller.py` - Learning plan management
+- `analytics_controller.py` - Analytics and reporting
+- `admin_controller.py` - Administrative functions
 
 ### Models Directory
-- `User.js` - User data model
-- `FeedbackForm.js` - Feedback form structure
-- `FeedbackResponse.js` - Individual feedback responses
-- `LearningPlan.js` - AI-generated learning plans
-- `Competency.js` - Skills and competency definitions
-- `Organization.js` - Organization/company data
+- `user.py` - User data model
+- `feedback_form.py` - Feedback form structure
+- `feedback_response.py` - Individual feedback responses
+- `learning_plan.py` - AI-generated learning plans
+- `competency.py` - Skills and competency definitions
+- `organization.py` - Organization/company data
 
 ### Services Directory
-- `authService.js` - Authentication logic
-- `feedbackService.js` - Feedback processing
-- `aiService.js` - AI/ML integration
-- `emailService.js` - Email notifications
-- `reportService.js` - Report generation
-- `integrationService.js` - External API integrations
+- `auth_service.py` - Authentication logic
+- `feedback_service.py` - Feedback processing
+- `ai_service.py` - AI/ML integration with Ollama
+- `email_service.py` - Email notifications
+- `report_service.py` - Report generation
+- `integration_service.py` - External API integrations
 
 ## API Endpoints
 
@@ -157,13 +157,14 @@ POST   /api/analytics/export        # Export data
 ## Environment Variables
 
 ```
-NODE_ENV=development
-PORT=3001
-DATABASE_URL=postgresql://user:password@localhost:5432/360planner
+FLASK_ENV=development
+FLASK_APP=app.py
+PORT=5000
+MONGODB_URI=mongodb://localhost:27017/360planner
 JWT_SECRET=your-jwt-secret
 JWT_EXPIRES_IN=7d
 EMAIL_SERVICE_API_KEY=your-email-api-key
-AI_SERVICE_API_KEY=your-ai-service-key
+OLLAMA_API_URL=http://localhost:11434
 REDIS_URL=redis://localhost:6379
 ```
 
@@ -210,9 +211,11 @@ REDIS_URL=redis://localhost:6379
 
 ## Getting Started
 
-1. Install dependencies: `npm install`
-2. Set up environment variables
-3. Run database migrations: `npm run migrate`
-4. Seed initial data: `npm run seed`
-5. Start development server: `npm run dev`
-6. Run tests: `npm test`
+1. Create virtual environment: `python -m venv venv`
+2. Activate virtual environment: `source venv/bin/activate` (Linux/Mac) or `venv\Scripts\activate` (Windows)
+3. Install dependencies: `pip install -r requirements.txt`
+4. Set up environment variables
+5. Initialize database: `python manage.py init_db`
+6. Seed initial data: `python manage.py seed_data`
+7. Start development server: `python app.py` or `flask run`
+8. Run tests: `pytest`

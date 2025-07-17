@@ -76,11 +76,20 @@ export const AuthProvider = ({ children }) => {
     return { success: true };
   };
 
+  const updateProfile = async (profileData) => {
+    // Mock profile update - replace with actual API call
+    const updatedUser = { ...user, ...profileData };
+    setUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    return { success: true };
+  };
+
   const value = {
     user,
     login,
     logout,
     register,
+    updateProfile,
     loading,
     isAuthenticated: !!user,
     isAssessee: user?.role === 'assessee',

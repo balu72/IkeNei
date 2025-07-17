@@ -8,6 +8,7 @@ import CoachHome from './pages/CoachHome';
 import AdminHome from './pages/AdminHome';
 import Survey from './pages/Survey';
 import LearningPlans from './pages/LearningPlans';
+import ProfileUpdate from './pages/ProfileUpdate';
 import './App.css';
 
 // Protected Route Component
@@ -79,9 +80,8 @@ const AppRoutes = () => {
         
         {/* Assessee Routes */}
         <Route path="my-surveys" element={<Survey />} />
-        <Route path="my-learning-plans" element={<LearningPlans />} />
-        <Route path="my-progress" element={<div>My Progress Page (Coming Soon)</div>} />
-        <Route path="profile" element={<div>Profile Page (Coming Soon)</div>} />
+        <Route path="my-learning-progress" element={<LearningPlans />} />
+        <Route path="profile" element={<ProfileUpdate />} />
         
         {/* Coach Routes */}
         <Route path="assessees" element={<div>Assessees Management (Coming Soon)</div>} />

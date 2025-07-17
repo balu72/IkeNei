@@ -1,11 +1,19 @@
+import { useNavigate } from 'react-router-dom';
+
 const AssesseeHome = () => {
+  const navigate = useNavigate();
+
+  const handleUpdateProfile = () => {
+    navigate('/profile');
+  };
+
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
       {/* Welcome Section */}
       <div style={{ marginBottom: '2rem' }}>
-        <h1 className="page-title">Welcome to Your Development Journey</h1>
+        <h1 className="page-title">Welcome to Your Learning Journey</h1>
         <p className="page-description">
-          Track your 360° feedback, explore AI-powered learning recommendations, and monitor your professional growth.
+          Get feedback from peers and teachers, explore AI-powered learning recommendations, and track your academic growth.
         </p>
       </div>
 
@@ -141,12 +149,16 @@ const AssesseeHome = () => {
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <button className="btn-primary" style={{ width: '100%', textAlign: 'left' }}>
-              🚀 Start New 360° Survey
+              🚀 Start New Feedback Survey
             </button>
             <button className="btn-secondary" style={{ width: '100%', textAlign: 'left' }}>
               📈 View Progress Report
             </button>
-            <button className="btn-secondary" style={{ width: '100%', textAlign: 'left' }}>
+            <button 
+              className="btn-secondary" 
+              style={{ width: '100%', textAlign: 'left' }}
+              onClick={handleUpdateProfile}
+            >
               ⚙️ Update Profile
             </button>
           </div>

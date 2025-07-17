@@ -21,8 +21,7 @@ const Sidebar = () => {
       return [
         { name: 'Home', href: '/', icon: HomeIcon },
         { name: 'My Surveys', href: '/my-surveys', icon: ClipboardDocumentListIcon },
-        { name: 'My Learning Plans', href: '/my-learning-plans', icon: AcademicCapIcon },
-        { name: 'My Progress', href: '/my-progress', icon: ChartBarIcon },
+        { name: 'My Learning Progress', href: '/my-learning-progress', icon: AcademicCapIcon },
         { name: 'Profile', href: '/profile', icon: UserIcon },
       ];
     }

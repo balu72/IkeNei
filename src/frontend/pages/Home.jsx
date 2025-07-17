@@ -4,7 +4,7 @@ const Home = () => {
       <div className="home-content">
         {/* Main Title */}
         <h1 className="home-title">
-          360 + AI Planner
+          IkiNei.ai
         </h1>
         
         {/* Subtitle */}

@@ -16,16 +16,16 @@ export const AuthProvider = ({ children }) => {
 
   // Mock user data for development - replace with actual API calls later
   const mockUsers = {
-    'assessee@example.com': {
+    'respondant@example.com': {
       id: '1',
-      email: 'assessee@example.com',
+      email: 'respondant@example.com',
       name: 'John Doe',
       role: 'assessee',
       avatar: 'JD'
     },
-    'coach@example.com': {
+    'mentor@example.com': {
       id: '2',
-      email: 'coach@example.com',
+      email: 'mentor@example.com',
       name: 'Sarah Wilson',
       role: 'coach',
       avatar: 'SW'

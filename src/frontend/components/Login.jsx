@@ -22,8 +22,8 @@ const Login = () => {
 
   const demoLogin = (role) => {
     const demoCredentials = {
-      assessee: 'assessee@example.com',
-      coach: 'coach@example.com',
+      respondant: 'respondant@example.com',
+      mentor: 'mentor@example.com',
       admin: 'admin@example.com'
     };
     setEmail(demoCredentials[role]);
@@ -57,7 +57,7 @@ const Login = () => {
             backgroundClip: 'text',
             marginBottom: '0.5rem'
           }}>
-            360+AI Planner
+            IkiNei.ai
           </h1>
           <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>
             Sign in to your account
@@ -72,7 +72,7 @@ const Login = () => {
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
             <button
               type="button"
-              onClick={() => demoLogin('assessee')}
+              onClick={() => demoLogin('respondant')}
               style={{
                 flex: 1,
                 padding: '0.5rem',
@@ -83,11 +83,11 @@ const Login = () => {
                 cursor: 'pointer'
               }}
             >
-              Assessee
+              Respondent
             </button>
             <button
               type="button"
-              onClick={() => demoLogin('coach')}
+              onClick={() => demoLogin('mentor')}
               style={{
                 flex: 1,
                 padding: '0.5rem',
@@ -98,7 +98,7 @@ const Login = () => {
                 cursor: 'pointer'
               }}
             >
-              Coach
+              Mentor
             </button>
             <button
               type="button"

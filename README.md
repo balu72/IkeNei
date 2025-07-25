@@ -89,7 +89,7 @@ IkeNei is an innovative tool that combines traditional 360-degree feedback metho
 ## 📁 Project Structure
 
 ```
-360+AI-Planner/
+IkeNei/
 ├── README.md                    # This file
 ├── .gitignore                   # Git ignore rules
 └── src/

@@ -1,10 +1,10 @@
-pwd# 360+AI Planner
+pwd# IkeNei
 
 A comprehensive 360-degree feedback and AI-powered personalized learning platform that helps individuals and organizations drive professional development through data-driven insights.
 
 ## 🚀 Overview
 
-360+AI Planner is an innovative tool that combines traditional 360-degree feedback methodologies with cutting-edge artificial intelligence to deliver personalized learning experiences. The platform enables users to gather comprehensive feedback from peers, supervisors, and subordinates, then leverages AI to create tailored development plans that accelerate professional growth.
+IkeNei is an innovative tool that combines traditional 360-degree feedback methodologies with cutting-edge artificial intelligence to deliver personalized learning experiences. The platform enables users to gather comprehensive feedback from peers, supervisors, and subordinates, then leverages AI to create tailored development plans that accelerate professional growth.
 
 ## ✨ Key Features
 
@@ -193,7 +193,7 @@ The frontend includes demo credentials for testing:
 
 ## 🏗️ Architecture Overview
 
-The 360+AI Planner follows a layered architecture pattern:
+The IkeNei follows a layered architecture pattern:
 
 1. **Presentation Layer** (`frontend/`) - User interface and user experience
 2. **Business Logic Layer** (`backend/`) - API endpoints, business rules, and data processing
@@ -258,4 +258,4 @@ For information about contributing to this project or partnership opportunities,
 
 **Transform your professional development with data-driven insights and AI-powered learning plans.**
 
-*360+AI Planner - Where feedback meets intelligence for accelerated growth.*
+*IkeNei - Where feedback meets intelligence for accelerated growth.*

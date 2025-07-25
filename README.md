@@ -137,8 +137,8 @@ IkeNei is an innovative tool that combines traditional 360-degree feedback metho
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/balu72/360-Plus-AI-Planner.git
-   cd 360+AI-Planner
+   git clon https://github.com/balu72/IkeNei.git
+   cd IkeNei
    ```
 
 2. **Frontend Setup**

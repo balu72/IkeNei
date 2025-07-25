@@ -1,4 +1,4 @@
-pwd# IkeNei
+### IkeNei
 
 A comprehensive 360-degree feedback and AI-powered personalized learning platform that helps individuals and organizations drive professional development through data-driven insights.
 

@@ -1,6 +1,6 @@
-# Backend Layer - 360+AI Planner
+# Backend Layer - IkeNei
 
-This directory contains the backend API server for the 360+AI Planner, handling business logic, data processing, and AI-powered learning plan generation.
+This directory contains the backend API server for the IkeNei, handling business logic, data processing, and AI-powered learning plan generation.
 
 ## Directory Structure
 

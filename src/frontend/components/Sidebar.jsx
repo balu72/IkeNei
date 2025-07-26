@@ -74,7 +74,7 @@ const Sidebar = () => {
     <div className="sidebar">
       {/* Logo/Brand */}
       <div className="sidebar-header">
-        <h1 className="sidebar-title">360+AI Planner</h1>
+        <h1 className="sidebar-title">IkeNei</h1>
       </div>
 
       {/* User Role Badge */}

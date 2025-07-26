@@ -1,6 +1,6 @@
-# Database Layer - 360+AI Planner
+# Database Layer - IkeNei
 
-This directory contains all database-related files including schemas, migrations, seeds, and queries for the 360+AI Planner application.
+This directory contains all database-related files including schemas, migrations, seeds, and queries for the IkeNei application.
 
 ## Directory Structure
 

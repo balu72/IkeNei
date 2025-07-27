@@ -5,7 +5,7 @@ const AdminHome = () => {
       <div style={{ marginBottom: '2rem' }}>
         <h1 className="page-title">System Administration</h1>
         <p className="page-description">
-          Manage users, configure system settings, and monitor platform-wide analytics for IkeNei.
+          Manage global users, configure system-wide settings, and monitor platform-wide analytics for IkeNei.
         </p>
       </div>
 

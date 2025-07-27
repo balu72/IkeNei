@@ -22,9 +22,9 @@ const Login = () => {
 
   const demoLogin = (role) => {
     const demoCredentials = {
-      respondant: 'respondant@example.com',
-      mentor: 'mentor@example.com',
-      admin: 'admin@example.com'
+      account: 'account@example.com',
+      domainadmin: 'domainadmin@example.com',
+      systemadmin: 'systemadmin@example.com'
     };
     setEmail(demoCredentials[role]);
     setPassword('password');
@@ -72,7 +72,7 @@ const Login = () => {
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
             <button
               type="button"
-              onClick={() => demoLogin('respondant')}
+              onClick={() => demoLogin('account')}
               style={{
                 flex: 1,
                 padding: '0.5rem',
@@ -83,11 +83,11 @@ const Login = () => {
                 cursor: 'pointer'
               }}
             >
-              Respondent
+              Account
             </button>
             <button
               type="button"
-              onClick={() => demoLogin('mentor')}
+              onClick={() => demoLogin('domainadmin')}
               style={{
                 flex: 1,
                 padding: '0.5rem',
@@ -98,11 +98,11 @@ const Login = () => {
                 cursor: 'pointer'
               }}
             >
-              Mentor
+              Domain Admin
             </button>
             <button
               type="button"
-              onClick={() => demoLogin('admin')}
+              onClick={() => demoLogin('systemadmin')}
               style={{
                 flex: 1,
                 padding: '0.5rem',
@@ -113,7 +113,7 @@ const Login = () => {
                 cursor: 'pointer'
               }}
             >
-              Admin
+              System Admin
             </button>
           </div>
         </div>

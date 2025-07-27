@@ -1,11 +1,11 @@
-const CoachHome = () => {
+const DomainAdminHome = () => {
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
       {/* Welcome Section */}
       <div style={{ marginBottom: '2rem' }}>
-        <h1 className="page-title">Coach Dashboard</h1>
+        <h1 className="page-title">Domain Admin Dashboard</h1>
         <p className="page-description">
-          Guide your assessees through their development journey with AI-powered insights and coaching tools.
+          Create and manage surveys/questionnaires, oversee domain users, and analyze feedback data.
         </p>
       </div>
 
@@ -26,10 +26,10 @@ const CoachHome = () => {
             8
           </div>
           <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '0.25rem' }}>
-            Active Assessees
+            Domain Users
           </h3>
           <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-            Under your guidance
+            In your domain
           </p>
         </div>
 
@@ -73,7 +73,7 @@ const CoachHome = () => {
         {/* Recent Assessee Activity */}
         <div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem' }}>
-            Recent Assessee Activity
+            Recent User Activity
           </h2>
           
           <div className="card" style={{ marginBottom: '1rem' }}>
@@ -209,33 +209,33 @@ const CoachHome = () => {
         {/* Coaching Tools Sidebar */}
         <div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem' }}>
-            Coaching Tools
+            Admin Tools
           </h2>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '2rem' }}>
             <button className="btn-primary" style={{ width: '100%', textAlign: 'left' }}>
-              👥 Manage Assessees
+              👥 Manage Users
             </button>
             <button className="btn-secondary" style={{ width: '100%', textAlign: 'left' }}>
-              📊 Create Survey
+              📊 Create Survey/Questionnaire
             </button>
             <button className="btn-secondary" style={{ width: '100%', textAlign: 'left' }}>
               📈 View Reports
             </button>
             <button className="btn-secondary" style={{ width: '100%', textAlign: 'left' }}>
-              💬 Coaching Notes
+              📋 Domain Reports
             </button>
           </div>
 
           {/* AI Insights */}
           <div>
             <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem' }}>
-              AI Coaching Insights
+              Domain Analytics
             </h3>
             <div className="card" style={{ padding: '1rem' }}>
               <div style={{ marginBottom: '1rem' }}>
                 <h4 style={{ fontSize: '0.875rem', fontWeight: '600', marginBottom: '0.5rem' }}>
-                  🎯 Focus Areas This Week
+                  🎯 Domain Focus Areas
                 </h4>
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.875rem' }}>
                   <li style={{ marginBottom: '0.5rem', color: '#6b7280' }}>
@@ -294,4 +294,4 @@ const CoachHome = () => {
   );
 };
 
-export default CoachHome;
+export default DomainAdminHome;

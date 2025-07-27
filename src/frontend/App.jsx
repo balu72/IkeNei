@@ -3,12 +3,9 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Layout from './components/Layout';
 import Login from './components/Login';
 import Home from './pages/Home';
-import AssesseeHome from './pages/AssesseeHome';
-import CoachHome from './pages/CoachHome';
+import { AccountHome, ProfileUpdate, Survey, RunSurvey } from './pages/account_management_pages';
+import DomainAdminHome from './pages/DomainAdminHome';
 import AdminHome from './pages/AdminHome';
-import Survey from './pages/Survey';
-import LearningPlans from './pages/LearningPlans';
-import ProfileUpdate from './pages/ProfileUpdate';
 import './App.css';
 
 // Protected Route Component
@@ -45,11 +42,11 @@ const ProtectedRoute = ({ children }) => {
 
 // Role-based Home Component
 const RoleBasedHome = () => {
-  const { isAssessee, isCoach, isAdmin } = useAuth();
+  const { isAccount, isDomainAdmin, isSystemAdmin } = useAuth();
   
-  if (isAssessee) return <AssesseeHome />;
-  if (isCoach) return <CoachHome />;
-  if (isAdmin) return <AdminHome />;
+  if (isAccount) return <AccountHome />;
+  if (isDomainAdmin) return <DomainAdminHome />;
+  if (isSystemAdmin) return <AdminHome />;
   
   // Fallback to generic home
   return <Home />;
@@ -76,20 +73,16 @@ const AppRoutes = () => {
         
         {/* Legacy routes for backward compatibility */}
         <Route path="survey" element={<Survey />} />
-        <Route path="learning-plans" element={<LearningPlans />} />
         
-        {/* Assessee Routes */}
-        <Route path="my-surveys" element={<Survey />} />
-        <Route path="my-learning-progress" element={<LearningPlans />} />
+        {/* Account Routes */}
         <Route path="profile" element={<ProfileUpdate />} />
+        <Route path="run-survey" element={<RunSurvey />} />
         
-        {/* Coach Routes */}
-        <Route path="assessees" element={<div>Assessees Management (Coming Soon)</div>} />
-        <Route path="survey-management" element={<div>Survey Management (Coming Soon)</div>} />
-        <Route path="coaching-tools" element={<div>Coaching Tools (Coming Soon)</div>} />
+        {/* Domain Admin Routes */}
+        <Route path="create-survey" element={<div>Create Survey/Questionnaire (Coming Soon)</div>} />
         <Route path="reports" element={<div>Reports (Coming Soon)</div>} />
         
-        {/* Admin Routes */}
+        {/* System Admin Routes */}
         <Route path="user-management" element={<div>User Management (Coming Soon)</div>} />
         <Route path="system-settings" element={<div>System Settings (Coming Soon)</div>} />
         <Route path="analytics" element={<div>Analytics (Coming Soon)</div>} />

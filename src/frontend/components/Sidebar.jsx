@@ -13,30 +13,27 @@ import {
 } from '@heroicons/react/24/outline';
 
 const Sidebar = () => {
-  const { user, logout, isAssessee, isCoach, isAdmin } = useAuth();
+  const { user, logout, isAccount, isDomainAdmin, isSystemAdmin } = useAuth();
 
   // Role-based navigation
   const getNavigation = () => {
-    if (isAssessee) {
+    if (isAccount) {
       return [
         { name: 'Home', href: '/', icon: HomeIcon },
-        { name: 'My Surveys', href: '/my-surveys', icon: ClipboardDocumentListIcon },
-        { name: 'My Learning Progress', href: '/my-learning-progress', icon: AcademicCapIcon },
         { name: 'Profile', href: '/profile', icon: UserIcon },
       ];
     }
     
-    if (isCoach) {
+    if (isDomainAdmin) {
       return [
         { name: 'Home', href: '/', icon: HomeIcon },
-        { name: 'Assessees', href: '/assessees', icon: UserGroupIcon },
-        { name: 'Survey Management', href: '/survey-management', icon: ClipboardDocumentListIcon },
-        { name: 'Coaching Tools', href: '/coaching-tools', icon: AcademicCapIcon },
+        { name: 'Create Survey/Questionnaire', href: '/create-survey', icon: ClipboardDocumentListIcon },
+        { name: 'User Management', href: '/user-management', icon: UserGroupIcon },
         { name: 'Reports', href: '/reports', icon: ChartBarIcon },
       ];
     }
     
-    if (isAdmin) {
+    if (isSystemAdmin) {
       return [
         { name: 'Home', href: '/', icon: HomeIcon },
         { name: 'User Management', href: '/user-management', icon: UserGroupIcon },
@@ -57,16 +54,16 @@ const Sidebar = () => {
   const navigation = getNavigation();
 
   const getRoleDisplayName = () => {
-    if (isAssessee) return 'Assessee';
-    if (isCoach) return 'Coach';
-    if (isAdmin) return 'Administrator';
+    if (isAccount) return 'Account';
+    if (isDomainAdmin) return 'Domain Admin';
+    if (isSystemAdmin) return 'System Admin';
     return 'User';
   };
 
   const getRoleColor = () => {
-    if (isAssessee) return '#10b981'; // Green
-    if (isCoach) return '#3b82f6';   // Blue
-    if (isAdmin) return '#ef4444';   // Red
+    if (isAccount) return '#10b981'; // Green
+    if (isDomainAdmin) return '#3b82f6';   // Blue
+    if (isSystemAdmin) return '#ef4444';   // Red
     return '#6b7280';                // Gray
   };
 

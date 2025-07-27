@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 const ProfileUpdate = () => {
@@ -11,13 +11,13 @@ const ProfileUpdate = () => {
     name: '',
     email: '',
     phone: '',
-    grade: '',
-    schoolName: '',
-    studentId: '',
-    dateOfBirth: '',
-    parentContact: '',
-    interests: '',
-    academicGoals: ''
+    address: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    country: '',
+    accountType: '',
+    department: ''
   });
 
   useEffect(() => {
@@ -26,13 +26,13 @@ const ProfileUpdate = () => {
         name: user.name || '',
         email: user.email || '',
         phone: user.phone || '',
-        grade: user.grade || '',
-        schoolName: user.schoolName || '',
-        studentId: user.studentId || '',
-        dateOfBirth: user.dateOfBirth || '',
-        parentContact: user.parentContact || '',
-        interests: user.interests || '',
-        academicGoals: user.academicGoals || ''
+        address: user.address || '',
+        city: user.city || '',
+        state: user.state || '',
+        zipCode: user.zipCode || '',
+        country: user.country || '',
+        accountType: user.accountType || '',
+        department: user.department || ''
       });
     }
   }, [user]);
@@ -48,22 +48,11 @@ const ProfileUpdate = () => {
   const validateForm = () => {
     const errors = [];
     
-    if (!formData.name.trim()) errors.push('Full name is required');
-    if (formData.name.trim().length < 2) errors.push('Name must be at least 2 characters');
-    if (!formData.grade) errors.push('Grade/Year is required');
-    if (!formData.schoolName.trim()) errors.push('School name is required');
-    if (!formData.dateOfBirth) errors.push('Date of birth is required');
-    if (!formData.parentContact.trim()) errors.push('Parent/Guardian contact is required');
-    
-    // Validate date of birth (should be reasonable for high school)
-    if (formData.dateOfBirth) {
-      const birthDate = new Date(formData.dateOfBirth);
-      const today = new Date();
-      const age = today.getFullYear() - birthDate.getFullYear();
-      if (age < 13 || age > 20) {
-        errors.push('Please enter a valid date of birth for a high school student');
-      }
-    }
+    if (!formData.name.trim()) errors.push('Account name is required');
+    if (formData.name.trim().length < 2) errors.push('Account name must be at least 2 characters');
+    if (!formData.address.trim()) errors.push('Address is required');
+    if (!formData.city.trim()) errors.push('City is required');
+    if (!formData.country.trim()) errors.push('Country is required');
     
     // Validate phone format if provided
     if (formData.phone && !/^\+?[\d\s\-\(\)]+$/.test(formData.phone)) {
@@ -127,25 +116,25 @@ const ProfileUpdate = () => {
         >
           ← Back to Dashboard
         </button>
-        <h1 className="page-title">Update Your Profile</h1>
+        <h1 className="page-title">Update Account Profile</h1>
         <p className="page-description">
-          Keep your information up to date to get the best feedback and learning recommendations.
+          Keep your account information up to date for better survey management and communication.
         </p>
       </div>
 
       {/* Profile Form */}
       <div className="card">
         <form onSubmit={handleSubmit} style={{ padding: '2rem' }}>
-          {/* Personal Information Section */}
+          {/* Account Information Section */}
           <div style={{ marginBottom: '2rem' }}>
             <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem', color: '#374151' }}>
-              Personal Information
+              Account Information
             </h2>
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
-                  Full Name *
+                  Account Name *
                 </label>
                 <input
                   type="text"
@@ -160,7 +149,7 @@ const ProfileUpdate = () => {
                     borderRadius: '0.375rem',
                     fontSize: '0.875rem'
                   }}
-                  placeholder="Enter your full name"
+                  placeholder="Enter your account name"
                 />
               </div>
               
@@ -186,16 +175,65 @@ const ProfileUpdate = () => {
               </div>
             </div>
 
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '0.375rem',
+                  fontSize: '0.875rem'
+                }}
+                placeholder="(+91)-999-999-9999."
+              />
+            </div>
+          </div>
+
+          {/* Official Address Section */}
+          <div style={{ marginBottom: '2rem' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem', color: '#374151' }}>
+              Official Address
+            </h2>
+            
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+                Street Address *
+              </label>
+              <input
+                type="text"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                required
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '0.375rem',
+                  fontSize: '0.875rem'
+                }}
+                placeholder="Enter your street address"
+              />
+            </div>
+
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
-                  Phone Number
+                  City *
                 </label>
                 <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
+                  type="text"
+                  name="city"
+                  value={formData.city}
                   onChange={handleChange}
+                  required
                   style={{
                     width: '100%',
                     padding: '0.75rem',
@@ -203,18 +241,60 @@ const ProfileUpdate = () => {
                     borderRadius: '0.375rem',
                     fontSize: '0.875rem'
                   }}
-                  placeholder="Your phone number (optional)"
+                  placeholder="Enter your city"
                 />
               </div>
               
               <div>
                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
-                  Date of Birth *
+                  State/Province
                 </label>
                 <input
-                  type="date"
-                  name="dateOfBirth"
-                  value={formData.dateOfBirth}
+                  type="text"
+                  name="state"
+                  value={formData.state}
+                  onChange={handleChange}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '0.375rem',
+                    fontSize: '0.875rem'
+                  }}
+                  placeholder="Enter your state/province"
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+                  ZIP/Postal Code
+                </label>
+                <input
+                  type="text"
+                  name="zipCode"
+                  value={formData.zipCode}
+                  onChange={handleChange}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '0.375rem',
+                    fontSize: '0.875rem'
+                  }}
+                  placeholder="Enter ZIP/postal code"
+                />
+              </div>
+              
+              <div>
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+                  Country *
+                </label>
+                <input
+                  type="text"
+                  name="country"
+                  value={formData.country}
                   onChange={handleChange}
                   required
                   style={{
@@ -224,27 +304,27 @@ const ProfileUpdate = () => {
                     borderRadius: '0.375rem',
                     fontSize: '0.875rem'
                   }}
+                  placeholder="Enter your country"
                 />
               </div>
             </div>
           </div>
 
-          {/* School Information Section */}
+          {/* Account Details Section */}
           <div style={{ marginBottom: '2rem' }}>
             <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem', color: '#374151' }}>
-              School Information
+              Account Details
             </h2>
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
-                  Grade/Year *
+                  Account Type
                 </label>
                 <select
-                  name="grade"
-                  value={formData.grade}
+                  name="accountType"
+                  value={formData.accountType}
                   onChange={handleChange}
-                  required
                   style={{
                     width: '100%',
                     padding: '0.75rem',
@@ -253,22 +333,22 @@ const ProfileUpdate = () => {
                     fontSize: '0.875rem'
                   }}
                 >
-                  <option value="">Select your grade</option>
-                  <option value="9th">9th Grade</option>
-                  <option value="10th">10th Grade</option>
-                  <option value="11th">11th Grade</option>
-                  <option value="12th">12th Grade</option>
+                  <option value="">Select account type</option>
+                  <option value="individual">Individual</option>
+                  <option value="business">Business</option>
+                  <option value="organization">Organization</option>
+                  <option value="educational">Educational</option>
                 </select>
               </div>
               
               <div>
                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
-                  Student ID
+                  Department
                 </label>
                 <input
                   type="text"
-                  name="studentId"
-                  value={formData.studentId}
+                  name="department"
+                  value={formData.department}
                   onChange={handleChange}
                   style={{
                     width: '100%',
@@ -277,108 +357,9 @@ const ProfileUpdate = () => {
                     borderRadius: '0.375rem',
                     fontSize: '0.875rem'
                   }}
-                  placeholder="Your student ID (optional)"
+                  placeholder="Enter your department (optional)"
                 />
               </div>
-            </div>
-
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
-                School Name *
-              </label>
-              <input
-                type="text"
-                name="schoolName"
-                value={formData.schoolName}
-                onChange={handleChange}
-                required
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '0.375rem',
-                  fontSize: '0.875rem'
-                }}
-                placeholder="Enter your school name"
-              />
-            </div>
-
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
-                Parent/Guardian Contact *
-              </label>
-              <input
-                type="text"
-                name="parentContact"
-                value={formData.parentContact}
-                onChange={handleChange}
-                required
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '0.375rem',
-                  fontSize: '0.875rem'
-                }}
-                placeholder="Parent/Guardian name and phone number"
-              />
-            </div>
-          </div>
-
-          {/* Additional Information Section */}
-          <div style={{ marginBottom: '2rem' }}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem', color: '#374151' }}>
-              About You
-            </h2>
-            
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
-                Interests & Hobbies
-              </label>
-              <textarea
-                name="interests"
-                value={formData.interests}
-                onChange={handleChange}
-                rows={3}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '0.375rem',
-                  fontSize: '0.875rem',
-                  resize: 'vertical'
-                }}
-                placeholder="Tell us about your interests, hobbies, and activities you enjoy..."
-                maxLength={500}
-              />
-              <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.25rem' }}>
-                {formData.interests.length}/500 characters
-              </p>
-            </div>
-
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
-                Academic Goals
-              </label>
-              <textarea
-                name="academicGoals"
-                value={formData.academicGoals}
-                onChange={handleChange}
-                rows={3}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '0.375rem',
-                  fontSize: '0.875rem',
-                  resize: 'vertical'
-                }}
-                placeholder="What are your academic goals and future aspirations?"
-                maxLength={500}
-              />
-              <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.25rem' }}>
-                {formData.academicGoals.length}/500 characters
-              </p>
             </div>
           </div>
 

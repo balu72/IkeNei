@@ -16,25 +16,25 @@ export const AuthProvider = ({ children }) => {
 
   // Mock user data for development - replace with actual API calls later
   const mockUsers = {
-    'respondant@example.com': {
+    'account@example.com': {
       id: '1',
-      email: 'respondant@example.com',
+      email: 'account@example.com',
       name: 'John Doe',
-      role: 'assessee',
+      role: 'account',
       avatar: 'JD'
     },
-    'mentor@example.com': {
+    'domainadmin@example.com': {
       id: '2',
-      email: 'mentor@example.com',
+      email: 'domainadmin@example.com',
       name: 'Sarah Wilson',
-      role: 'coach',
+      role: 'domain_admin',
       avatar: 'SW'
     },
-    'admin@example.com': {
+    'systemadmin@example.com': {
       id: '3',
-      email: 'admin@example.com',
+      email: 'systemadmin@example.com',
       name: 'Mike Johnson',
-      role: 'admin',
+      role: 'system_admin',
       avatar: 'MJ'
     }
   };
@@ -92,9 +92,9 @@ export const AuthProvider = ({ children }) => {
     updateProfile,
     loading,
     isAuthenticated: !!user,
-    isAssessee: user?.role === 'assessee',
-    isCoach: user?.role === 'coach',
-    isAdmin: user?.role === 'admin'
+    isAccount: user?.role === 'account',
+    isDomainAdmin: user?.role === 'domain_admin',
+    isSystemAdmin: user?.role === 'system_admin'
   };
 
   return (

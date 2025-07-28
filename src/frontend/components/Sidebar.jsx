@@ -27,9 +27,10 @@ const Sidebar = () => {
     if (isDomainAdmin) {
       return [
         { name: 'Home', href: '/', icon: HomeIcon },
-        { name: 'Surveys', href: '/create-survey', icon: ClipboardDocumentListIcon },
+        { name: 'Surveys', href: '/domain-surveys', icon: ClipboardDocumentListIcon },
+        { name: 'Traits/Competencies', href: '/domain-traits', icon: AcademicCapIcon },
         { name: 'Accounts', href: '/user-management', icon: UserGroupIcon },
-        { name: 'Reports', href: '/reports', icon: ChartBarIcon },
+        { name: 'Reports', href: '/domain-reports', icon: ChartBarIcon },
       ];
     }
     

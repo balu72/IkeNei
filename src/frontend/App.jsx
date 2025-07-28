@@ -4,7 +4,7 @@ import Layout from './components/Layout';
 import Login from './components/Login';
 import Home from './pages/Home';
 import { AccountHome, ProfileUpdate, Survey, RunSurvey } from './pages/account_management_pages';
-import { DomainAdminHome, CreateSurvey, CreateTrait, DefineReport } from './pages/domain_admin_pages';
+import { DomainAdminHome, CreateSurvey, CreateTrait, DefineReport, DomainSurveys, DomainTraits, DomainReports } from './pages/domain_admin_pages';
 import { SysAdminHome, CreateAccount, Accounts, Surveys, Settings } from './pages/sys_admin_pages';
 import './App.css';
 
@@ -83,6 +83,9 @@ const AppRoutes = () => {
         <Route path="create-trait" element={<CreateTrait />} />
         <Route path="create-account" element={<CreateAccount />} />
         <Route path="reports" element={<DefineReport />} />
+        <Route path="domain-surveys" element={<DomainSurveys />} />
+        <Route path="domain-traits" element={<DomainTraits />} />
+        <Route path="domain-reports" element={<DomainReports />} />
         
         {/* System Admin Routes */}
         <Route path="user-management" element={<Accounts />} />

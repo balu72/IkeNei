@@ -326,7 +326,7 @@ const CreateSurvey = () => {
               type="submit"
               className="btn-primary"
             >
-              Create Survey
+              Submit
             </button>
           </div>
         </form>

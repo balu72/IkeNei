@@ -241,7 +241,7 @@ const CreateTrait = () => {
                       fontSize: '0.875rem'
                     }}
                   >
-                    <option value="">Select difficulty level</option>
+                    <option value="">Select competency level</option>
                     {levels.map((level) => (
                       <option key={level} value={level}>
                         {level.charAt(0).toUpperCase() + level.slice(1)}

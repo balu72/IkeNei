@@ -17,11 +17,6 @@ const DomainAdminHome = () => {
     navigate('/create-trait');
   };
 
-  const handleOpenAccount = () => {
-    console.log('Open New Account clicked');
-    // Navigate to account creation page
-    navigate('/create-account');
-  };
 
   const handleDefineReport = () => {
     console.log('Define New Report clicked');
@@ -147,19 +142,6 @@ const DomainAdminHome = () => {
           }}
         >
           Add New Trait
-        </button>
-        <button 
-          className="btn-primary" 
-          onClick={handleOpenAccount}
-          style={{ 
-            width: '100%', 
-            textAlign: 'center',
-            padding: '1rem',
-            fontSize: '0.875rem',
-            fontWeight: '600'
-          }}
-        >
-          Open New Account
         </button>
         <button 
           className="btn-primary" 

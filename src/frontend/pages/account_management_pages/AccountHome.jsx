@@ -2,13 +2,11 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import CreateSubjectModal from '../../components/CreateSubjectModal';
 import CreateRespondantModal from '../../components/CreateRespondantModal';
-import CreateSurveyModal from '../../components/CreateSurveyModal';
 
 const AccountHome = () => {
   const navigate = useNavigate();
   const [showSubjectModal, setShowSubjectModal] = useState(false);
   const [showRespondantModal, setShowRespondantModal] = useState(false);
-  const [showSurveyModal, setShowSurveyModal] = useState(false);
 
   const handleUpdateProfile = () => {
     navigate('/profile');
@@ -22,9 +20,6 @@ const AccountHome = () => {
     setShowRespondantModal(true);
   };
 
-  const handleCreateSurvey = () => {
-    setShowSurveyModal(true);
-  };
 
   const handleRunSurvey = () => {
     navigate('/run-survey');
@@ -42,11 +37,6 @@ const AccountHome = () => {
     setShowRespondantModal(false);
   };
 
-  const handleSurveySubmit = (data) => {
-    console.log('Survey data:', data);
-    alert('Survey created successfully!');
-    setShowSurveyModal(false);
-  };
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -149,19 +139,6 @@ const AccountHome = () => {
           }}
         >
           Create New Respondant
-        </button>
-        <button 
-          className="btn-primary" 
-          onClick={handleCreateSurvey}
-          style={{ 
-            width: '100%', 
-            textAlign: 'center',
-            padding: '1rem',
-            fontSize: '0.875rem',
-            fontWeight: '600'
-          }}
-        >
-          Create New Survey
         </button>
         <button 
           className="btn-primary" 
@@ -356,11 +333,6 @@ const AccountHome = () => {
         onSubmit={handleRespondantSubmit}
       />
 
-      <CreateSurveyModal
-        isOpen={showSurveyModal}
-        onClose={() => setShowSurveyModal(false)}
-        onSubmit={handleSurveySubmit}
-      />
     </div>
   );
 };

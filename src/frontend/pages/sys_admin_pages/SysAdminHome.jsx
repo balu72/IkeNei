@@ -1,11 +1,16 @@
-const AdminHome = () => {
+import { useNavigate } from 'react-router-dom';
+
+const SysAdminHome = () => {
+  const navigate = useNavigate();
+
+
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
       {/* Welcome Section */}
       <div style={{ marginBottom: '2rem' }}>
         <h1 className="page-title">System Administration</h1>
         <p className="page-description">
-          Manage global users, configure system-wide settings, and monitor platform-wide analytics for IkeNei.
+          Manage global accounts, configure system-wide settings, and monitor platform-wide analytics for IkeNei.
         </p>
       </div>
 
@@ -26,10 +31,10 @@ const AdminHome = () => {
             247
           </div>
           <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '0.25rem' }}>
-            Total Users
+            Total Accounts
           </h3>
           <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-            Active platform users
+            Active platform accounts
           </p>
         </div>
 
@@ -50,22 +55,6 @@ const AdminHome = () => {
           </p>
         </div>
 
-        <div className="card" style={{ textAlign: 'center', padding: '1.5rem' }}>
-          <div style={{ 
-            fontSize: '2rem', 
-            fontWeight: 'bold', 
-            color: '#10b981',
-            marginBottom: '0.5rem'
-          }}>
-            156
-          </div>
-          <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '0.25rem' }}>
-            Learning Plans
-          </h3>
-          <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-            AI-generated this month
-          </p>
-        </div>
 
         <div className="card" style={{ textAlign: 'center', padding: '1.5rem' }}>
           <div style={{ 
@@ -84,6 +73,7 @@ const AdminHome = () => {
           </p>
         </div>
       </div>
+
 
       {/* Main Content Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem' }}>
@@ -110,10 +100,10 @@ const AdminHome = () => {
                 </div>
                 <div>
                   <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '0.25rem' }}>
-                    New User Registrations
+                    New Account Registrations
                   </h3>
                   <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                    15 new users joined today • 8 Assessees, 5 Coaches, 2 Admins
+                    8 Subjects, 5 Respondants
                   </p>
                 </div>
               </div>
@@ -207,28 +197,6 @@ const AdminHome = () => {
 
         {/* Admin Tools Sidebar */}
         <div>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem' }}>
-            Admin Tools
-          </h2>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '2rem' }}>
-            <button className="btn-primary" style={{ width: '100%', textAlign: 'left' }}>
-              👥 User Management
-            </button>
-            <button className="btn-secondary" style={{ width: '100%', textAlign: 'left' }}>
-              ⚙️ System Settings
-            </button>
-            <button className="btn-secondary" style={{ width: '100%', textAlign: 'left' }}>
-              📊 Analytics Dashboard
-            </button>
-            <button className="btn-secondary" style={{ width: '100%', textAlign: 'left' }}>
-              📝 Form Templates
-            </button>
-            <button className="btn-secondary" style={{ width: '100%', textAlign: 'left' }}>
-              🔧 System Maintenance
-            </button>
-          </div>
-
           {/* System Health */}
           <div>
             <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem' }}>
@@ -327,4 +295,4 @@ const AdminHome = () => {
   );
 };
 
-export default AdminHome;
+export default SysAdminHome;

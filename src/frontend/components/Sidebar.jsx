@@ -36,10 +36,9 @@ const Sidebar = () => {
     if (isSystemAdmin) {
       return [
         { name: 'Home', href: '/', icon: HomeIcon },
-        { name: 'User Management', href: '/user-management', icon: UserGroupIcon },
-        { name: 'System Settings', href: '/system-settings', icon: Cog6ToothIcon },
-        { name: 'Analytics', href: '/analytics', icon: ChartBarIcon },
-        { name: 'Form Templates', href: '/form-templates', icon: DocumentTextIcon },
+        { name: 'Accounts', href: '/user-management', icon: UserGroupIcon },
+        { name: 'Surveys', href: '/analytics', icon: ClipboardDocumentListIcon },
+        { name: 'Settings', href: '/system-settings', icon: Cog6ToothIcon },
       ];
     }
     

@@ -7,6 +7,7 @@ const CreateRespondantModal = ({ isOpen, onClose, onSubmit }) => {
     phone: '',
     address: '',
     subjectAttachedTo: '',
+    category: '',
     otherInfo: ''
   });
 
@@ -27,6 +28,7 @@ const CreateRespondantModal = ({ isOpen, onClose, onSubmit }) => {
       phone: '',
       address: '',
       subjectAttachedTo: '',
+      category: '',
       otherInfo: ''
     });
   };
@@ -38,6 +40,7 @@ const CreateRespondantModal = ({ isOpen, onClose, onSubmit }) => {
       phone: '',
       address: '',
       subjectAttachedTo: '',
+      category: '',
       otherInfo: ''
     });
     onClose();
@@ -190,6 +193,38 @@ const CreateRespondantModal = ({ isOpen, onClose, onSubmit }) => {
               <option value="Jane Smith">Jane Smith</option>
               <option value="Robert Brown">Robert Brown</option>
               <option value="Lisa Anderson">Lisa Anderson</option>
+            </select>
+          </div>
+
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+              Category *
+            </label>
+            <select
+              name="category"
+              value={formData.category}
+              onChange={handleInputChange}
+              required
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                border: '1px solid #d1d5db',
+                borderRadius: '0.375rem',
+                fontSize: '0.875rem'
+              }}
+            >
+              <option value="">Select a category</option>
+              <option value="Peer">Peer</option>
+              <option value="Subordinate">Subordinate</option>
+              <option value="Boss">Boss</option>
+              <option value="Customer">Customer</option>
+              <option value="Previous Employer">Previous Employer</option>
+              <option value="Super Boss">Super Boss</option>
+              <option value="Parent">Parent</option>
+              <option value="Teacher">Teacher</option>
+              <option value="Counseller">Counseller</option>
+              <option value="Third Party">Third Party</option>
+              <option value="Others">Others</option>
             </select>
           </div>
 

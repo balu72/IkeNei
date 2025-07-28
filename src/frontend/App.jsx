@@ -4,8 +4,8 @@ import Layout from './components/Layout';
 import Login from './components/Login';
 import Home from './pages/Home';
 import { AccountHome, ProfileUpdate, Survey, RunSurvey } from './pages/account_management_pages';
-import { DomainAdminHome, CreateSurvey, CreateTrait, CreateAccount, DefineReport } from './pages/domain_admin_pages';
-import AdminHome from './pages/AdminHome';
+import { DomainAdminHome, CreateSurvey, CreateTrait, DefineReport } from './pages/domain_admin_pages';
+import { SysAdminHome, CreateAccount, Accounts, Surveys, Settings } from './pages/sys_admin_pages';
 import './App.css';
 
 // Protected Route Component
@@ -46,7 +46,7 @@ const RoleBasedHome = () => {
   
   if (isAccount) return <AccountHome />;
   if (isDomainAdmin) return <DomainAdminHome />;
-  if (isSystemAdmin) return <AdminHome />;
+  if (isSystemAdmin) return <SysAdminHome />;
   
   // Fallback to generic home
   return <Home />;
@@ -85,10 +85,9 @@ const AppRoutes = () => {
         <Route path="reports" element={<DefineReport />} />
         
         {/* System Admin Routes */}
-        <Route path="user-management" element={<div>User Management (Coming Soon)</div>} />
-        <Route path="system-settings" element={<div>System Settings (Coming Soon)</div>} />
-        <Route path="analytics" element={<div>Analytics (Coming Soon)</div>} />
-        <Route path="form-templates" element={<div>Form Templates (Coming Soon)</div>} />
+        <Route path="user-management" element={<Accounts />} />
+        <Route path="system-settings" element={<Settings />} />
+        <Route path="analytics" element={<Surveys />} />
         
         {/* Catch all route */}
         <Route path="*" element={<Navigate to="/" replace />} />

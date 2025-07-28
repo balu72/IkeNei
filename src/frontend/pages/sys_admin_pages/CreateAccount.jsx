@@ -397,29 +397,6 @@ const CreateAccount = () => {
                 />
               </div>
             </div>
-
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
-                User Role *
-              </label>
-              <select
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                required
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '0.375rem',
-                  fontSize: '0.875rem'
-                }}
-              >
-                <option value="account">Account User</option>
-                <option value="domain_admin">Domain Admin</option>
-                <option value="system_admin">System Admin</option>
-              </select>
-            </div>
           </div>
 
           {/* Message Display */}

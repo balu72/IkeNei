@@ -8,7 +8,8 @@ const RunSurvey = () => {
     subjects: [
       {
         subject: '',
-        respondants: []
+        respondants: [],
+        categoryWeights: {}
       }
     ]
   });
@@ -29,13 +30,13 @@ const RunSurvey = () => {
   ];
 
   const respondants = [
-    'Sarah Wilson',
-    'Mike Johnson',
-    'Emily Davis',
-    'David Wilson',
-    'Tom Harris',
-    'Lisa Anderson',
-    'Robert Brown'
+    { name: 'Sarah Wilson', category: 'Peer' },
+    { name: 'Mike Johnson', category: 'Subordinate' },
+    { name: 'Emily Davis', category: 'Boss' },
+    { name: 'David Wilson', category: 'Customer' },
+    { name: 'Tom Harris', category: 'Peer' },
+    { name: 'Lisa Anderson', category: 'Super Boss' },
+    { name: 'Robert Brown', category: 'Subordinate' }
   ];
 
   const handleSurveyChange = (e) => {
@@ -49,21 +50,38 @@ const RunSurvey = () => {
     setFormData(prev => ({
       ...prev,
       subjects: prev.subjects.map((item, i) => 
-        i === index ? { ...item, subject: value, respondants: [] } : item
+        i === index ? { ...item, subject: value, respondants: [], categoryWeights: {} } : item
       )
     }));
   };
 
-  const handleRespondantChange = (subjectIndex, respondant) => {
+  const handleRespondantChange = (subjectIndex, respondantName) => {
     setFormData(prev => ({
       ...prev,
       subjects: prev.subjects.map((item, i) => 
         i === subjectIndex 
           ? {
               ...item,
-              respondants: item.respondants.includes(respondant)
-                ? item.respondants.filter(r => r !== respondant)
-                : [...item.respondants, respondant]
+              respondants: item.respondants.includes(respondantName)
+                ? item.respondants.filter(r => r !== respondantName)
+                : [...item.respondants, respondantName]
+            }
+          : item
+      )
+    }));
+  };
+
+  const handleCategoryWeightChange = (subjectIndex, category, weight) => {
+    setFormData(prev => ({
+      ...prev,
+      subjects: prev.subjects.map((item, i) => 
+        i === subjectIndex 
+          ? {
+              ...item,
+              categoryWeights: {
+                ...item.categoryWeights,
+                [category]: weight
+              }
             }
           : item
       )
@@ -73,7 +91,7 @@ const RunSurvey = () => {
   const addSubject = () => {
     setFormData(prev => ({
       ...prev,
-      subjects: [...prev.subjects, { subject: '', respondants: [] }]
+      subjects: [...prev.subjects, { subject: '', respondants: [], categoryWeights: {} }]
     }));
   };
 
@@ -248,24 +266,43 @@ const RunSurvey = () => {
                       border: '1px solid #d1d5db',
                       borderRadius: '0.375rem',
                       padding: '0.75rem',
-                      maxHeight: '150px',
+                      maxHeight: '200px',
                       overflow: 'auto',
                       backgroundColor: 'white'
                     }}>
                       {respondants.map((respondant) => (
-                        <label key={respondant} style={{
+                        <label key={respondant.name} style={{
                           display: 'flex',
                           alignItems: 'center',
+                          justifyContent: 'space-between',
                           marginBottom: '0.5rem',
-                          cursor: 'pointer'
+                          cursor: 'pointer',
+                          padding: '0.5rem',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: '0.25rem',
+                          backgroundColor: subjectItem.respondants.includes(respondant.name) ? '#f0f9ff' : 'white'
                         }}>
-                          <input
-                            type="checkbox"
-                            checked={subjectItem.respondants.includes(respondant)}
-                            onChange={() => handleRespondantChange(index, respondant)}
-                            style={{ marginRight: '0.5rem' }}
-                          />
-                          <span style={{ fontSize: '0.875rem' }}>{respondant}</span>
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <input
+                              type="checkbox"
+                              checked={subjectItem.respondants.includes(respondant.name)}
+                              onChange={() => handleRespondantChange(index, respondant.name)}
+                              style={{ marginRight: '0.5rem' }}
+                            />
+                            <div>
+                              <span style={{ fontSize: '0.875rem', fontWeight: '500' }}>{respondant.name}</span>
+                              <span style={{ 
+                                fontSize: '0.75rem', 
+                                color: '#6b7280',
+                                marginLeft: '0.5rem',
+                                backgroundColor: '#f3f4f6',
+                                padding: '0.125rem 0.5rem',
+                                borderRadius: '0.75rem'
+                              }}>
+                                {respondant.category}
+                              </span>
+                            </div>
+                          </div>
                         </label>
                       ))}
                     </div>
@@ -273,6 +310,58 @@ const RunSurvey = () => {
                       <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.5rem' }}>
                         Selected: {subjectItem.respondants.join(', ')}
                       </p>
+                    )}
+
+                    {/* Category Weights Section */}
+                    {subjectItem.respondants.length > 0 && (
+                      <div style={{ marginTop: '1.5rem' }}>
+                        <h5 style={{ fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '1rem' }}>
+                          Category Weightages
+                        </h5>
+                        {(() => {
+                          const selectedCategories = [...new Set(
+                            respondants
+                              .filter(r => subjectItem.respondants.includes(r.name))
+                              .map(r => r.category)
+                          )];
+                          
+                          return selectedCategories.map((category) => (
+                            <div key={category} style={{ 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'space-between',
+                              marginBottom: '0.75rem',
+                              padding: '0.5rem',
+                              backgroundColor: '#f9fafb',
+                              borderRadius: '0.25rem'
+                            }}>
+                              <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>
+                                {category}
+                              </label>
+                              <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                step="1"
+                                value={subjectItem.categoryWeights[category] || ''}
+                                onChange={(e) => handleCategoryWeightChange(index, category, e.target.value)}
+                                placeholder="Weight %"
+                                style={{
+                                  width: '80px',
+                                  padding: '0.375rem',
+                                  border: '1px solid #d1d5db',
+                                  borderRadius: '0.25rem',
+                                  fontSize: '0.75rem',
+                                  textAlign: 'center'
+                                }}
+                              />
+                            </div>
+                          ));
+                        })()}
+                        <p style={{ fontSize: '0.75rem', color: '#6b7280', fontStyle: 'italic' }}>
+                          Note: Assign percentage weights to each category. Total should ideally sum to 100%.
+                        </p>
+                      </div>
                     )}
                   </div>
                 )}

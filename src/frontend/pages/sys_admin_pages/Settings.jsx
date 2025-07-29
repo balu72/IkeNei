@@ -12,7 +12,7 @@ const Settings = () => {
       id: 1,
       settingName: 'User Registration',
       category: 'Authentication',
-      description: 'Allow new users to register accounts',
+      description: 'Allow new accounts to register',
       value: 'Enabled',
       type: 'boolean',
       lastModified: '2024-01-15'

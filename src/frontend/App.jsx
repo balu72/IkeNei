@@ -88,7 +88,7 @@ const AppRoutes = () => {
         <Route path="domain-reports" element={<DomainReports />} />
         
         {/* System Admin Routes */}
-        <Route path="user-management" element={<Accounts />} />
+        <Route path="account-management" element={<Accounts />} />
         <Route path="system-settings" element={<Settings />} />
         <Route path="analytics" element={<Surveys />} />
         

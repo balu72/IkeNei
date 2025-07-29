@@ -87,14 +87,14 @@ POST   /api/auth/forgot             # Password reset request
 POST   /api/auth/reset              # Password reset confirmation
 ```
 
-#### User Management (System Admin)
+#### Account Management (System Admin)
 ```
-GET    /api/users                   # Get all users with filtering (search, state, type)
-POST   /api/users                   # Create new user account
-GET    /api/users/{id}              # Get specific user details
-PUT    /api/users/{id}              # Update user information
-PATCH  /api/users/{id}/status       # Activate/deactivate user account
-DELETE /api/users/{id}              # Delete user account
+GET    /api/accounts                # Get all accounts with filtering (search, state, type)
+POST   /api/accounts                # Create new account
+GET    /api/accounts/{id}           # Get specific account details
+PUT    /api/accounts/{id}           # Update account information
+PATCH  /api/accounts/{id}/status    # Activate/deactivate account
+DELETE /api/accounts/{id}           # Delete account
 ```
 
 ### Survey Management
@@ -110,7 +110,7 @@ PATCH  /api/surveys/{id}/status     # Change survey status (Active/Draft/Complet
 GET    /api/surveys/available       # Get available surveys for current user
 ```
 
-#### Survey Execution (Account Users)
+#### Survey Execution (Accounts)
 ```
 POST   /api/surveys/{id}/responses  # Submit survey responses
 GET    /api/surveys/{id}/responses  # Get survey responses
@@ -148,7 +148,7 @@ PATCH  /api/reports/{id}/status     # Change report status
 
 ### Subject & Respondent Management
 
-#### Subjects (Account Users)
+#### Subjects (Accounts)
 ```
 GET    /api/subjects                # Get user's subjects
 POST   /api/subjects                # Create new subject
@@ -157,7 +157,7 @@ PUT    /api/subjects/{id}           # Update subject
 DELETE /api/subjects/{id}           # Delete subject
 ```
 
-#### Respondents (Account Users)
+#### Respondents (Accounts)
 ```
 GET    /api/respondents             # Get user's respondents
 POST   /api/respondents             # Create new respondent
@@ -189,7 +189,7 @@ GET    /api/dashboard/analytics     # Get analytics data for charts
 #### System Analytics (System Admin)
 ```
 GET    /api/analytics/surveys       # Get survey analytics
-GET    /api/analytics/users         # Get user analytics
+GET    /api/analytics/accounts      # Get account analytics
 GET    /api/analytics/system-health # Get system health metrics
 GET    /api/analytics/reports       # Generate analytics reports
 POST   /api/analytics/export        # Export analytics data
@@ -247,7 +247,7 @@ For errors:
 - **Public endpoints**: `/api/auth/login`, `/api/auth/register`, `/api/auth/forgot`, `/api/auth/reset`
 - **Account role**: All `/api/subjects/*`, `/api/respondents/*`, `/api/surveys/my-surveys`, `/api/surveys/*/responses`
 - **Domain Admin role**: All `/api/surveys/*`, `/api/traits/*`, `/api/reports/*` (except system-wide operations)
-- **System Admin role**: All `/api/users/*`, `/api/settings/*`, `/api/analytics/*`
+- **System Admin role**: All `/api/accounts/*`, `/api/settings/*`, `/api/analytics/*`
 
 ### Pagination & Filtering
 

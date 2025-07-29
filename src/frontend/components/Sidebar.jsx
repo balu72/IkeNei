@@ -29,7 +29,7 @@ const Sidebar = () => {
         { name: 'Home', href: '/', icon: HomeIcon },
         { name: 'Surveys', href: '/domain-surveys', icon: ClipboardDocumentListIcon },
         { name: 'Traits/Competencies', href: '/domain-traits', icon: AcademicCapIcon },
-        { name: 'Accounts', href: '/user-management', icon: UserGroupIcon },
+        { name: 'Accounts', href: '/account-management', icon: UserGroupIcon },
         { name: 'Reports', href: '/domain-reports', icon: ChartBarIcon },
       ];
     }
@@ -37,7 +37,7 @@ const Sidebar = () => {
     if (isSystemAdmin) {
       return [
         { name: 'Home', href: '/', icon: HomeIcon },
-        { name: 'Accounts', href: '/user-management', icon: UserGroupIcon },
+        { name: 'Accounts', href: '/account-management', icon: UserGroupIcon },
         { name: 'Surveys', href: '/analytics', icon: ClipboardDocumentListIcon },
         { name: 'Settings', href: '/system-settings', icon: Cog6ToothIcon },
       ];

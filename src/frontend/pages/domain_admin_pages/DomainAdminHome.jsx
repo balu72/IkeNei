@@ -6,7 +6,7 @@ const DomainAdminHome = () => {
       <div style={{ marginBottom: '2rem' }}>
         <h1 className="page-title">Domain Admin Dashboard</h1>
         <p className="page-description">
-          Create and manage surveys/questionnaires, oversee domain users, and analyze feedback data.
+          Create and manage surveys/questionnaires, oversee domain accounts, and analyze feedback data.
         </p>
       </div>
 

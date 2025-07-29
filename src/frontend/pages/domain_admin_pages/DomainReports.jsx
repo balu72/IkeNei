@@ -81,17 +81,6 @@ const DomainReports = () => {
       description: 'Department-level innovation and creativity assessment'
     },
     {
-      id: 7,
-      reportName: 'Learning Path Recommendations',
-      reportType: 'Development Report',
-      associatedSurvey: 'Multiple Surveys',
-      status: 'Active',
-      generatedCount: 35,
-      lastGenerated: '2024-01-16',
-      createdBy: 'Admin User',
-      description: 'Personalized learning recommendations based on assessment results'
-    },
-    {
       id: 8,
       reportName: 'Executive Dashboard',
       reportType: 'Executive Summary',

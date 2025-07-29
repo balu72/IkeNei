@@ -177,7 +177,7 @@ const SysAdminHome = () => {
                     AI Model Update
                   </h3>
                   <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                    Learning recommendation engine updated • v2.1.3
+                    Feedback analysis engine updated • v2.1.3
                   </p>
                 </div>
               </div>
@@ -278,10 +278,6 @@ const SysAdminHome = () => {
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
                 <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>Feedback Responses</span>
                 <span style={{ fontSize: '0.875rem', fontWeight: '600' }}>89</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>Learning Plans Generated</span>
-                <span style={{ fontSize: '0.875rem', fontWeight: '600' }}>7</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>System Uptime</span>

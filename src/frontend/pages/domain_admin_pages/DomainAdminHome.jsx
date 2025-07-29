@@ -110,10 +110,6 @@ const DomainAdminHome = () => {
                   <span style={{ width: '6px', height: '6px', backgroundColor: '#f59e0b', borderRadius: '50%', marginRight: '0.5rem' }}></span>
                   2 leadership assessments ready
                 </li>
-                <li style={{ color: '#6b7280', display: 'flex', alignItems: 'center' }}>
-                  <span style={{ width: '6px', height: '6px', backgroundColor: '#10b981', borderRadius: '50%', marginRight: '0.5rem' }}></span>
-                  1 learning plan needs review
-                </li>
               </ul>
             </div>
 

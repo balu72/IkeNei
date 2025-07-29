@@ -47,7 +47,6 @@ const Sidebar = () => {
     return [
       { name: 'Home', href: '/', icon: HomeIcon },
       { name: '360 Survey', href: '/survey', icon: ClipboardDocumentListIcon },
-      { name: 'Learning Plans', href: '/learning-plans', icon: AcademicCapIcon },
     ];
   };
 

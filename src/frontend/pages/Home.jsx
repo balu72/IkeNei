@@ -9,7 +9,7 @@ const Home = () => {
         
         {/* Subtitle */}
         <p className="home-subtitle">
-          AI powered personalised learning path for you
+          AI powered feedback analysis for you
         </p>
       </div>
     </div>

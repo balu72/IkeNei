@@ -1,17 +1,17 @@
 ### IkeNei
 
-A comprehensive 360-degree feedback and AI-powered personalized learning platform that helps individuals and organizations drive professional development through data-driven insights.
+A comprehensive 360-degree feedback and survey management platform that helps individuals and organizations drive professional development through data-driven insights.
 
 ## 🚀 Overview
 
-IkeNei is an innovative tool that combines traditional 360-degree feedback methodologies with cutting-edge artificial intelligence to deliver personalized learning experiences. The platform enables users to gather comprehensive feedback from peers, supervisors, and subordinates, then leverages AI to create tailored development plans that accelerate professional growth.
+IkeNei is an innovative tool that combines traditional 360-degree feedback methodologies with data analytics to deliver comprehensive feedback insights. The platform enables accounts to gather feedback from subjects and respondents, then leverages analytics to provide detailed reports and insights that accelerate professional growth.
 
 ## ✨ Key Features
 
-### 🔐 User Management
+### 🔐 Account Management
 - **Secure Registration & Authentication**: Easy onboarding with robust security measures
-- **Role-based Access Control**: Three distinct user personas (Assessee, Coach, Admin)
-- **Profile Management**: Comprehensive user profiles with professional information
+- **Role-based Access Control**: Three distinct account roles (Account, Domain Admin, System Admin)
+- **Profile Management**: Comprehensive account profiles with organizational information
 
 ### 📊 360-Degree Feedback System
 - **Multi-source Feedback Collection**: Gather insights from supervisors, peers, direct reports, and self-assessments
@@ -19,37 +19,43 @@ IkeNei is an innovative tool that combines traditional 360-degree feedback metho
 - **Anonymous Feedback Options**: Ensure honest and constructive feedback
 - **Real-time Progress Tracking**: Monitor feedback collection status and completion rates
 
-### 🤖 AI-Powered Learning Plans
-- **Intelligent Analysis**: AI processes feedback data to identify strengths and development areas
-- **Personalized Recommendations**: Custom learning paths based on individual feedback patterns
-- **Adaptive Learning**: Plans that evolve based on progress and new feedback
-- **Resource Integration**: Curated learning materials, courses, and development activities
+### 📊 Subject & Respondent Management
+- **Subject Management**: Manage individuals being assessed within each account
+- **Respondent Management**: Organize feedback providers for each subject
+- **Relationship Mapping**: Define relationships between subjects and respondents
+- **Feedback Collection**: Streamlined process for gathering multi-source feedback
 
 ### 📈 Analytics & Reporting
-- **Comprehensive Dashboards**: Visual insights into feedback trends and development progress
-- **Competency Mapping**: Track skills development across various competencies
-- **Progress Metrics**: Quantifiable measures of improvement over time
-- **Export Capabilities**: Generate reports for HR and management review
+- **Comprehensive Dashboards**: Visual insights into feedback trends and survey results
+- **Competency Mapping**: Track skills assessment across various competencies
+- **Survey Analytics**: Detailed analysis of survey responses and patterns
+- **Export Capabilities**: Generate reports for management and organizational review
 
-## 👥 User Personas
+### 💰 Billing & Usage Tracking
+- **Survey Usage Monitoring**: Track surveys conducted by each account
+- **Billing Management**: Automated billing based on survey usage
+- **Usage Analytics**: Detailed statistics on platform utilization
+- **Payment Processing**: Secure billing and payment status tracking
 
-### 🎯 Assessee
-- **Primary user** receiving 360-degree feedback
-- **Personal dashboard** with development journey tracking
-- **Access to** feedback results and AI-generated learning plans
-- **Progress monitoring** and goal setting capabilities
+## 👥 Account Roles
 
-### 👨‍💼 Coach
-- **Guides and supports** assessees through development
-- **Aggregated insights** (no raw feedback data for privacy)
-- **Coaching tools** and AI-powered recommendations
-- **Team progress** monitoring and reporting
+### 🎯 Account
+- **Primary role** managing subjects and respondents
+- **Survey execution** and feedback collection
+- **Access to** survey results and feedback reports
+- **Subject/respondent management** and relationship tracking
 
-### ⚙️ Admin
-- **System administration** and user management
+### 👨‍💼 Domain Admin
+- **Manages accounts** within their domain
+- **Survey creation** and template management
+- **Competency definition** and trait management
+- **Domain-level analytics** and reporting
+
+### ⚙️ System Admin
+- **System administration** and account management
 - **Platform-wide analytics** and reporting
-- **Configuration** of feedback forms and competency frameworks
-- **System health** monitoring and maintenance
+- **Configuration** of system settings and parameters
+- **Billing management** and usage monitoring
 
 ## 🛠️ Technology Stack
 
@@ -74,11 +80,11 @@ IkeNei is an innovative tool that combines traditional 360-degree feedback metho
 - **Caching**: Redis
 - **Data Security**: Encryption in transit and at rest
 
-### AI/ML & Analytics
-- **AI Engine**: Ollama (Local LLM integration)
+### Analytics & Insights
 - **Data Processing**: Python-based analytics
-- **Feedback Analysis**: Natural language processing
-- **Learning Recommendations**: Machine learning algorithms
+- **Feedback Analysis**: Statistical analysis and pattern recognition
+- **Survey Analytics**: Comprehensive survey response analysis
+- **Reporting Engine**: Automated report generation
 
 ### Infrastructure & Security
 - **Containerization**: Docker
@@ -163,33 +169,32 @@ IkeNei/
 ### Demo Access
 
 The frontend includes demo credentials for testing:
-- **Assessee**: assessee@example.com / password
-- **Coach**: coach@example.com / password
-- **Admin**: admin@example.com / password
+- **Account**: account@example.com / password
+- **Domain Admin**: domainadmin@example.com / password
+- **System Admin**: sysadmin@example.com / password
 
 ## 📋 How It Works
 
-### Step 1: Registration & Setup
-- Create your account with basic professional information
-- Set up your profile and preferences
-- Define your feedback network (supervisors, peers, direct reports)
+### Step 1: Account Setup
+- Create your account with organizational information
+- Set up subjects and respondents within your account
+- Define relationships and feedback networks
 
-### Step 2: 360-Degree Feedback Collection
-- Launch a feedback cycle with customized questionnaires
-- Invite feedback providers through the platform
-- Monitor collection progress and send reminders
+### Step 2: Survey Creation & Management
+- Create customized surveys and feedback forms
+- Define competencies and traits for assessment
+- Configure survey settings and parameters
+
+### Step 3: Feedback Collection
+- Launch surveys with selected subjects and respondents
+- Monitor collection progress and completion rates
 - Ensure anonymous and confidential feedback submission
 
-### Step 3: AI Analysis & Insights
-- AI processes all feedback data to identify patterns
-- Generates comprehensive analysis of strengths and development areas
-- Creates competency-based insights and recommendations
-
-### Step 4: Personalized Learning Plan
-- Receive AI-generated development recommendations
-- Access curated learning resources and activities
-- Set goals and track progress over time
-- Schedule follow-up feedback cycles for continuous improvement
+### Step 4: Analytics & Reporting
+- Access comprehensive feedback analysis and insights
+- Generate detailed reports on survey results
+- Track competency assessments and development areas
+- Export data for organizational review and planning
 
 ## 🏗️ Architecture Overview
 
@@ -229,13 +234,13 @@ The IkeNei follows a layered architecture pattern:
 ### 🚧 In Progress
 - Backend API development
 - Database schema implementation
-- AI integration with Ollama
+- Billing system integration
 
 ### 📅 Upcoming Features
 - Mobile application for iOS and Android
 - Integration with popular HRIS systems
-- Advanced AI coaching recommendations
-- Team-based feedback and development plans
+- Advanced analytics and insights
+- Team-based feedback and organizational reporting
 - Multi-language support
 - API for third-party integrations
 
@@ -256,6 +261,6 @@ For information about contributing to this project or partnership opportunities,
 
 ---
 
-**Transform your professional development with data-driven insights and AI-powered learning plans.**
+**Transform your professional development with comprehensive 360-degree feedback and data-driven insights.**
 
-*IkeNei - Where feedback meets intelligence for accelerated growth.*
+*IkeNei - Where feedback meets analytics for organizational growth.*

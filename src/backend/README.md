@@ -17,8 +17,8 @@ backend/
 
 ## Key Features
 
-### User Management
-- User registration and authentication
+### Account Management
+- Account registration and authentication
 - JWT token management
 - Role-based access control (RBAC)
 - Password reset and email verification
@@ -50,13 +50,13 @@ backend/
 
 ### Controllers Directory
 - `auth_controller.py` - Authentication and authorization
-- `user_controller.py` - User management operations
+- `account_controller.py` - Account management operations
 - `feedback_controller.py` - 360-degree feedback operations
 - `analytics_controller.py` - Analytics and reporting
 - `admin_controller.py` - Administrative functions
 
 ### Models Directory
-- `user.py` - User data model
+- `account.py` - Account data model
 - `feedback_form.py` - Feedback form structure
 - `feedback_response.py` - Individual feedback responses
 - `competency.py` - Skills and competency definitions
@@ -77,11 +77,11 @@ Based on the frontend requirements analysis, the following REST API endpoints ar
 
 #### Authentication
 ```
-POST   /api/auth/login              # User login with email/password
-POST   /api/auth/logout             # User logout
-POST   /api/auth/register           # User registration
-GET    /api/auth/me                 # Get current user profile
-PUT    /api/auth/profile            # Update user profile
+POST   /api/auth/login              # Account login with email/password
+POST   /api/auth/logout             # Account logout
+POST   /api/auth/register           # Account registration
+GET    /api/auth/me                 # Get current account profile
+PUT    /api/auth/profile            # Update account profile
 POST   /api/auth/refresh            # Token refresh
 POST   /api/auth/forgot             # Password reset request
 POST   /api/auth/reset              # Password reset confirmation
@@ -107,14 +107,14 @@ GET    /api/surveys/{id}            # Get specific survey details
 PUT    /api/surveys/{id}            # Update survey
 DELETE /api/surveys/{id}            # Delete survey
 PATCH  /api/surveys/{id}/status     # Change survey status (Active/Draft/Completed)
-GET    /api/surveys/available       # Get available surveys for current user
+GET    /api/surveys/available       # Get available surveys for current account
 ```
 
 #### Survey Execution (Accounts)
 ```
 POST   /api/surveys/{id}/responses  # Submit survey responses
 GET    /api/surveys/{id}/responses  # Get survey responses
-GET    /api/surveys/my-surveys      # Get surveys where user is subject/respondent
+GET    /api/surveys/my-surveys      # Get surveys where account is subject/respondent
 POST   /api/surveys/{id}/run        # Run/execute a survey
 ```
 
@@ -150,7 +150,7 @@ PATCH  /api/reports/{id}/status     # Change report status
 
 #### Subjects (Accounts)
 ```
-GET    /api/subjects                # Get user's subjects
+GET    /api/subjects                # Get account's subjects
 POST   /api/subjects                # Create new subject
 GET    /api/subjects/{id}           # Get subject details
 PUT    /api/subjects/{id}           # Update subject
@@ -159,7 +159,7 @@ DELETE /api/subjects/{id}           # Delete subject
 
 #### Respondents (Accounts)
 ```
-GET    /api/respondents             # Get user's respondents
+GET    /api/respondents             # Get account's respondents
 POST   /api/respondents             # Create new respondent
 GET    /api/respondents/{id}        # Get respondent details
 PUT    /api/respondents/{id}        # Update respondent
@@ -206,7 +206,7 @@ DELETE /api/files/{id}              # Delete files
 
 #### Notifications
 ```
-GET    /api/notifications           # Get user notifications
+GET    /api/notifications           # Get account notifications
 PATCH  /api/notifications/{id}/read # Mark notification as read
 POST   /api/notifications           # Create notification
 DELETE /api/notifications/{id}      # Delete notification
@@ -303,7 +303,7 @@ REDIS_URL=redis://localhost:6379
 ## Database Schema
 
 ### Core Tables
-- `users` - User accounts and profiles
+- `accounts` - Account profiles and data
 - `organizations` - Company/organization data
 - `feedback_forms` - Feedback form templates
 - `feedback_responses` - Individual feedback submissions

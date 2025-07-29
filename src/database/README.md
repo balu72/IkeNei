@@ -17,12 +17,12 @@ database/
 
 ### Core Entities
 
-#### Users & Organizations
-- **users** - User accounts, profiles, and authentication data
+#### Accounts & Organizations
+- **accounts** - Account profiles, authentication data, and user information
 - **organizations** - Company/organization information
-- **user_organizations** - Many-to-many relationship between users and organizations
-- **roles** - User roles and permissions
-- **user_roles** - User role assignments
+- **account_organizations** - Many-to-many relationship between accounts and organizations
+- **roles** - Account roles and permissions
+- **account_roles** - Account role assignments
 
 #### 360-Degree Feedback System
 - **feedback_forms** - Feedback form templates and configurations
@@ -36,25 +36,19 @@ database/
 - **competencies** - Skills and competency definitions
 - **competency_categories** - Grouping of related competencies
 - **competency_levels** - Proficiency levels for each competency
-- **user_competencies** - User's current competency levels
+- **account_competencies** - Account's current competency levels
 
-#### AI-Powered Learning Plans
-- **learning_plans** - AI-generated personalized learning plans
-- **learning_objectives** - Specific learning goals and targets
-- **learning_resources** - External learning materials and courses
-- **learning_progress** - User progress tracking
-- **recommendations** - AI-generated recommendations
 
 #### Analytics & Reporting
-- **analytics_events** - User interaction tracking
+- **analytics_events** - Account interaction tracking
 - **reports** - Generated reports and their metadata
 - **dashboard_widgets** - Customizable dashboard configurations
 
 ## Schema Definitions
 
-### Users Table
+### Accounts Table
 ```sql
-CREATE TABLE users (
+CREATE TABLE accounts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
@@ -62,7 +56,7 @@ CREATE TABLE users (
     last_name VARCHAR(100) NOT NULL,
     job_title VARCHAR(200),
     department VARCHAR(100),
-    manager_id UUID REFERENCES users(id),
+    manager_id UUID REFERENCES accounts(id),
     profile_image_url TEXT,
     is_active BOOLEAN DEFAULT true,
     email_verified BOOLEAN DEFAULT false,
@@ -99,7 +93,7 @@ CREATE TABLE feedback_forms (
     is_anonymous BOOLEAN DEFAULT false,
     is_active BOOLEAN DEFAULT true,
     settings JSONB DEFAULT '{}',
-    created_by UUID REFERENCES users(id),
+    created_by UUID REFERENCES accounts(id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -120,22 +114,6 @@ CREATE TABLE competencies (
 );
 ```
 
-### Learning Plans Table
-```sql
-CREATE TABLE learning_plans (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES users(id),
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
-    ai_analysis JSONB,
-    status VARCHAR(50) DEFAULT 'active',
-    start_date DATE,
-    target_completion_date DATE,
-    actual_completion_date DATE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
 
 ## Migration Strategy
 
@@ -145,33 +123,33 @@ YYYYMMDD_HHMMSS_description.sql
 ```
 
 Example:
-- `20240101_120000_create_users_table.sql`
+- `20240101_120000_create_accounts_table.sql`
 - `20240101_130000_create_organizations_table.sql`
 - `20240101_140000_create_feedback_forms_table.sql`
 
 ### Migration Structure
 ```sql
 -- Up Migration
--- Description: Create users table
+-- Description: Create accounts table
 -- Date: 2024-01-01
 
-CREATE TABLE users (
+CREATE TABLE accounts (
     -- table definition
 );
 
 -- Create indexes
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_organization ON users(organization_id);
+CREATE INDEX idx_accounts_email ON accounts(email);
+CREATE INDEX idx_accounts_organization ON accounts(organization_id);
 
 -- Down Migration (for rollback)
--- DROP TABLE users;
+-- DROP TABLE accounts;
 ```
 
 ## Seed Data
 
 ### Development Seeds
 - Sample organizations
-- Test user accounts
+- Test account data
 - Default competency frameworks
 - Sample feedback forms
 - Mock feedback responses
@@ -179,31 +157,26 @@ CREATE INDEX idx_users_organization ON users(organization_id);
 ### Production Seeds
 - Default system roles
 - Standard competency categories
-- Default learning resource types
 - System configuration data
 
 ## Query Optimization
 
 ### Indexes Strategy
 ```sql
--- User lookup optimization
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_active ON users(is_active) WHERE is_active = true;
+-- Account lookup optimization
+CREATE INDEX idx_accounts_email ON accounts(email);
+CREATE INDEX idx_accounts_active ON accounts(is_active) WHERE is_active = true;
 
 -- Feedback system optimization
 CREATE INDEX idx_feedback_responses_form_cycle ON feedback_responses(form_id, cycle_id);
-CREATE INDEX idx_feedback_responses_user ON feedback_responses(target_user_id);
-
--- Learning plan optimization
-CREATE INDEX idx_learning_plans_user_status ON learning_plans(user_id, status);
-CREATE INDEX idx_learning_progress_plan ON learning_progress(plan_id, completed_at);
+CREATE INDEX idx_feedback_responses_account ON feedback_responses(target_account_id);
 ```
 
 ### Complex Queries
 
 #### Feedback Analysis Query
 ```sql
--- Get aggregated feedback scores for a user
+-- Get aggregated feedback scores for an account
 SELECT 
     c.name as competency_name,
     AVG(fr.rating) as average_rating,
@@ -212,28 +185,10 @@ SELECT
 FROM feedback_responses fr
 JOIN feedback_questions fq ON fr.question_id = fq.id
 JOIN competencies c ON fq.competency_id = c.id
-WHERE fr.target_user_id = $1
+WHERE fr.target_account_id = $1
     AND fr.cycle_id = $2
 GROUP BY c.id, c.name
 ORDER BY average_rating DESC;
-```
-
-#### Learning Progress Query
-```sql
--- Get user's learning progress summary
-SELECT 
-    lp.title as plan_title,
-    COUNT(lo.id) as total_objectives,
-    COUNT(CASE WHEN lo.status = 'completed' THEN 1 END) as completed_objectives,
-    ROUND(
-        COUNT(CASE WHEN lo.status = 'completed' THEN 1 END) * 100.0 / COUNT(lo.id), 
-        2
-    ) as completion_percentage
-FROM learning_plans lp
-LEFT JOIN learning_objectives lo ON lp.id = lo.plan_id
-WHERE lp.user_id = $1
-    AND lp.status = 'active'
-GROUP BY lp.id, lp.title;
 ```
 
 ## Data Privacy & Security
@@ -245,7 +200,7 @@ GROUP BY lp.id, lp.title;
 - Data retention policies
 
 ### GDPR Compliance
-- User data export functionality
+- Account data export functionality
 - Right to be forgotten implementation
 - Consent tracking
 - Data processing logs

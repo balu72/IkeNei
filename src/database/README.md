@@ -23,6 +23,8 @@ database/
 - **account_roles** - Account role assignments
 
 #### 360-Degree Feedback System
+- **subjects** - Individuals being assessed (each account has multiple subjects)
+- **respondents** - Individuals providing feedback (each subject has multiple respondents)
 - **feedback_forms** - Feedback form templates and configurations
 - **feedback_questions** - Individual questions within forms
 - **feedback_cycles** - Feedback collection periods
@@ -60,6 +62,34 @@ CREATE TABLE accounts (
 );
 ```
 
+### Subjects Table
+```sql
+CREATE TABLE subjects (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    account_id UUID REFERENCES accounts(id),
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255),
+    position VARCHAR(200),
+    department VARCHAR(100),
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### Respondents Table
+```sql
+CREATE TABLE respondents (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    subject_id UUID REFERENCES subjects(id),
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255),
+    relationship VARCHAR(100),
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
 
 ### Feedback Forms Table
 ```sql
@@ -103,8 +133,10 @@ YYYYMMDD_HHMMSS_description.sql
 
 Example:
 - `20240101_120000_create_accounts_table.sql`
-- `20240101_130000_create_feedback_forms_table.sql`
-- `20240101_140000_create_competencies_table.sql`
+- `20240101_130000_create_subjects_table.sql`
+- `20240101_140000_create_respondents_table.sql`
+- `20240101_150000_create_feedback_forms_table.sql`
+- `20240101_160000_create_competencies_table.sql`
 
 ### Migration Structure
 ```sql
@@ -128,7 +160,8 @@ CREATE INDEX idx_accounts_type ON accounts(account_type);
 
 ### Development Seeds
 - Sample accounts (individual and organizational)
-- Test account data
+- Test subjects for each account
+- Test respondents for each subject
 - Default competency frameworks
 - Sample feedback forms
 - Mock feedback responses
@@ -146,9 +179,15 @@ CREATE INDEX idx_accounts_type ON accounts(account_type);
 CREATE INDEX idx_accounts_email ON accounts(email);
 CREATE INDEX idx_accounts_active ON accounts(is_active) WHERE is_active = true;
 
+-- Subject and respondent optimization
+CREATE INDEX idx_subjects_account ON subjects(account_id);
+CREATE INDEX idx_subjects_active ON subjects(is_active) WHERE is_active = true;
+CREATE INDEX idx_respondents_subject ON respondents(subject_id);
+CREATE INDEX idx_respondents_active ON respondents(is_active) WHERE is_active = true;
+
 -- Feedback system optimization
 CREATE INDEX idx_feedback_responses_form_cycle ON feedback_responses(form_id, cycle_id);
-CREATE INDEX idx_feedback_responses_account ON feedback_responses(target_account_id);
+CREATE INDEX idx_feedback_responses_subject ON feedback_responses(target_subject_id);
 ```
 
 ### Complex Queries

@@ -17,10 +17,8 @@ database/
 
 ### Core Entities
 
-#### Accounts & Organizations
-- **accounts** - Account profiles, authentication data, and user information
-- **organizations** - Company/organization information
-- **account_organizations** - Many-to-many relationship between accounts and organizations
+#### Accounts & Roles
+- **accounts** - Account profiles and authentication data (individual or organizational)
 - **roles** - Account roles and permissions
 - **account_roles** - Account role assignments
 
@@ -52,12 +50,8 @@ CREATE TABLE accounts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
-    job_title VARCHAR(200),
-    department VARCHAR(100),
-    manager_id UUID REFERENCES accounts(id),
-    profile_image_url TEXT,
+    account_name VARCHAR(255) NOT NULL,
+    account_type VARCHAR(50) DEFAULT 'standard',
     is_active BOOLEAN DEFAULT true,
     email_verified BOOLEAN DEFAULT false,
     last_login_at TIMESTAMP,
@@ -66,27 +60,12 @@ CREATE TABLE accounts (
 );
 ```
 
-### Organizations Table
-```sql
-CREATE TABLE organizations (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(255) NOT NULL,
-    domain VARCHAR(100) UNIQUE,
-    industry VARCHAR(100),
-    size_category VARCHAR(50),
-    logo_url TEXT,
-    settings JSONB DEFAULT '{}',
-    is_active BOOLEAN DEFAULT true,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
 
 ### Feedback Forms Table
 ```sql
 CREATE TABLE feedback_forms (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    organization_id UUID REFERENCES organizations(id),
+    account_id UUID REFERENCES accounts(id),
     title VARCHAR(255) NOT NULL,
     description TEXT,
     form_type VARCHAR(50) DEFAULT 'standard',
@@ -103,7 +82,7 @@ CREATE TABLE feedback_forms (
 ```sql
 CREATE TABLE competencies (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    organization_id UUID REFERENCES organizations(id),
+    account_id UUID REFERENCES accounts(id),
     name VARCHAR(255) NOT NULL,
     description TEXT,
     category_id UUID REFERENCES competency_categories(id),
@@ -124,8 +103,8 @@ YYYYMMDD_HHMMSS_description.sql
 
 Example:
 - `20240101_120000_create_accounts_table.sql`
-- `20240101_130000_create_organizations_table.sql`
-- `20240101_140000_create_feedback_forms_table.sql`
+- `20240101_130000_create_feedback_forms_table.sql`
+- `20240101_140000_create_competencies_table.sql`
 
 ### Migration Structure
 ```sql
@@ -139,7 +118,7 @@ CREATE TABLE accounts (
 
 -- Create indexes
 CREATE INDEX idx_accounts_email ON accounts(email);
-CREATE INDEX idx_accounts_organization ON accounts(organization_id);
+CREATE INDEX idx_accounts_type ON accounts(account_type);
 
 -- Down Migration (for rollback)
 -- DROP TABLE accounts;
@@ -148,7 +127,7 @@ CREATE INDEX idx_accounts_organization ON accounts(organization_id);
 ## Seed Data
 
 ### Development Seeds
-- Sample organizations
+- Sample accounts (individual and organizational)
 - Test account data
 - Default competency frameworks
 - Sample feedback forms

@@ -195,6 +195,20 @@ GET    /api/analytics/reports       # Generate analytics reports
 POST   /api/analytics/export        # Export analytics data
 ```
 
+### Billing & Usage Tracking
+
+#### Billing Management (System Admin & Account)
+```
+GET    /api/billing                 # Get billing records with filtering (account, date range, status)
+POST   /api/billing                 # Create new billing record (auto-generated on survey completion)
+GET    /api/billing/{id}            # Get specific billing record details
+PUT    /api/billing/{id}            # Update billing record (amount, status)
+PATCH  /api/billing/{id}/status     # Update billing status (pending, paid, failed)
+GET    /api/billing/account/{id}    # Get billing records for specific account
+GET    /api/billing/summary         # Get billing summary and statistics
+POST   /api/billing/calculate       # Calculate billing amount for survey usage
+```
+
 ### Additional Utility APIs
 
 #### File Management
@@ -245,9 +259,9 @@ For errors:
 ### Authentication Requirements
 
 - **Public endpoints**: `/api/auth/login`, `/api/auth/register`, `/api/auth/forgot`, `/api/auth/reset`
-- **Account role**: All `/api/subjects/*`, `/api/respondents/*`, `/api/surveys/my-surveys`, `/api/surveys/*/responses`
+- **Account role**: All `/api/subjects/*`, `/api/respondents/*`, `/api/surveys/my-surveys`, `/api/surveys/*/responses`, `/api/billing/account/{own_id}`
 - **Domain Admin role**: All `/api/surveys/*`, `/api/traits/*`, `/api/reports/*` (except system-wide operations)
-- **System Admin role**: All `/api/accounts/*`, `/api/settings/*`, `/api/analytics/*`
+- **System Admin role**: All `/api/accounts/*`, `/api/settings/*`, `/api/analytics/*`, `/api/billing/*`
 
 ### Pagination & Filtering
 

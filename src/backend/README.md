@@ -73,7 +73,7 @@ backend/
 
 Based on the frontend requirements analysis, the following REST API endpoints are required to support the IkeNei application functionality:
 
-### Authentication & User Management
+### Authentication & Account Management
 
 #### Authentication
 ```

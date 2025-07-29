@@ -44,6 +44,9 @@ database/
 - **reports** - Generated reports and their metadata
 - **dashboard_widgets** - Customizable dashboard configurations
 
+#### Billing & Usage Tracking
+- **billing** - Survey usage tracking and billing records for each account
+
 ## Schema Definitions
 
 ### Accounts Table
@@ -123,6 +126,22 @@ CREATE TABLE competencies (
 );
 ```
 
+### Billing Table
+```sql
+CREATE TABLE billing (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    account_id UUID REFERENCES accounts(id),
+    survey_id UUID REFERENCES feedback_forms(id),
+    survey_title VARCHAR(255) NOT NULL,
+    subjects_count INTEGER NOT NULL DEFAULT 0,
+    respondents_count INTEGER NOT NULL DEFAULT 0,
+    survey_conducted_at TIMESTAMP NOT NULL,
+    billing_amount DECIMAL(10,2),
+    billing_status VARCHAR(50) DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
 
 ## Migration Strategy
 
@@ -137,6 +156,7 @@ Example:
 - `20240101_140000_create_respondents_table.sql`
 - `20240101_150000_create_feedback_forms_table.sql`
 - `20240101_160000_create_competencies_table.sql`
+- `20240101_170000_create_billing_table.sql`
 
 ### Migration Structure
 ```sql
@@ -165,6 +185,7 @@ CREATE INDEX idx_accounts_type ON accounts(account_type);
 - Default competency frameworks
 - Sample feedback forms
 - Mock feedback responses
+- Sample billing records
 
 ### Production Seeds
 - Default system roles
@@ -188,6 +209,12 @@ CREATE INDEX idx_respondents_active ON respondents(is_active) WHERE is_active = 
 -- Feedback system optimization
 CREATE INDEX idx_feedback_responses_form_cycle ON feedback_responses(form_id, cycle_id);
 CREATE INDEX idx_feedback_responses_subject ON feedback_responses(target_subject_id);
+
+-- Billing optimization
+CREATE INDEX idx_billing_account ON billing(account_id);
+CREATE INDEX idx_billing_survey ON billing(survey_id);
+CREATE INDEX idx_billing_conducted_date ON billing(survey_conducted_at);
+CREATE INDEX idx_billing_status ON billing(billing_status);
 ```
 
 ### Complex Queries

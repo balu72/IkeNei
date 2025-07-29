@@ -1,6 +1,6 @@
 # Backend Layer - IkeNei
 
-This directory contains the backend API server for the IkeNei, handling business logic, data processing, and AI-powered learning plan generation.
+This directory contains the backend API server for the IkeNei, handling business logic, data processing, and survey management.
 
 ## Directory Structure
 
@@ -30,12 +30,6 @@ backend/
 - Progress tracking and notifications
 - Feedback cycle management
 
-### AI-Powered Learning Plans
-- Feedback data analysis using AI/ML algorithms
-- Personalized learning recommendation engine
-- Progress tracking and adaptive learning paths
-- Integration with external learning resources
-
 ### Analytics & Reporting
 - Data aggregation and analysis
 - Report generation and export
@@ -49,7 +43,6 @@ backend/
 - **Database**: MongoDB
 - **ORM**: SQLAlchemy
 - **Authentication**: JWT
-- **AI/ML**: Ollama
 - **Testing**: Pytest
 - **Documentation**: OpenAPI
 
@@ -59,7 +52,6 @@ backend/
 - `auth_controller.py` - Authentication and authorization
 - `user_controller.py` - User management operations
 - `feedback_controller.py` - 360-degree feedback operations
-- `learning_controller.py` - Learning plan management
 - `analytics_controller.py` - Analytics and reporting
 - `admin_controller.py` - Administrative functions
 
@@ -67,14 +59,12 @@ backend/
 - `user.py` - User data model
 - `feedback_form.py` - Feedback form structure
 - `feedback_response.py` - Individual feedback responses
-- `learning_plan.py` - AI-generated learning plans
 - `competency.py` - Skills and competency definitions
 - `organization.py` - Organization/company data
 
 ### Services Directory
 - `auth_service.py` - Authentication logic
 - `feedback_service.py` - Feedback processing
-- `ai_service.py` - AI/ML integration with Ollama
 - `email_service.py` - Email notifications
 - `report_service.py` - Report generation
 - `integration_service.py` - External API integrations
@@ -307,7 +297,6 @@ MONGODB_URI=mongodb://localhost:27017/360planner
 JWT_SECRET=your-jwt-secret
 JWT_EXPIRES_IN=7d
 EMAIL_SERVICE_API_KEY=your-email-api-key
-OLLAMA_API_URL=http://localhost:11434
 REDIS_URL=redis://localhost:6379
 ```
 
@@ -318,9 +307,7 @@ REDIS_URL=redis://localhost:6379
 - `organizations` - Company/organization data
 - `feedback_forms` - Feedback form templates
 - `feedback_responses` - Individual feedback submissions
-- `learning_plans` - AI-generated learning plans
 - `competencies` - Skills and competency framework
-- `learning_resources` - External learning materials
 
 ## AI/ML Integration
 
@@ -330,18 +317,11 @@ REDIS_URL=redis://localhost:6379
 - Pattern recognition in feedback data
 - Competency gap identification
 
-### Learning Plan Generation
-- Personalized recommendation algorithms
-- Adaptive learning path optimization
-- Resource matching and ranking
-- Progress prediction and adjustment
-
 ## Testing Strategy
 
 - Unit tests for all business logic
 - Integration tests for API endpoints
 - Database testing with test fixtures
-- AI/ML model testing and validation
 - Performance and load testing
 
 ## Deployment

@@ -431,44 +431,289 @@ npm run deploy      # Deploy to hosting platform
 ## Getting Started
 
 ### Prerequisites
-- Node.js (v18 or higher)
-- Backend API server running on `http://localhost:5000`
+- **Node.js** (v18 or higher) - [Download here](https://nodejs.org/)
+- **Python** (v3.8 or higher) - [Download here](https://python.org/)
+- **MongoDB** (v5.0 or higher) - [Download here](https://mongodb.com/try/download/community)
 
-### Development Setup
+### Complete Setup & Testing Guide
 
-1. **Install Dependencies**
-   ```bash
-   cd src/frontend
-   npm install
+#### Step 1: Clone and Setup Project
+```bash
+# Clone the repository
+git clone https://github.com/balu72/IkeNei.git
+cd IkeNei
+```
+
+#### Step 2: Setup Backend (Flask API)
+```bash
+# Navigate to backend directory
+cd src/backend
+
+# Create Python virtual environment
+python -m venv venv
+
+# Activate virtual environment
+# On macOS/Linux:
+source venv/bin/activate
+# On Windows:
+venv\Scripts\activate
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Verify environment variables
+cat .env
+# Should show:
+# FLASK_ENV=development
+# FLASK_APP=app.py
+# MONGODB_URI=mongodb://localhost:27017/ikenei
+# JWT_SECRET_KEY=jwt-secret-string-change-in-production
+```
+
+#### Step 3: Setup MongoDB Database
+```bash
+# Start MongoDB service
+# On macOS (with Homebrew):
+brew services start mongodb-community
+
+# On Linux:
+sudo systemctl start mongod
+
+# On Windows:
+# Start MongoDB as a Windows service or run mongod.exe
+
+# Verify MongoDB is running
+mongosh
+# Should connect to MongoDB shell
+# Type 'exit' to quit
+```
+
+#### Step 4: Start Backend Server
+```bash
+# Make sure you're in src/backend directory
+cd src/backend
+
+# Activate virtual environment if not already active
+source venv/bin/activate  # macOS/Linux
+# venv\Scripts\activate   # Windows
+
+# Start Flask development server
+python app.py
+
+# You should see:
+# * Running on http://127.0.0.1:5000
+# * Debug mode: on
+```
+
+#### Step 5: Setup Frontend (React App)
+```bash
+# Open a new terminal window/tab
+# Navigate to frontend directory
+cd src/frontend
+
+# Install Node.js dependencies
+npm install
+
+# Verify environment configuration
+cat .env
+# Should show:
+# VITE_API_BASE_URL=http://localhost:5000/api
+# VITE_APP_NAME=IkeNei
+# VITE_APP_VERSION=1.0.0
+```
+
+#### Step 6: Start Frontend Development Server
+```bash
+# Make sure you're in src/frontend directory
+cd src/frontend
+
+# Start Vite development server
+npm run dev
+
+# You should see:
+# Local:   http://localhost:5173/
+# Network: use --host to expose
+```
+
+#### Step 7: Access and Test Application
+
+1. **Open Browser**
+   - Navigate to: `http://localhost:5173`
+   - You should see the IkeNei login page
+
+2. **Test Authentication**
+   ```
+   Demo Login Credentials:
+   
+   Account Role:
+   Email: account@example.com
+   Password: password
+   
+   Domain Admin Role:
+   Email: domainadmin@example.com  
+   Password: password
+   
+   System Admin Role:
+   Email: systemadmin@example.com
+   Password: password
    ```
 
-2. **Environment Configuration**
-   - ✅ `.env` file already configured with API base URL
-   - Backend API: `http://localhost:5000/api`
-   - Frontend dev server: `http://localhost:5173`
+3. **Verify API Connection**
+   - Open browser Developer Tools (F12)
+   - Go to Network tab
+   - Login with any demo credentials
+   - You should see API calls to `http://localhost:5000/api/auth/login`
 
-3. **Start Development Server**
-   ```bash
-   npm run dev
-   ```
+#### Step 8: Test Different User Roles
 
-4. **Start Backend API** (Required for full functionality)
-   ```bash
-   cd src/backend
-   python app.py
-   ```
+**Account Role Testing:**
+1. Login with `account@example.com`
+2. Should redirect to Account Dashboard
+3. Test navigation: Profile, Run Survey
+4. Verify sidebar shows account-specific options
 
-5. **Access Application**
-   - Frontend: `http://localhost:5173`
-   - Backend API: `http://localhost:5000/api`
-   - Use demo credentials for testing
+**Domain Admin Role Testing:**
+1. Login with `domainadmin@example.com`
+2. Should redirect to Domain Admin Dashboard
+3. Test navigation: Create Survey, Create Trait, Reports
+4. Verify sidebar shows domain admin options
+
+**System Admin Role Testing:**
+1. Login with `systemadmin@example.com`
+2. Should redirect to System Admin Dashboard
+3. Test navigation: Account Management, Settings, Analytics
+4. Verify sidebar shows system admin options
 
 ### Development Workflow
-1. **Backend First**: Ensure backend API is running
-2. **Frontend Development**: Make component changes
-3. **API Integration**: Components use real API calls via `services/api.js`
-4. **Testing**: Test with real backend data
-5. **Error Handling**: Proper error states and user feedback
+
+#### Daily Development Process
+```bash
+# Terminal 1: Start MongoDB (if not running as service)
+mongod
+
+# Terminal 2: Start Backend
+cd src/backend
+source venv/bin/activate  # Activate virtual environment
+python app.py
+
+# Terminal 3: Start Frontend
+cd src/frontend
+npm run dev
+
+# Terminal 4: Development work
+# Make your code changes here
+```
+
+#### Testing API Integration
+1. **Check Backend Health**
+   ```bash
+   curl http://localhost:5000/api/auth/login
+   # Should return method not allowed (needs POST)
+   ```
+
+2. **Test Authentication**
+   ```bash
+   curl -X POST http://localhost:5000/api/auth/login \
+     -H "Content-Type: application/json" \
+     -d '{"email":"account@example.com","password":"password"}'
+   ```
+
+3. **Monitor Network Traffic**
+   - Open browser DevTools → Network tab
+   - Login and navigate through the app
+   - Verify API calls are being made to backend
+
+#### Troubleshooting Common Issues
+
+**Backend Issues:**
+```bash
+# Port 5000 already in use
+lsof -ti:5000 | xargs kill -9
+
+# MongoDB connection issues
+mongosh --eval "db.adminCommand('ping')"
+
+# Python dependencies issues
+pip install -r requirements.txt --force-reinstall
+```
+
+**Frontend Issues:**
+```bash
+# Port 5173 already in use
+lsof -ti:5173 | xargs kill -9
+
+# Node modules issues
+rm -rf node_modules package-lock.json
+npm install
+
+# Clear Vite cache
+rm -rf node_modules/.vite
+```
+
+**API Connection Issues:**
+- Verify backend is running on port 5000
+- Check CORS settings in backend
+- Verify `.env` file has correct API URL
+- Check browser console for CORS errors
+
+### Production Deployment
+
+#### Backend Deployment
+```bash
+# Set production environment variables
+export FLASK_ENV=production
+export MONGODB_URI=your-production-mongodb-uri
+export JWT_SECRET_KEY=your-secure-jwt-secret
+
+# Install production dependencies
+pip install -r requirements.txt
+
+# Run with production WSGI server
+gunicorn -w 4 -b 0.0.0.0:5000 app:app
+```
+
+#### Frontend Deployment
+```bash
+# Build for production
+npm run build
+
+# Preview production build locally
+npm run preview
+
+# Deploy dist/ folder to your hosting service
+# (Netlify, Vercel, AWS S3, etc.)
+```
+
+### Testing Checklist
+
+#### ✅ Backend Testing
+- [ ] MongoDB connection successful
+- [ ] Flask server starts without errors
+- [ ] API endpoints respond correctly
+- [ ] JWT authentication works
+- [ ] CORS headers are set properly
+
+#### ✅ Frontend Testing
+- [ ] Vite dev server starts successfully
+- [ ] Login page loads correctly
+- [ ] Authentication flow works
+- [ ] Role-based routing works
+- [ ] API calls are successful
+- [ ] Error handling displays properly
+
+#### ✅ Integration Testing
+- [ ] Login with all three user roles
+- [ ] Navigation works for each role
+- [ ] API calls show in Network tab
+- [ ] JWT tokens are stored and sent
+- [ ] Logout clears authentication
+- [ ] Protected routes redirect properly
+
+### Performance Monitoring
+- **Backend**: Monitor Flask logs for API response times
+- **Frontend**: Use React DevTools Profiler
+- **Network**: Monitor API call performance in DevTools
+- **Database**: Use MongoDB Compass for query performance
 ## Current Implementation Status
 
 ### ✅ Completed API Integration

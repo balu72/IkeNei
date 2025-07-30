@@ -6,13 +6,50 @@ This directory contains the React frontend application for the IkeNei 360-degree
 
 ```
 frontend/
-├── components/         # Reusable UI components
-├── pages/             # Page components organized by user roles
-├── contexts/          # React context providers
-├── assets/            # Static assets (images, icons, etc.)
-├── public/            # Public static files
-├── src/               # Source code
-└── config/            # Configuration files
+├── .env                           # Environment configuration
+├── .gitignore                     # Git ignore rules
+├── App.css                        # Global styles
+├── App.jsx                        # Main application component
+├── eslint.config.js               # ESLint configuration
+├── index.css                      # Base styles
+├── index.html                     # HTML template
+├── main.jsx                       # Application entry point
+├── package.json                   # Dependencies and scripts
+├── package-lock.json              # Dependency lock file
+├── README.md                      # Documentation
+├── vite.config.js                 # Vite configuration
+├── components/                    # Reusable UI components
+│   ├── CreateRespondantModal.jsx  # Respondent creation modal
+│   ├── CreateSubjectModal.jsx     # Subject creation modal
+│   ├── CreateSurveyModal.jsx      # Survey creation modal
+│   ├── Layout.jsx                 # Main layout wrapper
+│   ├── Login.jsx                  # Authentication component
+│   └── Sidebar.jsx                # Navigation sidebar
+├── contexts/                      # React context providers
+│   └── AuthContext.jsx            # Authentication context
+├── pages/                         # Page components by role
+│   ├── Home.jsx                   # Generic home page
+│   ├── account_management_pages/  # Account role pages
+│   │   ├── AccountHome.jsx        # Account dashboard
+│   │   ├── ProfileUpdate.jsx      # Profile management
+│   │   ├── RunSurvey.jsx          # Survey execution
+│   │   └── Survey.jsx             # Survey participation
+│   ├── domain_admin_pages/        # Domain admin pages
+│   │   ├── CreateSurvey.jsx       # Survey creation
+│   │   ├── CreateTrait.jsx        # Trait management
+│   │   ├── DefineReport.jsx       # Report definition
+│   │   ├── DomainAdminHome.jsx    # Domain admin dashboard
+│   │   ├── DomainReports.jsx      # Report management
+│   │   ├── DomainSurveys.jsx      # Survey management
+│   │   └── DomainTraits.jsx       # Trait management
+│   └── sys_admin_pages/           # System admin pages
+│       ├── Accounts.jsx           # Account management
+│       ├── CreateAccount.jsx      # Account creation
+│       ├── Settings.jsx           # System settings
+│       ├── Surveys.jsx            # System analytics
+│       └── SysAdminHome.jsx       # System admin dashboard
+└── services/                      # API service layer
+    └── api.js                     # Complete API integration
 ```
 
 ## Key Features

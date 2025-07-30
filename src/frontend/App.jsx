@@ -3,9 +3,22 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Layout from './components/Layout';
 import Login from './components/Login';
 import Home from './pages/Home';
-import { AccountHome, ProfileUpdate, Survey, RunSurvey } from './pages/account_management_pages';
-import { DomainAdminHome, CreateSurvey, CreateTrait, DefineReport, DomainSurveys, DomainTraits, DomainReports } from './pages/domain_admin_pages';
-import { SysAdminHome, CreateAccount, Accounts, Surveys, Settings } from './pages/sys_admin_pages';
+import AccountHome from './pages/account_management_pages/AccountHome';
+import ProfileUpdate from './pages/account_management_pages/ProfileUpdate';
+import Survey from './pages/account_management_pages/Survey';
+import RunSurvey from './pages/account_management_pages/RunSurvey';
+import DomainAdminHome from './pages/domain_admin_pages/DomainAdminHome';
+import CreateSurvey from './pages/domain_admin_pages/CreateSurvey';
+import CreateTrait from './pages/domain_admin_pages/CreateTrait';
+import DefineReport from './pages/domain_admin_pages/DefineReport';
+import DomainSurveys from './pages/domain_admin_pages/DomainSurveys';
+import DomainTraits from './pages/domain_admin_pages/DomainTraits';
+import DomainReports from './pages/domain_admin_pages/DomainReports';
+import SysAdminHome from './pages/sys_admin_pages/SysAdminHome';
+import CreateAccount from './pages/sys_admin_pages/CreateAccount';
+import Accounts from './pages/sys_admin_pages/Accounts';
+import Surveys from './pages/sys_admin_pages/Surveys';
+import Settings from './pages/sys_admin_pages/Settings';
 import './App.css';
 
 // Protected Route Component

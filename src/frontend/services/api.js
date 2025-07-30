@@ -3,10 +3,32 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000
 
 // API Response handler
 const handleResponse = async (response) => {
-  const data = await response.json();
+  let data = null;
+  
+  // Check if response has content before parsing JSON
+  const contentType = response.headers.get('content-type');
+  if (contentType && contentType.includes('application/json')) {
+    try {
+      data = await response.json();
+    } catch (error) {
+      console.error('Failed to parse JSON response:', error);
+      data = { error: { message: 'Invalid JSON response from server' } };
+    }
+  } else {
+    // Handle non-JSON responses
+    try {
+      const text = await response.text();
+      data = { message: text || 'No content' };
+    } catch (error) {
+      data = { error: { message: 'Failed to read response' } };
+    }
+  }
   
   if (!response.ok) {
-    throw new Error(data.error?.message || `HTTP error! status: ${response.status}`);
+    const errorMessage = data?.error?.message || 
+                        data?.message || 
+                        `HTTP error! status: ${response.status}`;
+    throw new Error(errorMessage);
   }
   
   return data;
@@ -30,8 +52,17 @@ const apiRequest = async (endpoint, options = {}) => {
     ...options,
   };
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-  return handleResponse(response);
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+    return handleResponse(response);
+  } catch (error) {
+    // Handle network errors
+    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      throw new Error('Network error: Unable to connect to server. Please check your internet connection.');
+    }
+    // Re-throw other errors (including those from handleResponse)
+    throw error;
+  }
 };
 
 // Authentication API

@@ -18,8 +18,21 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Check for stored user session and validate with backend
     const initializeAuth = async () => {
-      const storedUser = localStorage.getItem('user');
+      let storedUser = null;
       const token = localStorage.getItem('token');
+      
+      // Safely parse stored user data
+      try {
+        const storedUserData = localStorage.getItem('user');
+        if (storedUserData) {
+          storedUser = JSON.parse(storedUserData);
+        }
+      } catch (error) {
+        console.error('Failed to parse stored user data:', error);
+        // Clear corrupted data
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+      }
       
       if (storedUser && token) {
         try {

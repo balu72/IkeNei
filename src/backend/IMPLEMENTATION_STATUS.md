@@ -74,7 +74,7 @@
 ## 🚧 Next Steps Required
 
 ### 1. Database Models (Priority: HIGH)
-Create SQLAlchemy models in `models/` directory:
+Create MongoDB document models in `models/` directory:
 - `models/account.py`
 - `models/subject.py`
 - `models/respondent.py`
@@ -100,9 +100,9 @@ Create service layer in `services/` directory:
 - etc.
 
 ### 4. Database Setup (Priority: HIGH)
-- Initialize SQLAlchemy with Flask app
-- Create database migration scripts
-- Set up database seeding
+- Initialize MongoDB connection with Flask app
+- Create database indexes for performance
+- Set up database seeding with sample data
 
 ### 5. Testing (Priority: MEDIUM)
 - Unit tests for controllers
@@ -113,7 +113,7 @@ Create service layer in `services/` directory:
 
 ### Request Flow
 ```
-Request → Route → Controller → Service → Model → Database
+Request → Route → Controller → Service → Model → MongoDB
                      ↓
 Response ← Middleware ← Validation ← Business Logic
 ```
@@ -145,9 +145,9 @@ pip install -r requirements.txt
 - Update database URL and JWT secrets for production
 
 ### Next Implementation Phase
-1. **Models**: Define database schema with SQLAlchemy
+1. **Models**: Define MongoDB document schemas and validation
 2. **Controllers**: Implement business logic for each route group
-3. **Database**: Set up migrations and initial data
+3. **Database**: Set up MongoDB indexes and initial data
 4. **Testing**: Create test suite for API endpoints
 
 ## 📝 Notes

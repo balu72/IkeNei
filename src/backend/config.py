@@ -5,9 +5,9 @@ class Config:
     # Flask configuration
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
     
-    # Database configuration
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///ikenei.db'
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # MongoDB configuration
+    MONGODB_URI = os.environ.get('MONGODB_URI') or 'mongodb://localhost:27017/ikenei'
+    MONGODB_DB_NAME = os.environ.get('MONGODB_DB_NAME') or 'ikenei'
     
     # JWT configuration
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'jwt-secret-string'
@@ -34,15 +34,18 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or 'sqlite:///ikenei_dev.db'
+    MONGODB_URI = os.environ.get('DEV_MONGODB_URI') or 'mongodb://localhost:27017/ikenei_dev'
+    MONGODB_DB_NAME = os.environ.get('DEV_MONGODB_DB_NAME') or 'ikenei_dev'
 
 class ProductionConfig(Config):
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    MONGODB_URI = os.environ.get('MONGODB_URI')
+    MONGODB_DB_NAME = os.environ.get('MONGODB_DB_NAME')
 
 class TestingConfig(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    MONGODB_URI = os.environ.get('TEST_MONGODB_URI') or 'mongodb://localhost:27017/ikenei_test'
+    MONGODB_DB_NAME = os.environ.get('TEST_MONGODB_DB_NAME') or 'ikenei_test'
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=5)
 
 config = {

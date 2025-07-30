@@ -41,7 +41,7 @@ backend/
 - **Runtime**: Python
 - **Framework**: Flask
 - **Database**: MongoDB
-- **ORM**: SQLAlchemy
+- **ODM**: PyMongo
 - **Authentication**: JWT
 - **Testing**: Pytest
 - **Documentation**: OpenAPI
@@ -56,11 +56,13 @@ backend/
 - `admin_controller.py` - Administrative functions
 
 ### Models Directory
-- `account.py` - Account data model
-- `feedback_form.py` - Feedback form structure
-- `feedback_response.py` - Individual feedback responses
-- `competency.py` - Skills and competency definitions
-- `organization.py` - Organization/company data
+- `account.py` - Account document model
+- `feedback_form.py` - Feedback form document structure
+- `feedback_response.py` - Individual feedback response documents
+- `competency.py` - Skills and competency document definitions
+- `subject.py` - Subject document model
+- `respondent.py` - Respondent document model
+- `billing.py` - Billing document model
 
 ### Services Directory
 - `auth_service.py` - Authentication logic
@@ -307,21 +309,22 @@ Example: `GET /api/surveys?page=1&limit=20&search=leadership&sort=created_at:des
 FLASK_ENV=development
 FLASK_APP=app.py
 PORT=5000
-MONGODB_URI=mongodb://localhost:27017/360planner
-JWT_SECRET=your-jwt-secret
-JWT_EXPIRES_IN=7d
+MONGODB_URI=mongodb://localhost:27017/ikenei
+MONGODB_DB_NAME=ikenei
+JWT_SECRET_KEY=your-jwt-secret
 EMAIL_SERVICE_API_KEY=your-email-api-key
-REDIS_URL=redis://localhost:6379
 ```
 
 ## Database Schema
 
-### Core Tables
+### Core Collections
 - `accounts` - Account profiles and data
-- `organizations` - Company/organization data
+- `subjects` - Individuals being assessed
+- `respondents` - Feedback providers
 - `feedback_forms` - Feedback form templates
 - `feedback_responses` - Individual feedback submissions
 - `competencies` - Skills and competency framework
+- `billing` - Survey usage tracking and billing records
 
 ## AI/ML Integration
 
@@ -351,8 +354,9 @@ REDIS_URL=redis://localhost:6379
 1. Create virtual environment: `python -m venv venv`
 2. Activate virtual environment: `source venv/bin/activate` (Linux/Mac) or `venv\Scripts\activate` (Windows)
 3. Install dependencies: `pip install -r requirements.txt`
-4. Set up environment variables
-5. Initialize database: `python manage.py init_db`
-6. Seed initial data: `python manage.py seed_data`
-7. Start development server: `python app.py` or `flask run`
-8. Run tests: `pytest`
+4. Set up environment variables (copy `.env` and update values)
+5. Start MongoDB server: `mongod`
+6. Initialize database collections and indexes
+7. Seed initial data with sample accounts and data
+8. Start development server: `python app.py`
+9. Run tests: `pytest`

@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { authAPI } from '../services/api';
 
 const AuthContext = createContext();
 
@@ -14,74 +15,109 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Mock user data for development - replace with actual API calls later
-  const mockUsers = {
-    'account@example.com': {
-      id: '1',
-      email: 'account@example.com',
-      name: 'John Doe',
-      role: 'account',
-      avatar: 'JD'
-    },
-    'domainadmin@example.com': {
-      id: '2',
-      email: 'domainadmin@example.com',
-      name: 'Sarah Wilson',
-      role: 'domain_admin',
-      avatar: 'SW'
-    },
-    'systemadmin@example.com': {
-      id: '3',
-      email: 'systemadmin@example.com',
-      name: 'Mike Johnson',
-      role: 'system_admin',
-      avatar: 'MJ'
-    }
-  };
-
   useEffect(() => {
-    // Check for stored user session
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
+    // Check for stored user session and validate with backend
+    const initializeAuth = async () => {
+      const storedUser = localStorage.getItem('user');
+      const token = localStorage.getItem('token');
+      
+      if (storedUser && token) {
+        try {
+          // Validate token with backend
+          const response = await authAPI.getCurrentUser();
+          if (response.success) {
+            setUser(response.data);
+            localStorage.setItem('user', JSON.stringify(response.data));
+          } else {
+            // Token is invalid, clear storage
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+          }
+        } catch (error) {
+          console.error('Auth validation failed:', error);
+          localStorage.removeItem('user');
+          localStorage.removeItem('token');
+        }
+      }
+      setLoading(false);
+    };
+
+    initializeAuth();
   }, []);
 
   const login = async (email, password) => {
-    // Mock authentication - replace with actual API call
-    const mockUser = mockUsers[email];
-    if (mockUser && password === 'password') {
-      setUser(mockUser);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      return { success: true };
+    try {
+      const response = await authAPI.login(email, password);
+      if (response.success) {
+        setUser(response.data.user);
+        return { success: true };
+      }
+      return { success: false, error: response.error?.message || 'Login failed' };
+    } catch (error) {
+      console.error('Login error:', error);
+      return { success: false, error: error.message || 'Login failed' };
     }
-    return { success: false, error: 'Invalid credentials' };
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
+  const logout = async () => {
+    try {
+      await authAPI.logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setUser(null);
+    }
   };
 
   const register = async (userData) => {
-    // Mock registration - replace with actual API call
-    const newUser = {
-      id: Date.now().toString(),
-      ...userData,
-      avatar: userData.name.split(' ').map(n => n[0]).join('').toUpperCase()
-    };
-    setUser(newUser);
-    localStorage.setItem('user', JSON.stringify(newUser));
-    return { success: true };
+    try {
+      const response = await authAPI.register(userData);
+      if (response.success) {
+        // After successful registration, log the user in
+        const loginResponse = await login(userData.email, userData.password);
+        return loginResponse;
+      }
+      return { success: false, error: response.error?.message || 'Registration failed' };
+    } catch (error) {
+      console.error('Registration error:', error);
+      return { success: false, error: error.message || 'Registration failed' };
+    }
   };
 
   const updateProfile = async (profileData) => {
-    // Mock profile update - replace with actual API call
-    const updatedUser = { ...user, ...profileData };
-    setUser(updatedUser);
-    localStorage.setItem('user', JSON.stringify(updatedUser));
-    return { success: true };
+    try {
+      const response = await authAPI.updateProfile(profileData);
+      if (response.success) {
+        const updatedUser = { ...user, ...response.data };
+        setUser(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        return { success: true };
+      }
+      return { success: false, error: response.error?.message || 'Profile update failed' };
+    } catch (error) {
+      console.error('Profile update error:', error);
+      return { success: false, error: error.message || 'Profile update failed' };
+    }
+  };
+
+  const forgotPassword = async (email) => {
+    try {
+      const response = await authAPI.forgotPassword(email);
+      return response;
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      return { success: false, error: error.message || 'Password reset request failed' };
+    }
+  };
+
+  const resetPassword = async (token, newPassword) => {
+    try {
+      const response = await authAPI.resetPassword(token, newPassword);
+      return response;
+    } catch (error) {
+      console.error('Reset password error:', error);
+      return { success: false, error: error.message || 'Password reset failed' };
+    }
   };
 
   const value = {
@@ -90,6 +126,8 @@ export const AuthProvider = ({ children }) => {
     logout,
     register,
     updateProfile,
+    forgotPassword,
+    resetPassword,
     loading,
     isAuthenticated: !!user,
     isAccount: user?.role === 'account',

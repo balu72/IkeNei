@@ -1,7 +1,33 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { surveysAPI } from '../../services/api';
 
 const DomainSurveys = () => {
   const navigate = useNavigate();
+  const [surveysData, setSurveysData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch surveys data from API
+  useEffect(() => {
+    const fetchSurveys = async () => {
+      try {
+        setLoading(true);
+        const response = await surveysAPI.getMySurveys();
+        if (response.success) {
+          setSurveysData(response.data || []);
+        } else {
+          setError('Failed to fetch surveys');
+        }
+      } catch (err) {
+        setError(err.message || 'Failed to fetch surveys');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSurveys();
+  }, []);
 
   const handleCreateSurvey = () => {
     console.log('Create New Survey clicked');
@@ -109,166 +135,67 @@ const DomainSurveys = () => {
               </tr>
             </thead>
             <tbody>
-              <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
-                <td style={{ padding: '1rem', color: '#374151', verticalAlign: 'top' }}>Leadership Skills Assessment</td>
-                <td style={{ padding: '1rem', color: '#374151', verticalAlign: 'top' }}>
-                  Strategic Thinking<br/>
-                  Decision Making<br/>
-                  Team Management
-                </td>
-                <td style={{ padding: '1rem', color: '#374151', verticalAlign: 'top' }}>
-                  40%<br/>
-                  35%<br/>
-                  25%
-                </td>
-                <td style={{ padding: '1rem', verticalAlign: 'top' }}>
-                  <span style={{
-                    backgroundColor: '#dcfce7',
-                    color: '#166534',
-                    padding: '0.25rem 0.75rem',
-                    borderRadius: '1rem',
-                    fontSize: '0.75rem',
-                    fontWeight: '500'
+              {surveysData.length > 0 ? (
+                surveysData.map((survey) => (
+                  <tr key={survey.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
+                    <td style={{ padding: '1rem', color: '#374151', verticalAlign: 'top' }}>
+                      {survey.name || survey.surveyName}
+                    </td>
+                    <td style={{ padding: '1rem', color: '#374151', verticalAlign: 'top' }}>
+                      {survey.traits ? survey.traits.map(trait => trait.name).join(', ') : 'No traits assigned'}
+                    </td>
+                    <td style={{ padding: '1rem', color: '#374151', verticalAlign: 'top' }}>
+                      {survey.traits ? survey.traits.map(trait => `${trait.weight}%`).join(', ') : 'N/A'}
+                    </td>
+                    <td style={{ padding: '1rem', verticalAlign: 'top' }}>
+                      <span style={{
+                        backgroundColor: survey.status === 'active' ? '#dcfce7' : survey.status === 'draft' ? '#fef3c7' : '#fee2e2',
+                        color: survey.status === 'active' ? '#166534' : survey.status === 'draft' ? '#d97706' : '#dc2626',
+                        padding: '0.25rem 0.75rem',
+                        borderRadius: '1rem',
+                        fontSize: '0.75rem',
+                        fontWeight: '500'
+                      }}>
+                        {survey.status === 'active' ? 'Active' : survey.status === 'draft' ? 'Draft' : 'Completed'}
+                      </span>
+                    </td>
+                    <td style={{ padding: '1rem', verticalAlign: 'top' }}>
+                      {survey.status === 'completed' ? (
+                        <a 
+                          href="#" 
+                          style={{
+                            color: '#3b82f6',
+                            textDecoration: 'underline',
+                            fontSize: '0.875rem',
+                            fontWeight: '500'
+                          }}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            console.log('View report for survey:', survey.id);
+                          }}
+                        >
+                          View Report
+                        </a>
+                      ) : (
+                        <span style={{ color: '#6b7280', fontSize: '0.875rem' }}>
+                          Not Available
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" style={{ 
+                    padding: '2rem', 
+                    textAlign: 'center', 
+                    color: '#6b7280',
+                    fontStyle: 'italic'
                   }}>
-                    Active
-                  </span>
-                </td>
-                <td style={{ padding: '1rem', verticalAlign: 'top' }}>
-                  <a 
-                    href="#" 
-                    style={{
-                      color: '#3b82f6',
-                      textDecoration: 'underline',
-                      fontSize: '0.875rem',
-                      fontWeight: '500'
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      console.log('View report for Leadership Skills Assessment');
-                    }}
-                  >
-                    View Report
-                  </a>
-                </td>
-              </tr>
-              <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
-                <td style={{ padding: '1rem', color: '#374151', verticalAlign: 'top' }}>Communication Skills Survey</td>
-                <td style={{ padding: '1rem', color: '#374151', verticalAlign: 'top' }}>
-                  Verbal Communication<br/>
-                  Written Communication<br/>
-                  Active Listening<br/>
-                  Presentation Skills
-                </td>
-                <td style={{ padding: '1rem', color: '#374151', verticalAlign: 'top' }}>
-                  30%<br/>
-                  25%<br/>
-                  25%<br/>
-                  20%
-                </td>
-                <td style={{ padding: '1rem', verticalAlign: 'top' }}>
-                  <span style={{
-                    backgroundColor: '#dcfce7',
-                    color: '#166534',
-                    padding: '0.25rem 0.75rem',
-                    borderRadius: '1rem',
-                    fontSize: '0.75rem',
-                    fontWeight: '500'
-                  }}>
-                    Active
-                  </span>
-                </td>
-                <td style={{ padding: '1rem', verticalAlign: 'top' }}>
-                  <a 
-                    href="#" 
-                    style={{
-                      color: '#3b82f6',
-                      textDecoration: 'underline',
-                      fontSize: '0.875rem',
-                      fontWeight: '500'
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      console.log('View report for Communication Skills Survey');
-                    }}
-                  >
-                    View Report
-                  </a>
-                </td>
-              </tr>
-              <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
-                <td style={{ padding: '1rem', color: '#374151', verticalAlign: 'top' }}>Team Management Review</td>
-                <td style={{ padding: '1rem', color: '#374151', verticalAlign: 'top' }}>
-                  Delegation<br/>
-                  Conflict Resolution<br/>
-                  Performance Management
-                </td>
-                <td style={{ padding: '1rem', color: '#374151', verticalAlign: 'top' }}>
-                  45%<br/>
-                  30%<br/>
-                  25%
-                </td>
-                <td style={{ padding: '1rem', verticalAlign: 'top' }}>
-                  <span style={{
-                    backgroundColor: '#fef3c7',
-                    color: '#d97706',
-                    padding: '0.25rem 0.75rem',
-                    borderRadius: '1rem',
-                    fontSize: '0.75rem',
-                    fontWeight: '500'
-                  }}>
-                    Submitted For Approval
-                  </span>
-                </td>
-                <td style={{ padding: '1rem', verticalAlign: 'top' }}>
-                  <span style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                    Not Available
-                  </span>
-                </td>
-              </tr>
-              <tr>
-                <td style={{ padding: '1rem', color: '#374151', verticalAlign: 'top' }}>Project Management Skills</td>
-                <td style={{ padding: '1rem', color: '#374151', verticalAlign: 'top' }}>
-                  Planning & Organization<br/>
-                  Risk Management<br/>
-                  Resource Allocation<br/>
-                  Timeline Management
-                </td>
-                <td style={{ padding: '1rem', color: '#374151', verticalAlign: 'top' }}>
-                  35%<br/>
-                  25%<br/>
-                  20%<br/>
-                  20%
-                </td>
-                <td style={{ padding: '1rem', verticalAlign: 'top' }}>
-                  <span style={{
-                    backgroundColor: '#fee2e2',
-                    color: '#dc2626',
-                    padding: '0.25rem 0.75rem',
-                    borderRadius: '1rem',
-                    fontSize: '0.75rem',
-                    fontWeight: '500'
-                  }}>
-                    Completed
-                  </span>
-                </td>
-                <td style={{ padding: '1rem', verticalAlign: 'top' }}>
-                  <a 
-                    href="#" 
-                    style={{
-                      color: '#3b82f6',
-                      textDecoration: 'underline',
-                      fontSize: '0.875rem',
-                      fontWeight: '500'
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      console.log('View report for Project Management Skills');
-                    }}
-                  >
-                    View Report
-                  </a>
-                </td>
-              </tr>
+                    {loading ? 'Loading surveys...' : 'No surveys found. Create your first survey to get started.'}
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -283,28 +210,28 @@ const DomainSurveys = () => {
       }}>
         <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>
           <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#10b981', marginBottom: '0.5rem' }}>
-            2
+            {surveysData.filter(s => s.status === 'active').length}
           </div>
           <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Active Surveys</p>
         </div>
         
         <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>
           <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#f59e0b', marginBottom: '0.5rem' }}>
-            1
+            {surveysData.filter(s => s.status === 'draft').length}
           </div>
           <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Draft Surveys</p>
         </div>
         
         <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>
           <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#dc2626', marginBottom: '0.5rem' }}>
-            1
+            {surveysData.filter(s => s.status === 'completed').length}
           </div>
           <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Completed Surveys</p>
         </div>
         
         <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>
           <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#3b82f6', marginBottom: '0.5rem' }}>
-            4
+            {surveysData.length}
           </div>
           <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Total Surveys</p>
         </div>

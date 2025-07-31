@@ -1,70 +1,35 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { accountsAPI } from '../../services/api';
 
 const Accounts = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterState, setFilterState] = useState('all');
+  const [accountsData, setAccountsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Sample accounts data - in real app, this would come from API
-  const accountsData = [
-    {
-      id: 1,
-      accountName: 'John Doe',
-      contactInfo: 'john.doe@company.com | +1-555-0123',
-      accountType: 'Individual',
-      state: 'Active'
-    },
-    {
-      id: 2,
-      accountName: 'Jane Smith',
-      contactInfo: 'jane.smith@business.com | +1-555-0124',
-      accountType: 'Business',
-      state: 'Active'
-    },
-    {
-      id: 3,
-      accountName: 'Robert Brown',
-      contactInfo: 'robert.brown@org.com | +1-555-0125',
-      accountType: 'Organization',
-      state: 'Passive'
-    },
-    {
-      id: 4,
-      accountName: 'Lisa Anderson',
-      contactInfo: 'lisa.anderson@edu.com | +1-555-0126',
-      accountType: 'Educational',
-      state: 'Active'
-    },
-    {
-      id: 5,
-      accountName: 'Michael Johnson',
-      contactInfo: 'michael.johnson@company.com | +1-555-0127',
-      accountType: 'Individual',
-      state: 'Active'
-    },
-    {
-      id: 6,
-      accountName: 'Sarah Wilson',
-      contactInfo: 'sarah.wilson@business.com | +1-555-0128',
-      accountType: 'Business',
-      state: 'Passive'
-    },
-    {
-      id: 7,
-      accountName: 'David Miller',
-      contactInfo: 'david.miller@org.com | +1-555-0129',
-      accountType: 'Organization',
-      state: 'Active'
-    },
-    {
-      id: 8,
-      accountName: 'Emily Davis',
-      contactInfo: 'emily.davis@edu.com | +1-555-0130',
-      accountType: 'Educational',
-      state: 'Active'
-    }
-  ];
+  // Fetch accounts data from API
+  useEffect(() => {
+    const fetchAccounts = async () => {
+      try {
+        setLoading(true);
+        const response = await accountsAPI.getAll();
+        if (response.success) {
+          setAccountsData(response.data || []);
+        } else {
+          setError('Failed to fetch accounts');
+        }
+      } catch (err) {
+        setError(err.message || 'Failed to fetch accounts');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAccounts();
+  }, []);
 
   // Filter accounts based on search term and state filter
   const filteredAccounts = accountsData.filter(account => {
@@ -173,6 +138,15 @@ const Accounts = () => {
         </button>
       </div>
 
+      {/* Error Message */}
+      {error && (
+        <div className="card" style={{ padding: '1rem', marginBottom: '2rem', backgroundColor: '#fee2e2', border: '1px solid #fecaca' }}>
+          <p style={{ color: '#dc2626', fontSize: '0.875rem' }}>
+            Error: {error}
+          </p>
+        </div>
+      )}
+
       {/* Accounts Table */}
       <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
         <div style={{ 
@@ -183,7 +157,7 @@ const Accounts = () => {
           borderBottom: '1px solid #e5e7eb'
         }}>
           <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#374151' }}>
-            All Accounts ({filteredAccounts.length})
+            All Accounts ({loading ? '...' : filteredAccounts.length})
           </h2>
         </div>
 

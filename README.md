@@ -154,17 +154,19 @@ IkeNei/
    npm run dev
    ```
 
-3. **Backend Setup** (Coming Soon)
+3. **Backend Setup**
    ```bash
    cd src/backend
-   pip install -r requirements.txt
+   pip install flask flask-cors flask-jwt-extended python-dotenv
    python app.py
    ```
+   Backend will start on `http://localhost:5000`
 
-4. **Database Setup** (Coming Soon)
-   ```bash
-   # MongoDB setup instructions
-   ```
+4. **API Integration**
+   - Frontend automatically connects to backend at `http://localhost:5000/api`
+   - All API endpoints are functional with mock data
+   - JWT authentication is implemented and working
+   - Demo users available for testing all roles
 
 ### Demo Access
 
@@ -207,7 +209,7 @@ The IkeNei follows a layered architecture pattern:
 5. **Testing Layer** (`tests/`) - Comprehensive test coverage
 6. **Documentation Layer** (`docs/`) - Technical specifications and guides
 
-## 🔒 Privacy & Security
+## � Privacy & Security
 
 - **Data Encryption**: All data encrypted in transit and at rest
 - **Privacy Compliance**: GDPR and other privacy regulation compliant
@@ -231,10 +233,17 @@ The IkeNei follows a layered architecture pattern:
 - Responsive UI with magenta theme
 - Basic navigation and dashboard structure
 
+### ✅ Recently Completed
+- **Complete Backend API**: 13 controllers with full CRUD operations
+- **Frontend-Backend Integration**: Frontend now calls backend REST APIs
+- **Authentication System**: JWT-based authentication with role management
+- **Mock Data Implementation**: Comprehensive mock data for testing
+- **API Service Layer**: Centralized API calls with error handling
+
 ### 🚧 In Progress
-- Backend API development
-- Database schema implementation
-- Billing system integration
+- Database integration (replacing mock data with MongoDB)
+- JWT middleware implementation for protected routes
+- Input validation and sanitization
 
 ### 📅 Upcoming Features
 - Mobile application for iOS and Android

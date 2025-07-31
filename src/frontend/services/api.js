@@ -495,3 +495,24 @@ export const filesAPI = {
     return apiRequest(`/files/${id}`, { method: 'DELETE' });
   },
 };
+
+// Analytics API
+export const analyticsAPI = {
+  getOverview: async () => {
+    return apiRequest('/analytics/overview');
+  },
+
+  getSurveyAnalytics: async (surveyId = null) => {
+    const endpoint = surveyId ? `/analytics/surveys/${surveyId}` : '/analytics/surveys';
+    return apiRequest(endpoint);
+  },
+
+  getAccountAnalytics: async (accountId = null) => {
+    const endpoint = accountId ? `/analytics/accounts/${accountId}` : '/analytics/accounts';
+    return apiRequest(endpoint);
+  },
+
+  getSystemAnalytics: async () => {
+    return apiRequest('/analytics/system');
+  },
+};

@@ -1,71 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { surveysAPI } from '../../services/api';
 
 const Surveys = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterState, setFilterState] = useState('all');
   const [filterSector, setFilterSector] = useState('all');
+  const [surveysData, setSurveysData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Sample surveys data - in real app, this would come from API
-  const surveysData = [
-    {
-      id: 1,
-      surveyName: 'Leadership Skills Assessment',
-      traitsCompetencies: 'Strategic Thinking, Decision Making, Team Management',
-      sector: 'Corporate',
-      state: 'Active'
-    },
-    {
-      id: 2,
-      surveyName: 'Communication Skills Survey',
-      traitsCompetencies: 'Verbal Communication, Written Communication, Active Listening, Presentation Skills',
-      sector: 'Education',
-      state: 'Active'
-    },
-    {
-      id: 3,
-      surveyName: 'Team Management Review',
-      traitsCompetencies: 'Delegation, Conflict Resolution, Performance Management',
-      sector: 'Healthcare',
-      state: 'Passive'
-    },
-    {
-      id: 4,
-      surveyName: 'Project Management Skills',
-      traitsCompetencies: 'Planning & Organization, Risk Management, Resource Allocation, Timeline Management',
-      sector: 'Technology',
-      state: 'Active'
-    },
-    {
-      id: 5,
-      surveyName: 'Customer Service Excellence',
-      traitsCompetencies: 'Customer Focus, Problem Solving, Empathy, Communication',
-      sector: 'Retail',
-      state: 'Active'
-    },
-    {
-      id: 6,
-      surveyName: 'Innovation & Creativity Assessment',
-      traitsCompetencies: 'Creative Thinking, Innovation, Problem Solving, Adaptability',
-      sector: 'Technology',
-      state: 'Passive'
-    },
-    {
-      id: 7,
-      surveyName: 'Financial Management Skills',
-      traitsCompetencies: 'Budget Planning, Financial Analysis, Risk Assessment, Cost Control',
-      sector: 'Finance',
-      state: 'Active'
-    },
-    {
-      id: 8,
-      surveyName: 'Sales Performance Review',
-      traitsCompetencies: 'Negotiation, Relationship Building, Persuasion, Market Analysis',
-      sector: 'Sales',
-      state: 'Active'
-    }
-  ];
+  // Fetch surveys data from API
+  useEffect(() => {
+    const fetchSurveys = async () => {
+      try {
+        setLoading(true);
+        const response = await surveysAPI.getAll();
+        if (response.success) {
+          setSurveysData(response.data || []);
+        } else {
+          setError('Failed to fetch surveys');
+        }
+      } catch (err) {
+        setError(err.message || 'Failed to fetch surveys');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSurveys();
+  }, []);
 
   // Get unique sectors for filter dropdown
   const sectors = [...new Set(surveysData.map(survey => survey.sector))];

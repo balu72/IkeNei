@@ -1,7 +1,33 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { traitsAPI } from '../../services/api';
 
 const DomainTraits = () => {
   const navigate = useNavigate();
+  const [traitsData, setTraitsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch traits data from API
+  useEffect(() => {
+    const fetchTraits = async () => {
+      try {
+        setLoading(true);
+        const response = await traitsAPI.getAll();
+        if (response.success) {
+          setTraitsData(response.data || []);
+        } else {
+          setError('Failed to fetch traits');
+        }
+      } catch (err) {
+        setError(err.message || 'Failed to fetch traits');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTraits();
+  }, []);
 
   const handleCreateTrait = () => {
     console.log('Create New Trait clicked');
@@ -11,100 +37,6 @@ const DomainTraits = () => {
   const handleBack = () => {
     navigate('/');
   };
-
-  // Sample traits data - in real app, this would come from API
-  const traitsData = [
-    {
-      id: 1,
-      traitName: 'Strategic Thinking',
-      category: 'Leadership',
-      description: 'Ability to think long-term and develop comprehensive strategies',
-      status: 'Active',
-      usedInSurveys: 5,
-      lastModified: '2024-01-15'
-    },
-    {
-      id: 2,
-      traitName: 'Decision Making',
-      category: 'Leadership',
-      description: 'Capacity to make effective decisions under pressure',
-      status: 'Active',
-      usedInSurveys: 4,
-      lastModified: '2024-01-12'
-    },
-    {
-      id: 3,
-      traitName: 'Team Management',
-      category: 'Leadership',
-      description: 'Skills in leading and managing team members effectively',
-      status: 'Active',
-      usedInSurveys: 6,
-      lastModified: '2024-01-10'
-    },
-    {
-      id: 4,
-      traitName: 'Verbal Communication',
-      category: 'Communication',
-      description: 'Ability to communicate effectively through spoken words',
-      status: 'Active',
-      usedInSurveys: 3,
-      lastModified: '2024-01-14'
-    },
-    {
-      id: 5,
-      traitName: 'Written Communication',
-      category: 'Communication',
-      description: 'Skills in expressing ideas clearly through written text',
-      status: 'Active',
-      usedInSurveys: 3,
-      lastModified: '2024-01-13'
-    },
-    {
-      id: 6,
-      traitName: 'Active Listening',
-      category: 'Communication',
-      description: 'Ability to listen attentively and understand others',
-      status: 'Active',
-      usedInSurveys: 2,
-      lastModified: '2024-01-11'
-    },
-    {
-      id: 7,
-      traitName: 'Problem Solving',
-      category: 'Analytical',
-      description: 'Capacity to identify and solve complex problems',
-      status: 'Draft',
-      usedInSurveys: 0,
-      lastModified: '2024-01-16'
-    },
-    {
-      id: 8,
-      traitName: 'Innovation',
-      category: 'Creativity',
-      description: 'Ability to generate new ideas and creative solutions',
-      status: 'Active',
-      usedInSurveys: 2,
-      lastModified: '2024-01-09'
-    },
-    {
-      id: 9,
-      traitName: 'Adaptability',
-      category: 'Personal',
-      description: 'Flexibility to adjust to changing circumstances',
-      status: 'Active',
-      usedInSurveys: 4,
-      lastModified: '2024-01-08'
-    },
-    {
-      id: 10,
-      traitName: 'Time Management',
-      category: 'Personal',
-      description: 'Ability to manage time effectively and meet deadlines',
-      status: 'Inactive',
-      usedInSurveys: 1,
-      lastModified: '2024-01-07'
-    }
-  ];
 
   const getStatusStyle = (status) => {
     const styles = {
@@ -270,73 +202,86 @@ const DomainTraits = () => {
               </tr>
             </thead>
             <tbody>
-              {traitsData.map((trait) => (
-                <tr key={trait.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                  <td style={{ padding: '1rem', color: '#374151', fontWeight: '500', verticalAlign: 'top' }}>
-                    {trait.traitName}
-                  </td>
-                  <td style={{ padding: '1rem', verticalAlign: 'top' }}>
-                    <span style={getCategoryStyle(trait.category)}>
-                      {trait.category}
-                    </span>
-                  </td>
-                  <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'top', lineHeight: '1.5' }}>
-                    {trait.description}
-                  </td>
-                  <td style={{ padding: '1rem', verticalAlign: 'top' }}>
-                    <span style={getStatusStyle(trait.status)}>
-                      {trait.status}
-                    </span>
-                  </td>
-                  <td style={{ padding: '1rem', color: '#374151', verticalAlign: 'top', textAlign: 'center' }}>
-                    <span style={{
-                      backgroundColor: trait.usedInSurveys > 0 ? '#dbeafe' : '#f3f4f6',
-                      color: trait.usedInSurveys > 0 ? '#1e40af' : '#6b7280',
-                      padding: '0.25rem 0.5rem',
-                      borderRadius: '0.375rem',
-                      fontSize: '0.75rem',
-                      fontWeight: '600'
-                    }}>
-                      {trait.usedInSurveys}
-                    </span>
-                  </td>
-                  <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'top' }}>
-                    {trait.lastModified}
-                  </td>
-                  <td style={{ padding: '1rem', verticalAlign: 'top' }}>
-                    <div style={{ display: 'flex', gap: '0.5rem', flexDirection: 'column' }}>
-                      <button
-                        onClick={() => console.log('Edit trait:', trait.id)}
-                        style={{
-                          padding: '0.25rem 0.5rem',
-                          fontSize: '0.75rem',
-                          border: '1px solid #d1d5db',
-                          borderRadius: '0.25rem',
-                          backgroundColor: 'white',
-                          color: '#374151',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => console.log('Toggle status:', trait.id)}
-                        style={{
-                          padding: '0.25rem 0.5rem',
-                          fontSize: '0.75rem',
-                          border: '1px solid #d1d5db',
-                          borderRadius: '0.25rem',
-                          backgroundColor: trait.status === 'Active' ? '#fef3c7' : '#dcfce7',
-                          color: trait.status === 'Active' ? '#d97706' : '#166534',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        {trait.status === 'Active' ? 'Deactivate' : 'Activate'}
-                      </button>
-                    </div>
+              {traitsData.length > 0 ? (
+                traitsData.map((trait) => (
+                  <tr key={trait.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
+                    <td style={{ padding: '1rem', color: '#374151', fontWeight: '500', verticalAlign: 'top' }}>
+                      {trait.traitName}
+                    </td>
+                    <td style={{ padding: '1rem', verticalAlign: 'top' }}>
+                      <span style={getCategoryStyle(trait.category)}>
+                        {trait.category}
+                      </span>
+                    </td>
+                    <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'top', lineHeight: '1.5' }}>
+                      {trait.description}
+                    </td>
+                    <td style={{ padding: '1rem', verticalAlign: 'top' }}>
+                      <span style={getStatusStyle(trait.status)}>
+                        {trait.status}
+                      </span>
+                    </td>
+                    <td style={{ padding: '1rem', color: '#374151', verticalAlign: 'top', textAlign: 'center' }}>
+                      <span style={{
+                        backgroundColor: trait.usedInSurveys > 0 ? '#dbeafe' : '#f3f4f6',
+                        color: trait.usedInSurveys > 0 ? '#1e40af' : '#6b7280',
+                        padding: '0.25rem 0.5rem',
+                        borderRadius: '0.375rem',
+                        fontSize: '0.75rem',
+                        fontWeight: '600'
+                      }}>
+                        {trait.usedInSurveys}
+                      </span>
+                    </td>
+                    <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'top' }}>
+                      {trait.lastModified}
+                    </td>
+                    <td style={{ padding: '1rem', verticalAlign: 'top' }}>
+                      <div style={{ display: 'flex', gap: '0.5rem', flexDirection: 'column' }}>
+                        <button
+                          onClick={() => console.log('Edit trait:', trait.id)}
+                          style={{
+                            padding: '0.25rem 0.5rem',
+                            fontSize: '0.75rem',
+                            border: '1px solid #d1d5db',
+                            borderRadius: '0.25rem',
+                            backgroundColor: 'white',
+                            color: '#374151',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => console.log('Toggle status:', trait.id)}
+                          style={{
+                            padding: '0.25rem 0.5rem',
+                            fontSize: '0.75rem',
+                            border: '1px solid #d1d5db',
+                            borderRadius: '0.25rem',
+                            backgroundColor: trait.status === 'Active' ? '#fef3c7' : '#dcfce7',
+                            color: trait.status === 'Active' ? '#d97706' : '#166534',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {trait.status === 'Active' ? 'Deactivate' : 'Activate'}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="7" style={{ 
+                    padding: '2rem', 
+                    textAlign: 'center', 
+                    color: '#6b7280',
+                    fontStyle: 'italic'
+                  }}>
+                    No traits found. Create your first trait to get started.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

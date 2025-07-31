@@ -2,6 +2,7 @@ from flask import jsonify, request
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 from datetime import datetime, timedelta
 import bcrypt
+from utils.logger import get_logger, log_function_call
 
 class AuthController:
     """
@@ -9,10 +10,14 @@ class AuthController:
     """
     
     @staticmethod
+    @log_function_call
     def login(email, password):
         """
         Account login with email/password
         """
+        logger = get_logger(__name__)
+        logger.info(f"Login attempt for email: {email}")
+        
         try:
             # Mock authentication - replace with actual database lookup
             # For demo purposes, accept any email/password combination

@@ -3,6 +3,7 @@ from flask_pymongo import PyMongo
 from bson import ObjectId
 from datetime import datetime
 import bcrypt
+from utils.logger import get_logger, log_function_call
 
 class AccountsController:
     """
@@ -10,10 +11,14 @@ class AccountsController:
     """
     
     @staticmethod
+    @log_function_call
     def get_all_accounts(page=1, limit=20, filters=None):
         """
         Get all accounts with pagination and filtering
         """
+        logger = get_logger(__name__)
+        logger.info(f"Fetching accounts - page: {page}, limit: {limit}, filters: {filters}")
+        
         try:
             # Mock implementation - replace with actual database queries
             mock_accounts = [
@@ -86,10 +91,14 @@ class AccountsController:
             }), 500
     
     @staticmethod
+    @log_function_call
     def create_account(data):
         """
         Create a new account
         """
+        logger = get_logger(__name__)
+        logger.info(f"Creating new account with data: {data}")
+        
         try:
             # Mock implementation - replace with actual database operations
             new_account = {

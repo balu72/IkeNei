@@ -2,6 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from config import Config
+from utils.logger import setup_logging, get_logger
 
 # Import route blueprints
 from routes.auth_routes import auth_bp
@@ -22,32 +23,48 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     
+    # Set up logging first
+    setup_logging(app)
+    logger = get_logger(__name__)
+    logger.info("Starting IkeNei Backend API application")
+    
     # Initialize extensions
     CORS(app)
     jwt = JWTManager(app)
+    logger.info("Flask extensions initialized")
     
     # Register blueprints
-    app.register_blueprint(auth_bp)
-    app.register_blueprint(accounts_bp)
-    app.register_blueprint(surveys_bp)
-    app.register_blueprint(traits_bp)
-    app.register_blueprint(reports_bp)
-    app.register_blueprint(subjects_bp)
-    app.register_blueprint(respondents_bp)
-    app.register_blueprint(settings_bp)
-    app.register_blueprint(dashboard_bp)
-    app.register_blueprint(analytics_bp)
-    app.register_blueprint(billing_bp)
-    app.register_blueprint(files_bp)
-    app.register_blueprint(notifications_bp)
+    blueprints = [
+        (auth_bp, 'Authentication'),
+        (accounts_bp, 'Accounts'),
+        (surveys_bp, 'Surveys'),
+        (traits_bp, 'Traits'),
+        (reports_bp, 'Reports'),
+        (subjects_bp, 'Subjects'),
+        (respondents_bp, 'Respondents'),
+        (settings_bp, 'Settings'),
+        (dashboard_bp, 'Dashboard'),
+        (analytics_bp, 'Analytics'),
+        (billing_bp, 'Billing'),
+        (files_bp, 'Files'),
+        (notifications_bp, 'Notifications')
+    ]
+    
+    for blueprint, name in blueprints:
+        app.register_blueprint(blueprint)
+        logger.info(f"Registered {name} blueprint")
     
     # Health check endpoint
     @app.route('/health')
     def health_check():
+        logger.info("Health check endpoint accessed")
         return {"status": "healthy", "message": "IkeNei Backend API is running"}
     
+    logger.info("IkeNei Backend API application setup completed")
     return app
 
 if __name__ == '__main__':
+    logger = get_logger(__name__)
+    logger.info("Starting IkeNei Backend API server on 0.0.0.0:5000")
     app = create_app()
     app.run(debug=True, host='0.0.0.0', port=5000)

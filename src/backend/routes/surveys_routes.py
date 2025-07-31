@@ -3,6 +3,8 @@ from controllers.surveys_controller import SurveysController
 from middleware.auth_middleware import require_domain_admin_role, require_admin_roles, require_auth
 from utils.response_helpers import validation_error_response, handle_exception
 from utils.pagination import get_pagination_params, get_filter_params
+from utils.logger import get_logger
+from utils.route_logger import log_route
 
 surveys_bp = Blueprint('surveys', __name__)
 
@@ -12,13 +14,20 @@ def get_surveys():
     """
     Get all surveys with filtering and pagination
     """
+    logger = get_logger(__name__)
+    logger.info("=== ENTRY: GET /api/surveys ===")
+    
     try:
         page, limit = get_pagination_params()
         filters = get_filter_params()
+        logger.info(f"Request parameters - page: {page}, limit: {limit}, filters: {filters}")
         
-        return SurveysController.get_all_surveys(page, limit, filters)
+        result = SurveysController.get_all_surveys(page, limit, filters)
+        logger.info("=== EXIT: GET /api/surveys - SUCCESS ===")
+        return result
     
     except Exception as e:
+        logger.error(f"=== EXIT: GET /api/surveys - ERROR: {str(e)} ===")
         return handle_exception(e)
 
 @surveys_bp.route('/api/surveys', methods=['POST'])
@@ -27,11 +36,16 @@ def create_survey():
     """
     Create new survey
     """
+    logger = get_logger(__name__)
+    logger.info("=== ENTRY: POST /api/surveys ===")
+    
     try:
         data = request.get_json()
+        logger.debug(f"Survey creation data: {data}")
         
         # Basic validation
         if not data:
+            logger.warning("Create survey failed: No request body provided")
             return validation_error_response({"request": "Request body is required"})
         
         required_fields = ['title', 'description']
@@ -42,11 +56,16 @@ def create_survey():
                 errors[field] = f"{field.replace('_', ' ').title()} is required"
         
         if errors:
+            logger.warning(f"Create survey validation failed: {errors}")
             return validation_error_response(errors)
         
-        return SurveysController.create_survey(data)
+        logger.info(f"Creating survey: {data.get('title')}")
+        result = SurveysController.create_survey(data)
+        logger.info("=== EXIT: POST /api/surveys - SUCCESS ===")
+        return result
     
     except Exception as e:
+        logger.error(f"=== EXIT: POST /api/surveys - ERROR: {str(e)} ===")
         return handle_exception(e)
 
 @surveys_bp.route('/api/surveys/<int:survey_id>', methods=['GET'])
@@ -55,14 +74,21 @@ def get_survey(survey_id):
     """
     Get specific survey details
     """
+    logger = get_logger(__name__)
+    logger.info(f"=== ENTRY: GET /api/surveys/{survey_id} ===")
+    
     try:
-        return SurveysController.get_survey_by_id(survey_id)
+        result = SurveysController.get_survey_by_id(survey_id)
+        logger.info(f"=== EXIT: GET /api/surveys/{survey_id} - SUCCESS ===")
+        return result
     
     except Exception as e:
+        logger.error(f"=== EXIT: GET /api/surveys/{survey_id} - ERROR: {str(e)} ===")
         return handle_exception(e)
 
 @surveys_bp.route('/api/surveys/<int:survey_id>', methods=['PUT'])
 @require_domain_admin_role
+@log_route
 def update_survey(survey_id):
     """
     Update survey
@@ -80,6 +106,7 @@ def update_survey(survey_id):
 
 @surveys_bp.route('/api/surveys/<int:survey_id>', methods=['DELETE'])
 @require_domain_admin_role
+@log_route
 def delete_survey(survey_id):
     """
     Delete survey
@@ -92,6 +119,7 @@ def delete_survey(survey_id):
 
 @surveys_bp.route('/api/surveys/<int:survey_id>/status', methods=['PATCH'])
 @require_domain_admin_role
+@log_route
 def update_survey_status(survey_id):
     """
     Change survey status (Active/Draft/Completed)
@@ -117,6 +145,7 @@ def update_survey_status(survey_id):
 
 @surveys_bp.route('/api/surveys/available', methods=['GET'])
 @require_auth
+@log_route
 def get_available_surveys():
     """
     Get available surveys for current account
@@ -129,6 +158,7 @@ def get_available_surveys():
 
 @surveys_bp.route('/api/surveys/<int:survey_id>/responses', methods=['POST'])
 @require_auth
+@log_route
 def submit_survey_responses(survey_id):
     """
     Submit survey responses
@@ -149,6 +179,7 @@ def submit_survey_responses(survey_id):
 
 @surveys_bp.route('/api/surveys/<int:survey_id>/responses', methods=['GET'])
 @require_auth
+@log_route
 def get_survey_responses(survey_id):
     """
     Get survey responses
@@ -161,6 +192,7 @@ def get_survey_responses(survey_id):
 
 @surveys_bp.route('/api/surveys/my-surveys', methods=['GET'])
 @require_auth
+@log_route
 def get_my_surveys():
     """
     Get surveys where account is subject/respondent
@@ -173,6 +205,7 @@ def get_my_surveys():
 
 @surveys_bp.route('/api/surveys/<int:survey_id>/run', methods=['POST'])
 @require_auth
+@log_route
 def run_survey(survey_id):
     """
     Run/execute a survey

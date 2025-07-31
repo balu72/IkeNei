@@ -3,11 +3,13 @@ from controllers.traits_controller import TraitsController
 from middleware.auth_middleware import require_domain_admin_role, require_admin_roles
 from utils.response_helpers import validation_error_response, handle_exception
 from utils.pagination import get_pagination_params, get_filter_params
+from utils.route_logger import log_route
 
 traits_bp = Blueprint('traits', __name__)
 
 @traits_bp.route('/api/traits', methods=['GET'])
 @require_admin_roles
+@log_route
 def get_traits():
     """
     Get all traits with filtering
@@ -23,6 +25,7 @@ def get_traits():
 
 @traits_bp.route('/api/traits', methods=['POST'])
 @require_domain_admin_role
+@log_route
 def create_trait():
     """
     Create new trait
@@ -51,6 +54,7 @@ def create_trait():
 
 @traits_bp.route('/api/traits/<int:trait_id>', methods=['GET'])
 @require_admin_roles
+@log_route
 def get_trait(trait_id):
     """
     Get specific trait details
@@ -63,6 +67,7 @@ def get_trait(trait_id):
 
 @traits_bp.route('/api/traits/<int:trait_id>', methods=['PUT'])
 @require_domain_admin_role
+@log_route
 def update_trait(trait_id):
     """
     Update trait
@@ -80,6 +85,7 @@ def update_trait(trait_id):
 
 @traits_bp.route('/api/traits/<int:trait_id>', methods=['DELETE'])
 @require_domain_admin_role
+@log_route
 def delete_trait(trait_id):
     """
     Delete trait
@@ -92,6 +98,7 @@ def delete_trait(trait_id):
 
 @traits_bp.route('/api/traits/<int:trait_id>/status', methods=['PATCH'])
 @require_domain_admin_role
+@log_route
 def update_trait_status(trait_id):
     """
     Change trait status (Active/Draft/Inactive)
@@ -117,6 +124,7 @@ def update_trait_status(trait_id):
 
 @traits_bp.route('/api/traits/categories', methods=['GET'])
 @require_admin_roles
+@log_route
 def get_trait_categories():
     """
     Get trait categories
@@ -129,6 +137,7 @@ def get_trait_categories():
 
 @traits_bp.route('/api/traits/usage', methods=['GET'])
 @require_admin_roles
+@log_route
 def get_trait_usage():
     """
     Get trait usage statistics

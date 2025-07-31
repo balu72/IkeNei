@@ -21,8 +21,14 @@ def log_route(func):
         if request.args:
             logger.debug(f"Query parameters: {dict(request.args)}")
         
-        if request.json:
-            logger.debug(f"Request body: {request.json}")
+        # Only try to access JSON for requests that might have a body
+        if request.method in ['POST', 'PUT', 'PATCH'] and request.content_type == 'application/json':
+            try:
+                if request.json:
+                    logger.debug(f"Request body: {request.json}")
+            except Exception:
+                # Ignore JSON parsing errors for logging
+                pass
         
         # Log path parameters
         if kwargs:

@@ -70,8 +70,15 @@ def setup_logging(app):
     def log_request_info():
         g.start_time = datetime.now()
         app.logger.info(f"Request started: {request.method} {request.url} from {request.remote_addr}")
-        if request.json:
-            app.logger.debug(f"Request body: {request.json}")
+        
+        # Only try to access JSON for requests that might have a body
+        if request.method in ['POST', 'PUT', 'PATCH'] and request.content_type == 'application/json':
+            try:
+                if request.json:
+                    app.logger.debug(f"Request body: {request.json}")
+            except Exception:
+                # Ignore JSON parsing errors for logging
+                pass
     
     @app.after_request
     def log_request_result(response):

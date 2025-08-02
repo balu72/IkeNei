@@ -33,11 +33,13 @@ const Accounts = () => {
 
   // Filter accounts based on search term and state filter
   const filteredAccounts = accountsData.filter(account => {
-    const matchesSearch = account.accountName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         account.contactInfo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         account.accountType.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = account.account_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         account.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         account.account_type.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesState = filterState === 'all' || account.state.toLowerCase() === filterState.toLowerCase();
+    const matchesState = filterState === 'all' || 
+                        (filterState === 'active' && account.is_active) ||
+                        (filterState === 'passive' && !account.is_active);
     
     return matchesSearch && matchesState;
   });
@@ -216,17 +218,17 @@ const Accounts = () => {
                 filteredAccounts.map((account) => (
                   <tr key={account.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
                     <td style={{ padding: '1rem', color: '#374151', fontWeight: '500' }}>
-                      {account.accountName}
+                      {account.account_name}
                     </td>
                     <td style={{ padding: '1rem', color: '#6b7280' }}>
-                      {account.contactInfo}
+                      {account.email}
                     </td>
                     <td style={{ padding: '1rem', color: '#374151' }}>
-                      {account.accountType}
+                      {account.account_type}
                     </td>
                     <td style={{ padding: '1rem' }}>
-                      <span style={getStateStyle(account.state)}>
-                        {account.state}
+                      <span style={getStateStyle(account.is_active ? 'Active' : 'Passive')}>
+                        {account.is_active ? 'Active' : 'Passive'}
                       </span>
                     </td>
                     <td style={{ padding: '1rem' }}>
@@ -252,12 +254,12 @@ const Accounts = () => {
                             fontSize: '0.75rem',
                             border: '1px solid #d1d5db',
                             borderRadius: '0.25rem',
-                            backgroundColor: account.state === 'Active' ? '#fef3c7' : '#dcfce7',
-                            color: account.state === 'Active' ? '#d97706' : '#166534',
+                            backgroundColor: account.is_active ? '#fef3c7' : '#dcfce7',
+                            color: account.is_active ? '#d97706' : '#166534',
                             cursor: 'pointer'
                           }}
                         >
-                          {account.state === 'Active' ? 'Deactivate' : 'Activate'}
+                          {account.is_active ? 'Deactivate' : 'Activate'}
                         </button>
                       </div>
                     </td>
@@ -289,14 +291,14 @@ const Accounts = () => {
       }}>
         <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>
           <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#10b981', marginBottom: '0.5rem' }}>
-            {accountsData.filter(a => a.state === 'Active').length}
+            {accountsData.filter(a => a.is_active === true).length}
           </div>
           <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Active Accounts</p>
         </div>
         
         <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>
           <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#f59e0b', marginBottom: '0.5rem' }}>
-            {accountsData.filter(a => a.state === 'Passive').length}
+            {accountsData.filter(a => a.is_active === false).length}
           </div>
           <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Passive Accounts</p>
         </div>

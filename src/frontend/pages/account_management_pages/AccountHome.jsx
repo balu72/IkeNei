@@ -24,21 +24,55 @@ const AccountHome = () => {
 
 
   const handleRunSurvey = async () => {
+    console.log('🚀 RUN SURVEY BUTTON CLICKED!');
     try {
-      // First, let's get available surveys
-      console.log('Getting available surveys...');
-      const response = await surveysAPI.getAvailable();
+      // First, get available surveys
+      console.log('📡 Getting available surveys...');
+      const availableSurveysResponse = await surveysAPI.getAvailable();
+      console.log('📊 Available Surveys Response:', availableSurveysResponse);
       
-      if (response.success && response.data && response.data.length > 0) {
-        // If there are available surveys, navigate to run survey page
-        navigate('/run-survey');
+      if (availableSurveysResponse.success && availableSurveysResponse.data && availableSurveysResponse.data.length > 0) {
+        const surveys = availableSurveysResponse.data;
+        console.log('✅ Found surveys:', surveys);
+        
+        // For now, let's auto-select the first survey or let user choose
+        let selectedSurvey;
+        if (surveys.length === 1) {
+          selectedSurvey = surveys[0];
+          console.log('🎯 Auto-selecting single survey:', selectedSurvey.title);
+        } else {
+          // Multiple surveys - let user choose (for now, just pick the first one)
+          selectedSurvey = surveys[0];
+          console.log('🎯 Multiple surveys found, selecting first:', selectedSurvey.title);
+        }
+        
+        // Now actually run/initiate the survey
+        console.log('🚀 Initiating survey run for survey ID:', selectedSurvey.id);
+        const runSurveyResponse = await surveysAPI.runSurvey(selectedSurvey.id, {
+          // Add any additional data needed for running the survey
+          initiated_by: 'account_user',
+          timestamp: new Date().toISOString()
+        });
+        
+        console.log('📊 Run Survey Response:', runSurveyResponse);
+        
+        if (runSurveyResponse.success) {
+          console.log('✅ Survey initiated successfully!');
+          alert(`Survey "${selectedSurvey.title}" has been initiated successfully!`);
+          // Navigate to the run survey page to show progress/details
+          navigate('/run-survey');
+        } else {
+          console.log('❌ Failed to initiate survey');
+          alert('Failed to initiate survey: ' + (runSurveyResponse.error?.message || 'Unknown error'));
+        }
       } else {
+        console.log('❌ No surveys available');
         alert('No surveys available to run at this time.');
       }
     } catch (error) {
-      console.error('Error getting available surveys:', error);
-      // Still navigate to the page, let the page handle the error
-      navigate('/run-survey');
+      console.error('💥 Error running survey:', error);
+      console.error('💥 Error details:', error.message, error.stack);
+      alert('Error occurred while running survey: ' + error.message);
     }
   };
 

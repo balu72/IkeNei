@@ -32,17 +32,19 @@ const Surveys = () => {
     fetchSurveys();
   }, []);
 
-  // Get unique sectors for filter dropdown
-  const sectors = [...new Set(surveysData.map(survey => survey.sector))];
+  // Get unique sectors for filter dropdown (using account_name as sector substitute)
+  const sectors = [...new Set(surveysData.map(survey => survey.account_name).filter(Boolean))];
 
   // Filter surveys based on search term, state filter, and sector filter
   const filteredSurveys = surveysData.filter(survey => {
-    const matchesSearch = survey.surveyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         survey.traitsCompetencies.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         survey.sector.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = survey.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         survey.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (survey.account_name && survey.account_name.toLowerCase().includes(searchTerm.toLowerCase()));
     
-    const matchesState = filterState === 'all' || survey.state.toLowerCase() === filterState.toLowerCase();
-    const matchesSector = filterSector === 'all' || survey.sector === filterSector;
+    const matchesState = filterState === 'all' || 
+                        (filterState === 'active' && survey.status === 'active') ||
+                        (filterState === 'passive' && survey.status !== 'active');
+    const matchesSector = filterSector === 'all' || survey.account_name === filterSector;
     
     return matchesSearch && matchesState && matchesSector;
   });
@@ -239,10 +241,10 @@ const Surveys = () => {
                 filteredSurveys.map((survey) => (
                   <tr key={survey.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
                     <td style={{ padding: '1rem', color: '#374151', fontWeight: '500', verticalAlign: 'top' }}>
-                      {survey.surveyName}
+                      {survey.title}
                     </td>
                     <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'top', lineHeight: '1.5' }}>
-                      {survey.traitsCompetencies}
+                      {survey.description}
                     </td>
                     <td style={{ padding: '1rem', color: '#374151', verticalAlign: 'top' }}>
                       <span style={{
@@ -253,21 +255,21 @@ const Surveys = () => {
                         fontSize: '0.75rem',
                         fontWeight: '500'
                       }}>
-                        {survey.sector}
+                        {survey.account_name || 'N/A'}
                       </span>
                     </td>
                     <td style={{ padding: '1rem', verticalAlign: 'top' }}>
-                      <span style={getStateStyle(survey.state)}>
-                        {survey.state}
+                      <span style={getStateStyle(survey.status === 'active' ? 'Active' : 'Passive')}>
+                        {survey.status === 'active' ? 'Active' : 'Passive'}
                       </span>
                     </td>
                     <td style={{ padding: '1rem', verticalAlign: 'top' }}>
                       <div style={{ display: 'flex', gap: '0.5rem', flexDirection: 'column' }}>
                         <button
-                          onClick={() => handleToggleState(survey.id, survey.state)}
-                          style={getToggleButtonStyle(survey.state)}
+                          onClick={() => handleToggleState(survey.id, survey.status === 'active' ? 'Active' : 'Passive')}
+                          style={getToggleButtonStyle(survey.status === 'active' ? 'Active' : 'Passive')}
                         >
-                          {survey.state === 'Active' ? 'Retire' : 'Activate'}
+                          {survey.status === 'active' ? 'Retire' : 'Activate'}
                         </button>
                         <button
                           onClick={() => console.log('View details:', survey.id)}
@@ -313,14 +315,14 @@ const Surveys = () => {
       }}>
         <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>
           <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#10b981', marginBottom: '0.5rem' }}>
-            {surveysData.filter(s => s.state === 'Active').length}
+            {surveysData.filter(s => s.status === 'active').length}
           </div>
           <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Active Surveys</p>
         </div>
         
         <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>
           <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#f59e0b', marginBottom: '0.5rem' }}>
-            {surveysData.filter(s => s.state === 'Passive').length}
+            {surveysData.filter(s => s.status !== 'active').length}
           </div>
           <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Retired Surveys</p>
         </div>

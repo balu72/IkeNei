@@ -2,6 +2,8 @@ from flask import Blueprint, request
 from controllers.subjects_controller import SubjectsController
 from middleware.auth_middleware import require_auth
 from utils.response_helpers import validation_error_response, handle_exception
+from utils.logger import get_logger
+from utils.route_logger import log_route
 
 subjects_bp = Blueprint('subjects', __name__)
 
@@ -11,10 +13,17 @@ def get_subjects():
     """
     Get account's subjects
     """
+    logger = get_logger(__name__)
+    logger.info("=== ENTRY: GET /api/subjects ===")
+    
     try:
-        return SubjectsController.get_account_subjects()
+        logger.info("Fetching subjects for current account")
+        result = SubjectsController.get_account_subjects()
+        logger.info("=== EXIT: GET /api/subjects - SUCCESS ===")
+        return result
     
     except Exception as e:
+        logger.error(f"=== EXIT: GET /api/subjects - ERROR: {str(e)} ===")
         return handle_exception(e)
 
 @subjects_bp.route('/api/subjects', methods=['POST'])
@@ -23,11 +32,16 @@ def create_subject():
     """
     Create new subject
     """
+    logger = get_logger(__name__)
+    logger.info("=== ENTRY: POST /api/subjects ===")
+    
     try:
         data = request.get_json()
+        logger.debug(f"Subject creation data: {data}")
         
         # Basic validation
         if not data:
+            logger.warning("Create subject failed: No request body provided")
             return validation_error_response({"request": "Request body is required"})
         
         required_fields = ['name', 'email']
@@ -43,15 +57,21 @@ def create_subject():
             errors['email'] = "Invalid email format"
         
         if errors:
+            logger.warning(f"Create subject validation failed: {errors}")
             return validation_error_response(errors)
         
-        return SubjectsController.create_subject(data)
+        logger.info(f"Creating subject: {data.get('name')} ({data.get('email')})")
+        result = SubjectsController.create_subject(data)
+        logger.info("=== EXIT: POST /api/subjects - SUCCESS ===")
+        return result
     
     except Exception as e:
+        logger.error(f"=== EXIT: POST /api/subjects - ERROR: {str(e)} ===")
         return handle_exception(e)
 
 @subjects_bp.route('/api/subjects/<int:subject_id>', methods=['GET'])
 @require_auth
+@log_route
 def get_subject(subject_id):
     """
     Get subject details
@@ -64,6 +84,7 @@ def get_subject(subject_id):
 
 @subjects_bp.route('/api/subjects/<int:subject_id>', methods=['PUT'])
 @require_auth
+@log_route
 def update_subject(subject_id):
     """
     Update subject
@@ -86,6 +107,7 @@ def update_subject(subject_id):
 
 @subjects_bp.route('/api/subjects/<int:subject_id>', methods=['DELETE'])
 @require_auth
+@log_route
 def delete_subject(subject_id):
     """
     Delete subject

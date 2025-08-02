@@ -28,8 +28,11 @@ def create_app():
     logger = get_logger(__name__)
     logger.info("Starting IkeNei Backend API application")
     
-    # Initialize extensions
-    CORS(app)
+    # Initialize extensions with explicit CORS configuration
+    CORS(app, 
+         origins=['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3000'],
+         allow_headers=['Content-Type', 'Authorization'],
+         methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'])
     jwt = JWTManager(app)
     logger.info("Flask extensions initialized")
     

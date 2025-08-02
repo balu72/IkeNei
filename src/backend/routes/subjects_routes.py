@@ -1,4 +1,5 @@
 from flask import Blueprint, request
+from flask_jwt_extended import get_jwt_identity
 from controllers.subjects_controller import SubjectsController
 from middleware.auth_middleware import require_auth
 from utils.response_helpers import validation_error_response, handle_exception
@@ -60,7 +61,11 @@ def create_subject():
             logger.warning(f"Create subject validation failed: {errors}")
             return validation_error_response(errors)
         
-        logger.info(f"Creating subject: {data.get('name')} ({data.get('email')})")
+        # Get account_id from JWT token
+        current_user_id = get_jwt_identity()
+        data['account_id'] = current_user_id
+        
+        logger.info(f"Creating subject: {data.get('name')} ({data.get('email')}) for account: {current_user_id}")
         result = SubjectsController.create_subject(data)
         logger.info("=== EXIT: POST /api/subjects - SUCCESS ===")
         return result

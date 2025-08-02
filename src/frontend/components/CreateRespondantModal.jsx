@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { categoriesAPI } from '../services/api';
 
-const CreateRespondantModal = ({ isOpen, onClose, onSubmit }) => {
+const CreateRespondantModal = ({ isOpen, onClose, onSubmit, subjects = [] }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -10,6 +11,35 @@ const CreateRespondantModal = ({ isOpen, onClose, onSubmit }) => {
     category: '',
     otherInfo: ''
   });
+
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+
+  // Fetch categories when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      const fetchCategories = async () => {
+        try {
+          setLoadingCategories(true);
+          const response = await categoriesAPI.getRespondentCategories();
+          if (response.success) {
+            setCategories(response.data);
+          }
+        } catch (error) {
+          console.error('Error fetching categories:', error);
+          // Fallback to default categories if API fails
+          setCategories([
+            'Peer', 'Subordinate', 'Boss', 'Customer', 'Previous Employer',
+            'Super Boss', 'Parent', 'Teacher', 'Counseller', 'Third Party', 'Others'
+          ]);
+        } finally {
+          setLoadingCategories(false);
+        }
+      };
+
+      fetchCategories();
+    }
+  }, [isOpen]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -189,10 +219,11 @@ const CreateRespondantModal = ({ isOpen, onClose, onSubmit }) => {
               }}
             >
               <option value="">Select a subject</option>
-              <option value="John Doe">John Doe</option>
-              <option value="Jane Smith">Jane Smith</option>
-              <option value="Robert Brown">Robert Brown</option>
-              <option value="Lisa Anderson">Lisa Anderson</option>
+              {subjects.map((subject) => (
+                <option key={subject.id} value={subject.id}>
+                  {subject.name}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -205,6 +236,7 @@ const CreateRespondantModal = ({ isOpen, onClose, onSubmit }) => {
               value={formData.category}
               onChange={handleInputChange}
               required
+              disabled={loadingCategories}
               style={{
                 width: '100%',
                 padding: '0.75rem',
@@ -213,18 +245,14 @@ const CreateRespondantModal = ({ isOpen, onClose, onSubmit }) => {
                 fontSize: '0.875rem'
               }}
             >
-              <option value="">Select a category</option>
-              <option value="Peer">Peer</option>
-              <option value="Subordinate">Subordinate</option>
-              <option value="Boss">Boss</option>
-              <option value="Customer">Customer</option>
-              <option value="Previous Employer">Previous Employer</option>
-              <option value="Super Boss">Super Boss</option>
-              <option value="Parent">Parent</option>
-              <option value="Teacher">Teacher</option>
-              <option value="Counseller">Counseller</option>
-              <option value="Third Party">Third Party</option>
-              <option value="Others">Others</option>
+              <option value="">
+                {loadingCategories ? 'Loading categories...' : 'Select a category'}
+              </option>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
             </select>
           </div>
 

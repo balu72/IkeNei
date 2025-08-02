@@ -14,7 +14,7 @@ def get_respondents():
     try:
         # Optional subject_id filter
         subject_id = request.args.get('subject_id', type=int)
-        return RespondentsController.get_account_respondents(subject_id)
+        return RespondentsController.get_all_respondents(subject_id)
     
     except Exception as e:
         return handle_exception(e)
@@ -46,7 +46,10 @@ def create_respondent():
         
         # Validate relationship
         relationship = data.get('relationship')
-        valid_relationships = ['supervisor', 'peer', 'direct_report', 'customer', 'other']
+        valid_relationships = [
+            'Peer', 'Subordinate', 'Boss', 'Customer', 'Previous Employer', 
+            'Super Boss', 'Parent', 'Teacher', 'Counseller', 'Third Party', 'other'
+        ]
         
         if relationship and relationship not in valid_relationships:
             errors['relationship'] = f"Relationship must be one of: {', '.join(valid_relationships)}"

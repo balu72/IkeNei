@@ -16,6 +16,7 @@ from routes.auth_routes import auth_bp
 from routes.accounts_routes import accounts_bp
 from routes.surveys_routes import surveys_bp
 from routes.traits_routes import traits_bp
+from routes.categories_routes import categories_bp
 from routes.reports_routes import reports_bp
 from routes.subjects_routes import subjects_bp
 from routes.respondents_routes import respondents_bp
@@ -49,6 +50,7 @@ def create_app():
         (accounts_bp, 'Accounts'),
         (surveys_bp, 'Surveys'),
         (traits_bp, 'Traits'),
+        (categories_bp, 'Categories'),
         (reports_bp, 'Reports'),
         (subjects_bp, 'Subjects'),
         (respondents_bp, 'Respondents'),

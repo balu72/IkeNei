@@ -56,7 +56,7 @@ const Sidebar = () => {
     if (isAccount) return 'Account';
     if (isDomainAdmin) return 'Domain Admin';
     if (isSystemAdmin) return 'System Admin';
-    return 'User';
+    return 'Account'; // Default to Account instead of User
   };
 
   const getRoleColor = () => {
@@ -121,7 +121,7 @@ const Sidebar = () => {
             <span className="user-avatar-text">{user?.avatar || 'U'}</span>
           </div>
           <div style={{ flex: 1 }}>
-            <p className="user-name">{user?.name || 'User'}</p>
+            <p className="user-name">{user?.account_name || user?.name || 'Account User'}</p>
             <p className="user-email">{user?.email || 'user@example.com'}</p>
           </div>
           <button

@@ -1,5 +1,7 @@
 from flask import jsonify
 from datetime import datetime
+from database import RespondentRepository
+from utils.logger import get_logger, log_function_call
 
 class RespondentsController:
     """
@@ -7,79 +9,80 @@ class RespondentsController:
     """
     
     @staticmethod
+    @log_function_call
     def get_all_respondents(subject_id=None):
         """
         Get all respondents, optionally filtered by subject
         """
+        logger = get_logger(__name__)
+        logger.info(f"Retrieving all respondents, subject_id filter: {subject_id}")
+        
         try:
-            mock_respondents = [
-                {
-                    "id": "1",
-                    "name": "Alice Brown",
-                    "email": "alice.brown@company.com",
-                    "relationship": "Direct Report",
-                    "subject_id": "1",
-                    "subject_name": "John Smith",
-                    "status": "invited",
-                    "response_status": "pending",
-                    "invited_at": "2024-01-15T00:00:00Z",
-                    "created_at": "2024-01-15T00:00:00Z"
-                },
-                {
-                    "id": "2",
-                    "name": "Bob Wilson",
-                    "email": "bob.wilson@company.com",
-                    "relationship": "Peer",
-                    "subject_id": "1",
-                    "subject_name": "John Smith",
-                    "status": "active",
-                    "response_status": "completed",
-                    "invited_at": "2024-01-15T00:00:00Z",
-                    "responded_at": "2024-01-18T00:00:00Z",
-                    "created_at": "2024-01-15T00:00:00Z"
-                }
-            ]
+            # Get pagination parameters (could be from request args)
+            page = 1
+            per_page = 20
             
-            # Filter by subject if provided
-            if subject_id:
-                mock_respondents = [r for r in mock_respondents if r['subject_id'] == str(subject_id)]
+            # Get respondents from database
+            result = RespondentRepository.get_all_respondents(
+                page=page,
+                per_page=per_page,
+                subject_id=subject_id
+            )
+            
+            # Convert to public dict format
+            respondents_data = [respondent.to_public_dict() for respondent in result['respondents']]
             
             return jsonify({
                 "success": True,
-                "data": mock_respondents
+                "data": respondents_data,
+                "pagination": result['pagination']
             })
             
         except Exception as e:
+            logger.error(f"Failed to retrieve respondents: {str(e)}")
             return jsonify({
                 "success": False,
                 "error": {"message": f"Failed to retrieve respondents: {str(e)}"}
             }), 500
     
     @staticmethod
+    @log_function_call
     def create_respondent(data):
         """
         Create a new respondent
         """
+        logger = get_logger(__name__)
+        logger.info(f"Creating new respondent with data: {data}")
+        
         try:
-            new_respondent = {
-                "id": "new_respondent_id",
-                "name": data.get('name'),
-                "email": data.get('email'),
-                "relationship": data.get('relationship', 'Peer'),
-                "subject_id": data.get('subject_id'),
-                "status": "invited",
-                "response_status": "pending",
-                "invited_at": datetime.utcnow().isoformat() + "Z",
-                "created_at": datetime.utcnow().isoformat() + "Z"
-            }
+            # Validate required fields
+            required_fields = ['name', 'email', 'subject_id', 'relationship']
+            for field in required_fields:
+                if not data.get(field):
+                    return jsonify({
+                        "success": False,
+                        "error": {"message": f"Missing required field: {field}"}
+                    }), 400
+            
+            # Create respondent using repository
+            respondent = RespondentRepository.create_respondent(
+                subject_id=data.get('subject_id'),
+                name=data.get('name'),
+                email=data.get('email'),
+                phone=data.get('phone'),
+                address=data.get('address'),
+                relationship=data.get('relationship'),
+                other_info=data.get('other_info')
+            )
             
             return jsonify({
                 "success": True,
-                "data": new_respondent,
+                "data": respondent.to_public_dict(),
                 "message": "Respondent created successfully"
             }), 201
             
         except Exception as e:
+            logger.error(f"Failed to create respondent: {str(e)}")
             return jsonify({
                 "success": False,
                 "error": {"message": f"Failed to create respondent: {str(e)}"}

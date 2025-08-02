@@ -19,7 +19,7 @@ class Account(BaseModel):
     required_fields = ['email', 'password_hash', 'account_name', 'account_type']
     
     # Account types
-    ACCOUNT_TYPES = ['standard', 'premium', 'enterprise']
+    ACCOUNT_TYPES = ['account', 'domain_admin', 'system_admin']
     
     # Default settings
     DEFAULT_SETTINGS = {
@@ -46,12 +46,12 @@ class Account(BaseModel):
             kwargs['email_verified'] = False
         
         if 'account_type' not in kwargs:
-            kwargs['account_type'] = 'standard'
+            kwargs['account_type'] = 'account'
         
         super().__init__(**kwargs)
     
     @classmethod
-    def create_account(cls, email, password, account_name, account_type='standard', **kwargs):
+    def create_account(cls, email, password, account_name, account_type='account', **kwargs):
         """Create a new account with hashed password"""
         # Validate account type
         if account_type not in cls.ACCOUNT_TYPES:

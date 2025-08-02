@@ -15,25 +15,25 @@ def seed_accounts():
             'email': 'account1@example.com',
             'password': 'password123',
             'account_name': 'Demo Account 1',
-            'account_type': 'standard'
+            'account_type': 'account'
         },
         {
-            'email': 'account2@example.com',
+            'email': 'domainadmin@example.com',
             'password': 'password123',
-            'account_name': 'Demo Account 2',
-            'account_type': 'premium'
+            'account_name': 'Domain Admin',
+            'account_type': 'domain_admin'
         },
         {
-            'email': 'enterprise@example.com',
+            'email': 'sysadmin@example.com',
             'password': 'password123',
-            'account_name': 'Enterprise Corp',
-            'account_type': 'enterprise'
+            'account_name': 'System Admin',
+            'account_type': 'system_admin'
         },
         {
             'email': 'test@example.com',
             'password': 'password',
             'account_name': 'Test Account',
-            'account_type': 'standard'
+            'account_type': 'account'
         }
     ]
     

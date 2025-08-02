@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import CreateSubjectModal from '../../components/CreateSubjectModal';
 import CreateRespondantModal from '../../components/CreateRespondantModal';
 import { subjectsAPI, respondentsAPI, surveysAPI } from '../../services/api';
@@ -9,6 +9,60 @@ const AccountHome = () => {
   const [showSubjectModal, setShowSubjectModal] = useState(false);
   const [showRespondantModal, setShowRespondantModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [dashboardData, setDashboardData] = useState({
+    subjects: [],
+    respondents: [],
+    surveys: [],
+    stats: {
+      subjectsCount: 0,
+      respondentsCount: 0,
+      liveSurveysCount: 0
+    }
+  });
+
+  // Fetch dashboard data function
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch subjects, respondents, and surveys in parallel
+      const [subjectsResponse, respondentsResponse, surveysResponse] = await Promise.all([
+        subjectsAPI.getAll().catch(err => ({ success: false, error: err })),
+        respondentsAPI.getAll().catch(err => ({ success: false, error: err })),
+        surveysAPI.getMySurveys().catch(err => ({ success: false, error: err }))
+      ]);
+
+      console.log('📊 Surveys Response:', surveysResponse);
+
+      const subjects = subjectsResponse.success ? subjectsResponse.data : [];
+      const respondents = respondentsResponse.success ? respondentsResponse.data : [];
+      const surveys = surveysResponse.success ? surveysResponse.data : [];
+
+      console.log('📊 Surveys Count:', surveys.length);
+
+      setDashboardData({
+        subjects,
+        respondents,
+        surveys,
+        stats: {
+          subjectsCount: subjects.length,
+          respondentsCount: respondents.length,
+          liveSurveysCount: surveys.filter(s => s.status === 'active' || s.status === 'open').length
+        }
+      });
+
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch dashboard data on component mount
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
 
   const handleUpdateProfile = () => {
     navigate('/profile');
@@ -105,21 +159,46 @@ const AccountHome = () => {
     setIsSubmitting(true);
     try {
       console.log('Creating respondent with data:', data);
-      const response = await respondentsAPI.create(data);
+      
+      // Map form data to backend expected format
+      const mappedData = {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        subject_id: data.subjectAttachedTo, // Map subjectAttachedTo to subject_id
+        relationship: mapCategoryToRelationship(data.category), // Map category to relationship
+        other_info: data.otherInfo
+      };
+      
+      console.log('Mapped data for backend:', mappedData);
+      const response = await respondentsAPI.create(mappedData);
       
       if (response.success) {
         alert('Respondent created successfully!');
         setShowRespondantModal(false);
-        // Optionally refresh the page or update the respondents list
+        // Refresh dashboard data to show updated counts
+        fetchDashboardData();
       } else {
+        console.error('Backend validation error:', response.error);
         alert('Failed to create respondent: ' + (response.error?.message || 'Unknown error'));
       }
     } catch (error) {
       console.error('Error creating respondent:', error);
+      console.error('Full error object:', error);
       alert('Failed to create respondent: ' + error.message);
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Helper function to map category to relationship
+  const mapCategoryToRelationship = (category) => {
+    // Only map "Others" to "other", keep all other categories as their original names
+    if (category === 'Others') {
+      return 'other';
+    }
+    return category;
   };
 
 
@@ -147,7 +226,7 @@ const AccountHome = () => {
             color: '#d946ef',
             marginBottom: '0.5rem'
           }}>
-            2
+            {loading ? '...' : dashboardData.stats.subjectsCount}
           </div>
           <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '0.25rem' }}>
             Subjects
@@ -164,7 +243,7 @@ const AccountHome = () => {
             color: '#10b981',
             marginBottom: '0.5rem'
           }}>
-            3
+            {loading ? '...' : dashboardData.stats.respondentsCount}
           </div>
           <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '0.25rem' }}>
             Respondants
@@ -181,7 +260,7 @@ const AccountHome = () => {
             color: '#3b82f6',
             marginBottom: '0.5rem'
           }}>
-            2
+            {loading ? '...' : dashboardData.stats.liveSurveysCount}
           </div>
           <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '0.25rem' }}>
             Live Surveys
@@ -297,109 +376,68 @@ const AccountHome = () => {
               </tr>
             </thead>
             <tbody>
-              <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
-                <td style={{ padding: '1rem', color: '#374151' }}>John Doe</td>
-                <td style={{ padding: '1rem', color: '#374151' }}>
-                  Sarah Wilson, Mike Johnson, Emily Davis
-                </td>
-                <td style={{ padding: '1rem', color: '#374151' }}>Leadership Skills Assessment</td>
-                <td style={{ padding: '1rem' }}>
-                  <span style={{
-                    backgroundColor: '#dcfce7',
-                    color: '#166534',
-                    padding: '0.25rem 0.75rem',
-                    borderRadius: '1rem',
-                    fontSize: '0.75rem',
-                    fontWeight: '500'
-                  }}>
-                    Open
-                  </span>
-                </td>
-                <td style={{ padding: '1rem', color: '#6b7280' }}>
-                  -
-                </td>
-              </tr>
-              <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
-                <td style={{ padding: '1rem', color: '#374151' }}>Jane Smith</td>
-                <td style={{ padding: '1rem', color: '#374151' }}>
-                  Robert Brown, Lisa Anderson, David Wilson, Tom Harris
-                </td>
-                <td style={{ padding: '1rem', color: '#374151' }}>Communication Skills Survey</td>
-                <td style={{ padding: '1rem' }}>
-                  <span style={{
-                    backgroundColor: '#fef3c7',
-                    color: '#d97706',
-                    padding: '0.25rem 0.75rem',
-                    borderRadius: '1rem',
-                    fontSize: '0.75rem',
-                    fontWeight: '500'
-                  }}>
-                    Open
-                  </span>
-                </td>
-                <td style={{ padding: '1rem', color: '#6b7280' }}>
-                  -
-                </td>
-              </tr>
-              <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
-                <td style={{ padding: '1rem', color: '#374151' }}>Robert Brown</td>
-                <td style={{ padding: '1rem', color: '#374151' }}>
-                  Emily Davis, Sarah Wilson, John Doe
-                </td>
-                <td style={{ padding: '1rem', color: '#374151' }}>Team Management Review</td>
-                <td style={{ padding: '1rem' }}>
-                  <span style={{
-                    backgroundColor: '#fee2e2',
-                    color: '#dc2626',
-                    padding: '0.25rem 0.75rem',
-                    borderRadius: '1rem',
-                    fontSize: '0.75rem',
-                    fontWeight: '500'
-                  }}>
-                    Closed
-                  </span>
-                </td>
-                <td style={{ padding: '1rem' }}>
-                  <a 
-                    href="#" 
-                    style={{
-                      color: '#3b82f6',
-                      textDecoration: 'underline',
-                      fontSize: '0.875rem',
-                      fontWeight: '500'
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      // Handle report view
-                      console.log('View report for Team Management Review');
-                    }}
-                  >
-                    View Report
-                  </a>
-                </td>
-              </tr>
-              <tr>
-                <td style={{ padding: '1rem', color: '#374151' }}>Lisa Anderson</td>
-                <td style={{ padding: '1rem', color: '#374151' }}>
-                  David Wilson, Mike Johnson, Jane Smith, Robert Brown, Sarah Wilson
-                </td>
-                <td style={{ padding: '1rem', color: '#374151' }}>Project Management Skills</td>
-                <td style={{ padding: '1rem' }}>
-                  <span style={{
-                    backgroundColor: '#dcfce7',
-                    color: '#166534',
-                    padding: '0.25rem 0.75rem',
-                    borderRadius: '1rem',
-                    fontSize: '0.75rem',
-                    fontWeight: '500'
-                  }}>
-                    Open
-                  </span>
-                </td>
-                <td style={{ padding: '1rem', color: '#6b7280' }}>
-                  -
-                </td>
-              </tr>
+              {loading ? (
+                <tr>
+                  <td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>
+                    Loading survey data...
+                  </td>
+                </tr>
+              ) : dashboardData.subjects.length === 0 ? (
+                <tr>
+                  <td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>
+                    No subjects found. Create a subject to get started.
+                  </td>
+                </tr>
+              ) : (
+                dashboardData.subjects.map((subject, index) => (
+                  <tr key={subject.id || index} style={{ borderBottom: '1px solid #e5e7eb' }}>
+                    <td style={{ padding: '1rem', color: '#374151' }}>
+                      {subject.name || 'Unknown Subject'}
+                    </td>
+                    <td style={{ padding: '1rem', color: '#374151' }}>
+                      {subject.respondents ? subject.respondents.join(', ') : 'No respondents assigned'}
+                    </td>
+                    <td style={{ padding: '1rem', color: '#374151' }}>
+                      {subject.survey_name || 'No survey assigned'}
+                    </td>
+                    <td style={{ padding: '1rem' }}>
+                      <span style={{
+                        backgroundColor: subject.status === 'active' ? '#dcfce7' : 
+                                       subject.status === 'closed' ? '#fee2e2' : '#fef3c7',
+                        color: subject.status === 'active' ? '#166534' : 
+                               subject.status === 'closed' ? '#dc2626' : '#d97706',
+                        padding: '0.25rem 0.75rem',
+                        borderRadius: '1rem',
+                        fontSize: '0.75rem',
+                        fontWeight: '500'
+                      }}>
+                        {subject.status || 'Open'}
+                      </span>
+                    </td>
+                    <td style={{ padding: '1rem' }}>
+                      {subject.status === 'closed' ? (
+                        <a 
+                          href="#" 
+                          style={{
+                            color: '#3b82f6',
+                            textDecoration: 'underline',
+                            fontSize: '0.875rem',
+                            fontWeight: '500'
+                          }}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            console.log('View report for', subject.name);
+                          }}
+                        >
+                          View Report
+                        </a>
+                      ) : (
+                        <span style={{ color: '#6b7280' }}>-</span>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -416,6 +454,7 @@ const AccountHome = () => {
         isOpen={showRespondantModal}
         onClose={() => setShowRespondantModal(false)}
         onSubmit={handleRespondantSubmit}
+        subjects={dashboardData.subjects}
       />
 
     </div>

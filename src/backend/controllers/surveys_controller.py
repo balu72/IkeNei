@@ -248,29 +248,33 @@ class SurveysController:
             }), 500
     
     @staticmethod
+    @log_function_call
     def get_my_surveys():
         """
         Get surveys created by current user
         """
+        logger = get_logger(__name__)
+        logger.info("Retrieving surveys for current user")
+        
         try:
-            mock_surveys = [
-                {
-                    "id": "1",
-                    "title": "My Leadership 360",
-                    "status": "active",
-                    "responses_count": 8,
-                    "total_respondents": 12,
-                    "completion_rate": 66.7,
-                    "created_at": "2024-01-15T00:00:00Z"
-                }
-            ]
+            # Get surveys from database for current user
+            # For now, get all surveys since we don't have user context
+            result = SurveyRepository.get_all_surveys(
+                page=1,
+                per_page=100,
+                filters=None
+            )
+            
+            # Convert to public dict format
+            surveys_data = [survey.to_public_dict() for survey in result['surveys']]
             
             return jsonify({
                 "success": True,
-                "data": mock_surveys
+                "data": surveys_data
             })
             
         except Exception as e:
+            logger.error(f"Failed to retrieve my surveys: {str(e)}")
             return jsonify({
                 "success": False,
                 "error": {"message": f"Failed to retrieve my surveys: {str(e)}"}

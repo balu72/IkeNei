@@ -516,3 +516,10 @@ export const analyticsAPI = {
     return apiRequest('/analytics/system');
   },
 };
+
+// Categories API
+export const categoriesAPI = {
+  getRespondentCategories: async () => {
+    return apiRequest('/categories/respondent-categories');
+  },
+};

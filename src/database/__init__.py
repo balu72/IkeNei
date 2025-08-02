@@ -16,10 +16,12 @@ from database.models.account_model import Account
 from database.models.subject_model import Subject
 from database.models.survey_model import Survey
 from database.models.trait_model import Trait
+from database.models.respondent_model import RespondentModel
 from database.repositories.account_repository import AccountRepository
 from database.repositories.subject_repository import SubjectRepository
 from database.repositories.survey_repository import SurveyRepository
 from database.repositories.trait_repository import TraitRepository
+from database.repositories.respondent_repository import RespondentRepository
 
 __all__ = [
     # Connection utilities
@@ -35,10 +37,12 @@ __all__ = [
     'Subject',
     'Survey',
     'Trait',
+    'RespondentModel',
     
     # Repositories
     'AccountRepository',
     'SubjectRepository',
     'SurveyRepository',
-    'TraitRepository'
+    'TraitRepository',
+    'RespondentRepository'
 ]

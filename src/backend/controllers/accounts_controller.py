@@ -1,8 +1,6 @@
 from flask import jsonify
-from flask_pymongo import PyMongo
-from bson import ObjectId
 from datetime import datetime
-import bcrypt
+from database import AccountRepository
 from utils.logger import get_logger, log_function_call
 
 class AccountsController:
@@ -20,68 +18,17 @@ class AccountsController:
         logger.info(f"Fetching accounts - page: {page}, limit: {limit}, filters: {filters}")
         
         try:
-            # Mock implementation - replace with actual database queries
-            mock_accounts = [
-                {
-                    "id": "1",
-                    "email": "account1@example.com",
-                    "account_name": "Demo Account 1",
-                    "account_type": "standard",
-                    "is_active": True,
-                    "created_at": "2024-01-01T00:00:00Z",
-                    "updated_at": "2024-01-01T00:00:00Z"
-                },
-                {
-                    "id": "2",
-                    "email": "account2@example.com",
-                    "account_name": "Demo Account 2", 
-                    "account_type": "premium",
-                    "is_active": True,
-                    "created_at": "2024-01-02T00:00:00Z",
-                    "updated_at": "2024-01-02T00:00:00Z"
-                }
-            ]
-            
-            # Apply filters if provided
-            if filters:
-                # Filter by search term
-                if filters.get('search'):
-                    search_term = filters['search'].lower()
-                    mock_accounts = [
-                        acc for acc in mock_accounts 
-                        if search_term in acc['account_name'].lower() or 
-                           search_term in acc['email'].lower()
-                    ]
-                
-                # Filter by account type
-                if filters.get('account_type'):
-                    mock_accounts = [
-                        acc for acc in mock_accounts 
-                        if acc['account_type'] == filters['account_type']
-                    ]
-                
-                # Filter by status
-                if filters.get('is_active') is not None:
-                    is_active = filters['is_active'].lower() == 'true'
-                    mock_accounts = [
-                        acc for acc in mock_accounts 
-                        if acc['is_active'] == is_active
-                    ]
-            
-            # Apply pagination
-            start_idx = (page - 1) * limit
-            end_idx = start_idx + limit
-            paginated_accounts = mock_accounts[start_idx:end_idx]
+            # Use AccountRepository to get accounts from database
+            result = AccountRepository.get_all_accounts(
+                page=page,
+                per_page=limit,
+                filters=filters
+            )
             
             return jsonify({
                 "success": True,
-                "data": paginated_accounts,
-                "pagination": {
-                    "page": page,
-                    "limit": limit,
-                    "total": len(mock_accounts),
-                    "pages": (len(mock_accounts) + limit - 1) // limit
-                }
+                "data": result['accounts'],
+                "pagination": result['pagination']
             })
             
         except Exception as e:
@@ -100,20 +47,26 @@ class AccountsController:
         logger.info(f"Creating new account with data: {data}")
         
         try:
-            # Mock implementation - replace with actual database operations
-            new_account = {
-                "id": "new_account_id",
-                "email": data.get('email'),
-                "account_name": data.get('account_name'),
-                "account_type": data.get('account_type', 'standard'),
-                "is_active": True,
-                "created_at": datetime.utcnow().isoformat() + "Z",
-                "updated_at": datetime.utcnow().isoformat() + "Z"
-            }
+            # Validate required fields
+            required_fields = ['email', 'password', 'account_name']
+            for field in required_fields:
+                if not data.get(field):
+                    return jsonify({
+                        "success": False,
+                        "error": {"message": f"Missing required field: {field}"}
+                    }), 400
+            
+            # Create account using repository
+            account = AccountRepository.create_account(
+                email=data.get('email'),
+                password=data.get('password'),
+                account_name=data.get('account_name'),
+                account_type=data.get('account_type', 'standard')
+            )
             
             return jsonify({
                 "success": True,
-                "data": new_account,
+                "data": account.to_public_dict(),
                 "message": "Account created successfully"
             }), 201
             

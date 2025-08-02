@@ -3,6 +3,7 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from config import Config
 from utils.logger import setup_logging, get_logger
+from database import init_database, close_database, get_database_status
 
 # Import route blueprints
 from routes.auth_routes import auth_bp
@@ -57,11 +58,47 @@ def create_app():
         app.register_blueprint(blueprint)
         logger.info(f"Registered {name} blueprint")
     
+    # Initialize database
+    try:
+        init_database(app)
+        logger.info("Database initialized successfully")
+    except Exception as e:
+        logger.error(f"Database initialization failed: {str(e)}")
+        # Continue without database for now, but log the error
+    
     # Health check endpoint
     @app.route('/health')
     def health_check():
         logger.info("Health check endpoint accessed")
-        return {"status": "healthy", "message": "IkeNei Backend API is running"}
+        try:
+            db_status = get_database_status()
+            return {
+                "status": "healthy", 
+                "message": "IkeNei Backend API is running",
+                "database": db_status
+            }
+        except Exception as e:
+            logger.error(f"Health check failed: {str(e)}")
+            return {
+                "status": "error",
+                "message": "IkeNei Backend API is running but database check failed",
+                "database": {
+                    "status": "unhealthy",
+                    "error": str(e)
+                }
+            }
+    
+    # Database health check endpoint
+    @app.route('/health/database')
+    def database_health_check():
+        logger.info("Database health check endpoint accessed")
+        return get_database_status()
+    
+    # Cleanup on app teardown
+    @app.teardown_appcontext
+    def cleanup_database(error):
+        if error:
+            logger.error(f"Application error: {str(error)}")
     
     logger.info("IkeNei Backend API application setup completed")
     return app

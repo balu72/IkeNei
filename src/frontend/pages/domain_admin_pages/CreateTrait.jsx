@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { traitsAPI } from '../../services/api';
 
 const CreateTrait = () => {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ const CreateTrait = () => {
       }
     ]
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const levels = ['basic', 'medium', 'advanced'];
 
@@ -49,8 +51,10 @@ const CreateTrait = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (isSubmitting) return;
     
     // Validation
     if (!formData.traitName.trim()) {
@@ -75,9 +79,31 @@ const CreateTrait = () => {
       }
     }
 
-    console.log('Trait data:', formData);
-    alert('Trait created successfully!');
-    navigate('/');
+    setIsSubmitting(true);
+    try {
+      console.log('Creating trait with data:', formData);
+      
+      // Prepare data for API call
+      const traitData = {
+        name: formData.traitName,
+        description: formData.description,
+        items: formData.items
+      };
+      
+      const response = await traitsAPI.create(traitData);
+      
+      if (response.success) {
+        alert('Trait created successfully!');
+        navigate('/');
+      } else {
+        alert('Failed to create trait: ' + (response.error?.message || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Error creating trait:', error);
+      alert('Failed to create trait: ' + error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCancel = () => {

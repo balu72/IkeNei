@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { accountsAPI } from '../../services/api';
 
 const CreateAccount = () => {
   const navigate = useNavigate();
@@ -65,21 +66,37 @@ const CreateAccount = () => {
     }
     
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log('Creating account with data:', formData);
       
-      // Create new account (this will be replaced with actual API call later)
-      const newAccount = { ...formData };
-      delete newAccount.password;
-      delete newAccount.confirmPassword;
+      // Prepare data for API call
+      const accountData = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phone,
+        address: formData.address,
+        city: formData.city,
+        state: formData.state,
+        zip_code: formData.zipCode,
+        country: formData.country,
+        account_type: formData.accountType,
+        department: formData.department,
+        role: formData.role
+      };
       
-      console.log('New account created:', newAccount);
-      setMessage('Account created successfully!');
-      setTimeout(() => {
-        navigate('/');
-      }, 1500);
+      const response = await accountsAPI.create(accountData);
+      
+      if (response.success) {
+        setMessage('Account created successfully!');
+        setTimeout(() => {
+          navigate('/');
+        }, 1500);
+      } else {
+        setMessage('Failed to create account: ' + (response.error?.message || 'Unknown error'));
+      }
     } catch (error) {
-      setMessage('Failed to create account. Please try again.');
+      console.error('Error creating account:', error);
+      setMessage('Failed to create account: ' + error.message);
     } finally {
       setLoading(false);
     }

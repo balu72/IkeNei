@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { authAPI } from '../../services/api';
 
 const ProfileUpdate = () => {
   const { user, updateProfile } = useAuth();
@@ -75,19 +76,26 @@ const ProfileUpdate = () => {
     }
     
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log('Updating profile with data:', formData);
       
-      // Update user profile (this will be replaced with actual API call later)
-      const updatedUser = { ...user, ...formData };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+      // Call the backend API to update profile
+      const response = await authAPI.updateProfile(formData);
       
-      setMessage('Profile updated successfully!');
-      setTimeout(() => {
-        navigate('/');
-      }, 1500);
+      if (response.success) {
+        // Update local storage with the updated user data
+        const updatedUser = { ...user, ...response.data };
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        
+        setMessage('Profile updated successfully!');
+        setTimeout(() => {
+          navigate('/');
+        }, 1500);
+      } else {
+        setMessage('Failed to update profile: ' + (response.error?.message || 'Unknown error'));
+      }
     } catch (error) {
-      setMessage('Failed to update profile. Please try again.');
+      console.error('Error updating profile:', error);
+      setMessage('Failed to update profile: ' + error.message);
     } finally {
       setLoading(false);
     }

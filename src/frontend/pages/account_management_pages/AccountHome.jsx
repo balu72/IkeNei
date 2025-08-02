@@ -2,11 +2,13 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import CreateSubjectModal from '../../components/CreateSubjectModal';
 import CreateRespondantModal from '../../components/CreateRespondantModal';
+import { subjectsAPI, respondentsAPI, surveysAPI } from '../../services/api';
 
 const AccountHome = () => {
   const navigate = useNavigate();
   const [showSubjectModal, setShowSubjectModal] = useState(false);
   const [showRespondantModal, setShowRespondantModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleUpdateProfile = () => {
     navigate('/profile');
@@ -21,20 +23,69 @@ const AccountHome = () => {
   };
 
 
-  const handleRunSurvey = () => {
-    navigate('/run-survey');
+  const handleRunSurvey = async () => {
+    try {
+      // First, let's get available surveys
+      console.log('Getting available surveys...');
+      const response = await surveysAPI.getAvailable();
+      
+      if (response.success && response.data && response.data.length > 0) {
+        // If there are available surveys, navigate to run survey page
+        navigate('/run-survey');
+      } else {
+        alert('No surveys available to run at this time.');
+      }
+    } catch (error) {
+      console.error('Error getting available surveys:', error);
+      // Still navigate to the page, let the page handle the error
+      navigate('/run-survey');
+    }
   };
 
-  const handleSubjectSubmit = (data) => {
-    console.log('Subject data:', data);
-    alert('Subject created successfully!');
-    setShowSubjectModal(false);
+  const handleSubjectSubmit = async (data) => {
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
+    try {
+      console.log('Creating subject with data:', data);
+      const response = await subjectsAPI.create(data);
+      
+      if (response.success) {
+        alert('Subject created successfully!');
+        setShowSubjectModal(false);
+        // Optionally refresh the page or update the subjects list
+      } else {
+        alert('Failed to create subject: ' + (response.error?.message || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Error creating subject:', error);
+      alert('Failed to create subject: ' + error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleRespondantSubmit = (data) => {
-    console.log('Respondant data:', data);
-    alert('Respondant created successfully!');
-    setShowRespondantModal(false);
+  const handleRespondantSubmit = async (data) => {
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
+    try {
+      console.log('Creating respondent with data:', data);
+      const response = await respondentsAPI.create(data);
+      
+      if (response.success) {
+        alert('Respondent created successfully!');
+        setShowRespondantModal(false);
+        // Optionally refresh the page or update the respondents list
+      } else {
+        alert('Failed to create respondent: ' + (response.error?.message || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Error creating respondent:', error);
+      alert('Failed to create respondent: ' + error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
 

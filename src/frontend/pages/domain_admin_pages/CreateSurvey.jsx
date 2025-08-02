@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { surveysAPI } from '../../services/api';
 
 const CreateSurvey = () => {
   const navigate = useNavigate();
@@ -9,6 +10,7 @@ const CreateSurvey = () => {
     selectedTraits: [],
     targetSector: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Sample data - in real app, this would come from API
   const availableTraits = [
@@ -83,8 +85,10 @@ const CreateSurvey = () => {
     return formData.selectedTraits.reduce((total, trait) => total + trait.weightage, 0);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (isSubmitting) return;
     
     // Validation
     if (!formData.surveyName.trim()) {
@@ -110,9 +114,32 @@ const CreateSurvey = () => {
       return;
     }
 
-    console.log('Survey data:', formData);
-    alert('Survey created successfully!');
-    navigate('/');
+    setIsSubmitting(true);
+    try {
+      console.log('Creating survey with data:', formData);
+      
+      // Prepare data for API call
+      const surveyData = {
+        title: formData.surveyName,
+        description: formData.description,
+        traits: formData.selectedTraits,
+        target_sector: formData.targetSector
+      };
+      
+      const response = await surveysAPI.create(surveyData);
+      
+      if (response.success) {
+        alert('Survey created successfully!');
+        navigate('/');
+      } else {
+        alert('Failed to create survey: ' + (response.error?.message || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Error creating survey:', error);
+      alert('Failed to create survey: ' + error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCancel = () => {

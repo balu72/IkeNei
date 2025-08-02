@@ -1,6 +1,12 @@
+import sys
+import os
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
+
+# Add the src directory to Python path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
 from config import Config
 from utils.logger import setup_logging, get_logger
 from database import init_database, close_database, get_database_status

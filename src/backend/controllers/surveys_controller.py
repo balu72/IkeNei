@@ -1,5 +1,7 @@
 from flask import jsonify
 from datetime import datetime, timedelta
+from database import SurveyRepository
+from utils.logger import get_logger, log_function_call
 
 class SurveysController:
     """
@@ -7,235 +9,203 @@ class SurveysController:
     """
     
     @staticmethod
+    @log_function_call
     def get_all_surveys(page=1, limit=20, filters=None):
         """
         Get all surveys with pagination and filtering
         """
+        logger = get_logger(__name__)
+        logger.info(f"Retrieving surveys - page: {page}, limit: {limit}, filters: {filters}")
+        
         try:
-            mock_surveys = [
-                {
-                    "id": "1",
-                    "title": "Leadership 360 Assessment",
-                    "description": "Comprehensive leadership evaluation survey",
-                    "account_id": "1",
-                    "account_name": "Tech Corp",
-                    "status": "active",
-                    "survey_type": "360_feedback",
-                    "subjects_count": 5,
-                    "respondents_count": 25,
-                    "responses_count": 18,
-                    "completion_rate": 72.0,
-                    "created_at": "2024-01-15T00:00:00Z",
-                    "updated_at": "2024-01-20T00:00:00Z",
-                    "due_date": "2024-02-15T00:00:00Z"
-                },
-                {
-                    "id": "2",
-                    "title": "Team Skills Assessment",
-                    "description": "Technical and soft skills evaluation",
-                    "account_id": "2",
-                    "account_name": "Innovation Labs",
-                    "status": "completed",
-                    "survey_type": "skills",
-                    "subjects_count": 8,
-                    "respondents_count": 40,
-                    "responses_count": 40,
-                    "completion_rate": 100.0,
-                    "created_at": "2023-12-01T00:00:00Z",
-                    "updated_at": "2024-01-10T00:00:00Z",
-                    "completed_at": "2024-01-10T00:00:00Z"
-                }
-            ]
-            
-            # Apply filters
-            if filters:
-                if filters.get('status'):
-                    mock_surveys = [s for s in mock_surveys if s['status'] == filters['status']]
-                if filters.get('survey_type'):
-                    mock_surveys = [s for s in mock_surveys if s['survey_type'] == filters['survey_type']]
-                if filters.get('account_id'):
-                    mock_surveys = [s for s in mock_surveys if s['account_id'] == filters['account_id']]
-                if filters.get('search'):
-                    search_term = filters['search'].lower()
-                    mock_surveys = [s for s in mock_surveys if search_term in s['title'].lower() or search_term in s['description'].lower()]
-            
-            # Apply pagination
-            start_idx = (page - 1) * limit
-            end_idx = start_idx + limit
-            paginated_surveys = mock_surveys[start_idx:end_idx]
+            result = SurveyRepository.get_all_surveys(
+                page=page,
+                per_page=limit,
+                filters=filters
+            )
             
             return jsonify({
                 "success": True,
-                "data": paginated_surveys,
-                "pagination": {
-                    "page": page,
-                    "limit": limit,
-                    "total": len(mock_surveys),
-                    "pages": (len(mock_surveys) + limit - 1) // limit
-                }
+                "data": result['surveys'],
+                "pagination": result['pagination']
             })
             
         except Exception as e:
+            logger.error(f"Failed to retrieve surveys: {str(e)}")
             return jsonify({
                 "success": False,
                 "error": {"message": f"Failed to retrieve surveys: {str(e)}"}
             }), 500
     
     @staticmethod
+    @log_function_call
     def create_survey(data):
         """
         Create a new survey
         """
+        logger = get_logger(__name__)
+        logger.info(f"Creating new survey with data: {data}")
+        
         try:
-            new_survey = {
-                "id": "new_survey_id",
-                "title": data.get('title'),
-                "description": data.get('description', ''),
-                "account_id": data.get('account_id'),
-                "status": "draft",
-                "survey_type": data.get('survey_type', '360_feedback'),
-                "subjects_count": 0,
-                "respondents_count": 0,
-                "responses_count": 0,
-                "completion_rate": 0.0,
-                "created_at": datetime.utcnow().isoformat() + "Z",
-                "updated_at": datetime.utcnow().isoformat() + "Z",
-                "settings": {
-                    "anonymous_responses": data.get('anonymous_responses', True),
-                    "allow_comments": data.get('allow_comments', True),
-                    "reminder_frequency": data.get('reminder_frequency', 'weekly')
-                }
-            }
+            # Validate required fields
+            required_fields = ['title', 'account_id', 'survey_type']
+            for field in required_fields:
+                if not data.get(field):
+                    return jsonify({
+                        "success": False,
+                        "error": {"message": f"Missing required field: {field}"}
+                    }), 400
+            
+            # Parse due_date if provided
+            due_date = None
+            if data.get('due_date'):
+                try:
+                    due_date = datetime.fromisoformat(data['due_date'].replace('Z', '+00:00'))
+                except ValueError:
+                    return jsonify({
+                        "success": False,
+                        "error": {"message": "Invalid due_date format. Use ISO format."}
+                    }), 400
+            
+            # Create survey using repository
+            survey = SurveyRepository.create_survey(
+                account_id=data.get('account_id'),
+                title=data.get('title'),
+                survey_type=data.get('survey_type'),
+                description=data.get('description'),
+                due_date=due_date
+            )
             
             return jsonify({
                 "success": True,
-                "data": new_survey,
+                "data": survey.to_public_dict(),
                 "message": "Survey created successfully"
             }), 201
             
         except Exception as e:
+            logger.error(f"Failed to create survey: {str(e)}")
             return jsonify({
                 "success": False,
                 "error": {"message": f"Failed to create survey: {str(e)}"}
             }), 500
     
     @staticmethod
+    @log_function_call
     def get_survey_by_id(survey_id):
         """
         Get survey by ID
         """
+        logger = get_logger(__name__)
+        logger.info(f"Retrieving survey by ID: {survey_id}")
+        
         try:
-            mock_survey = {
-                "id": str(survey_id),
-                "title": "Leadership 360 Assessment",
-                "description": "Comprehensive leadership evaluation survey",
-                "account_id": "1",
-                "account_name": "Tech Corp",
-                "status": "active",
-                "survey_type": "360_feedback",
-                "subjects_count": 5,
-                "respondents_count": 25,
-                "responses_count": 18,
-                "completion_rate": 72.0,
-                "created_at": "2024-01-15T00:00:00Z",
-                "updated_at": "2024-01-20T00:00:00Z",
-                "due_date": "2024-02-15T00:00:00Z",
-                "settings": {
-                    "anonymous_responses": True,
-                    "allow_comments": True,
-                    "reminder_frequency": "weekly"
-                },
-                "questions": [
-                    {
-                        "id": "q1",
-                        "text": "How would you rate this person's leadership skills?",
-                        "type": "rating",
-                        "scale": 5,
-                        "required": True
-                    },
-                    {
-                        "id": "q2",
-                        "text": "What are their key strengths?",
-                        "type": "text",
-                        "required": False
-                    }
-                ]
-            }
+            survey = SurveyRepository.get_survey_by_id(survey_id)
+            
+            if not survey:
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Survey not found"}
+                }), 404
             
             return jsonify({
                 "success": True,
-                "data": mock_survey
+                "data": survey.to_public_dict()
             })
             
         except Exception as e:
+            logger.error(f"Failed to retrieve survey {survey_id}: {str(e)}")
             return jsonify({
                 "success": False,
                 "error": {"message": f"Failed to retrieve survey: {str(e)}"}
             }), 500
     
     @staticmethod
+    @log_function_call
     def update_survey(survey_id, data):
         """
         Update survey
         """
+        logger = get_logger(__name__)
+        logger.info(f"Updating survey {survey_id} with data: {data}")
+        
         try:
-            updated_survey = {
-                "id": str(survey_id),
-                "title": data.get('title', 'Updated Survey'),
-                "description": data.get('description', ''),
-                "status": data.get('status', 'active'),
-                "survey_type": data.get('survey_type', '360_feedback'),
-                "updated_at": datetime.utcnow().isoformat() + "Z"
-            }
+            survey = SurveyRepository.update_survey(survey_id, data)
+            
+            if not survey:
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Survey not found"}
+                }), 404
             
             return jsonify({
                 "success": True,
-                "data": updated_survey,
+                "data": survey.to_public_dict(),
                 "message": "Survey updated successfully"
             })
             
         except Exception as e:
+            logger.error(f"Failed to update survey {survey_id}: {str(e)}")
             return jsonify({
                 "success": False,
                 "error": {"message": f"Failed to update survey: {str(e)}"}
             }), 500
     
     @staticmethod
+    @log_function_call
     def delete_survey(survey_id):
         """
         Delete survey
         """
+        logger = get_logger(__name__)
+        logger.info(f"Deleting survey: {survey_id}")
+        
         try:
+            success = SurveyRepository.delete_survey(survey_id)
+            
+            if not success:
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Survey not found"}
+                }), 404
+            
             return jsonify({
                 "success": True,
                 "message": f"Survey {survey_id} deleted successfully"
             })
             
         except Exception as e:
+            logger.error(f"Failed to delete survey {survey_id}: {str(e)}")
             return jsonify({
                 "success": False,
                 "error": {"message": f"Failed to delete survey: {str(e)}"}
             }), 500
     
     @staticmethod
+    @log_function_call
     def update_survey_status(survey_id, status):
         """
         Update survey status
         """
+        logger = get_logger(__name__)
+        logger.info(f"Updating survey {survey_id} status to: {status}")
+        
         try:
-            updated_survey = {
-                "id": str(survey_id),
-                "status": status,
-                "updated_at": datetime.utcnow().isoformat() + "Z"
-            }
+            survey = SurveyRepository.update_survey_status(survey_id, status)
+            
+            if not survey:
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Survey not found"}
+                }), 404
             
             return jsonify({
                 "success": True,
-                "data": updated_survey,
+                "data": survey.to_public_dict(),
                 "message": f"Survey status updated to {status}"
             })
             
         except Exception as e:
+            logger.error(f"Failed to update survey status {survey_id}: {str(e)}")
             return jsonify({
                 "success": False,
                 "error": {"message": f"Failed to update survey status: {str(e)}"}

@@ -18,7 +18,7 @@ def get_subjects():
     
     try:
         logger.info("Fetching subjects for current account")
-        result = SubjectsController.get_account_subjects()
+        result = SubjectsController.get_all_subjects()
         logger.info("=== EXIT: GET /api/subjects - SUCCESS ===")
         return result
     

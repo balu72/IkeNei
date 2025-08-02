@@ -13,7 +13,13 @@ from database.connection import (
 )
 
 from database.models.account_model import Account
+from database.models.subject_model import Subject
+from database.models.survey_model import Survey
+from database.models.trait_model import Trait
 from database.repositories.account_repository import AccountRepository
+from database.repositories.subject_repository import SubjectRepository
+from database.repositories.survey_repository import SurveyRepository
+from database.repositories.trait_repository import TraitRepository
 
 __all__ = [
     # Connection utilities
@@ -26,7 +32,13 @@ __all__ = [
     
     # Models
     'Account',
+    'Subject',
+    'Survey',
+    'Trait',
     
     # Repositories
-    'AccountRepository'
+    'AccountRepository',
+    'SubjectRepository',
+    'SurveyRepository',
+    'TraitRepository'
 ]

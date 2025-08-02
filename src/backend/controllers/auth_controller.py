@@ -2,6 +2,7 @@ from flask import jsonify, request
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 from datetime import datetime, timedelta
 import bcrypt
+from database import AccountRepository
 from utils.logger import get_logger, log_function_call
 
 class AuthController:
@@ -19,72 +20,54 @@ class AuthController:
         logger.info(f"Login attempt for email: {email}")
         
         try:
-            # Mock authentication - replace with actual database lookup
-            # For demo purposes, accept any email/password combination
-            mock_users = {
-                "account@example.com": {
-                    "id": "1",
-                    "email": "account@example.com",
-                    "name": "Account User",
-                    "role": "account",
-                    "account_name": "Demo Account",
-                    "is_active": True
-                },
-                "domainadmin@example.com": {
-                    "id": "2", 
-                    "email": "domainadmin@example.com",
-                    "name": "Domain Admin",
-                    "role": "domain_admin",
-                    "account_name": "Domain Admin Account",
-                    "is_active": True
-                },
-                "systemadmin@example.com": {
-                    "id": "3",
-                    "email": "systemadmin@example.com", 
-                    "name": "System Admin",
-                    "role": "system_admin",
-                    "account_name": "System Admin Account",
-                    "is_active": True
-                }
-            }
+            # Find account by email
+            account = AccountRepository.get_account_by_email(email)
             
-            # Check if user exists in mock data
-            user = mock_users.get(email)
-            if not user:
-                # For demo, create a default account user for any other email
-                user = {
-                    "id": "demo_user",
-                    "email": email,
-                    "name": "Demo User",
-                    "role": "account",
-                    "account_name": "Demo Account",
-                    "is_active": True
-                }
+            if not account:
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Invalid email or password"}
+                }), 401
             
-            # In real implementation, verify password hash
-            # For demo, accept any password
+            # Check if account is active
+            if not account.get_field('is_active'):
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Account is deactivated"}
+                }), 401
+            
+            # Verify password
+            if not account.verify_password(password):
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Invalid email or password"}
+                }), 401
+            
+            # Update last login
+            account.update_last_login()
             
             # Create JWT tokens
             access_token = create_access_token(
-                identity=user["id"],
+                identity=str(account._id),
                 additional_claims={
-                    "email": user["email"],
-                    "role": user["role"]
+                    "email": account.get_field('email'),
+                    "account_type": account.get_field('account_type')
                 }
             )
-            refresh_token = create_refresh_token(identity=user["id"])
+            refresh_token = create_refresh_token(identity=str(account._id))
             
             return jsonify({
                 "success": True,
                 "data": {
                     "token": access_token,
                     "refresh_token": refresh_token,
-                    "user": user
+                    "user": account.to_public_dict()
                 },
                 "message": "Login successful"
             })
             
         except Exception as e:
+            logger.error(f"Login failed for {email}: {str(e)}")
             return jsonify({
                 "success": False,
                 "error": {"message": f"Login failed: {str(e)}"}
@@ -109,35 +92,48 @@ class AuthController:
             }), 500
     
     @staticmethod
+    @log_function_call
     def register(data):
         """
         Account registration
         """
+        logger = get_logger(__name__)
+        logger.info(f"Registration attempt for email: {data.get('email')}")
+        
         try:
-            # Mock registration - replace with actual database operations
-            new_user = {
-                "id": "new_user_id",
-                "email": data.get('email'),
-                "name": data.get('name', data.get('account_name')),
-                "role": "account",  # Default role for new registrations
-                "account_name": data.get('account_name'),
-                "is_active": True,
-                "created_at": datetime.utcnow().isoformat() + "Z"
-            }
+            # Validate required fields
+            required_fields = ['email', 'password', 'account_name']
+            for field in required_fields:
+                if not data.get(field):
+                    return jsonify({
+                        "success": False,
+                        "error": {"message": f"Missing required field: {field}"}
+                    }), 400
             
-            # In real implementation:
-            # 1. Check if email already exists
-            # 2. Hash the password
-            # 3. Save to database
-            # 4. Send verification email
+            # Check if email already exists
+            existing_account = AccountRepository.get_account_by_email(data.get('email'))
+            if existing_account:
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Email already registered"}
+                }), 409
+            
+            # Create new account
+            account = AccountRepository.create_account(
+                email=data.get('email'),
+                password=data.get('password'),
+                account_name=data.get('account_name'),
+                account_type=data.get('account_type', 'standard')
+            )
             
             return jsonify({
                 "success": True,
-                "data": new_user,
+                "data": account.to_public_dict(),
                 "message": "Registration successful"
             }), 201
             
         except Exception as e:
+            logger.error(f"Registration failed for {data.get('email')}: {str(e)}")
             return jsonify({
                 "success": False,
                 "error": {"message": f"Registration failed: {str(e)}"}
@@ -145,31 +141,32 @@ class AuthController:
     
     @staticmethod
     @jwt_required()
+    @log_function_call
     def get_current_account():
         """
         Get current account profile
         """
+        logger = get_logger(__name__)
+        
         try:
             current_user_id = get_jwt_identity()
+            logger.info(f"Getting current account for user: {current_user_id}")
             
-            # Mock user data - replace with actual database lookup
-            mock_user = {
-                "id": current_user_id,
-                "email": "user@example.com",
-                "name": "Current User",
-                "role": "account",
-                "account_name": "Demo Account",
-                "is_active": True,
-                "created_at": "2024-01-01T00:00:00Z",
-                "last_login": datetime.utcnow().isoformat() + "Z"
-            }
+            account = AccountRepository.get_account_by_id(current_user_id)
+            
+            if not account:
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Account not found"}
+                }), 404
             
             return jsonify({
                 "success": True,
-                "data": mock_user
+                "data": account.to_public_dict()
             })
             
         except Exception as e:
+            logger.error(f"Failed to get current account: {str(e)}")
             return jsonify({
                 "success": False,
                 "error": {"message": f"Failed to get current account: {str(e)}"}
@@ -177,31 +174,33 @@ class AuthController:
     
     @staticmethod
     @jwt_required()
+    @log_function_call
     def update_profile(data):
         """
         Update account profile
         """
+        logger = get_logger(__name__)
+        
         try:
             current_user_id = get_jwt_identity()
+            logger.info(f"Updating profile for user: {current_user_id}")
             
-            # Mock profile update - replace with actual database update
-            updated_user = {
-                "id": current_user_id,
-                "email": data.get('email', 'user@example.com'),
-                "name": data.get('name', 'Updated User'),
-                "role": "account",
-                "account_name": data.get('account_name', 'Demo Account'),
-                "is_active": True,
-                "updated_at": datetime.utcnow().isoformat() + "Z"
-            }
+            account = AccountRepository.update_account(current_user_id, data)
+            
+            if not account:
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Account not found"}
+                }), 404
             
             return jsonify({
                 "success": True,
-                "data": updated_user,
+                "data": account.to_public_dict(),
                 "message": "Profile updated successfully"
             })
             
         except Exception as e:
+            logger.error(f"Profile update failed: {str(e)}")
             return jsonify({
                 "success": False,
                 "error": {"message": f"Profile update failed: {str(e)}"}
@@ -234,17 +233,27 @@ class AuthController:
             }), 500
     
     @staticmethod
+    @log_function_call
     def forgot_password(email):
         """
         Password reset request
         """
+        logger = get_logger(__name__)
+        logger.info(f"Password reset request for email: {email}")
+        
         try:
-            # Mock password reset - replace with actual implementation
+            # Check if account exists
+            account = AccountRepository.get_account_by_email(email)
+            
+            # Always return success message for security (don't reveal if email exists)
             # In real implementation:
-            # 1. Check if email exists
-            # 2. Generate reset token
-            # 3. Send reset email
-            # 4. Store token with expiration
+            # 1. Generate reset token if account exists
+            # 2. Send reset email
+            # 3. Store token with expiration
+            
+            if account:
+                # TODO: Generate reset token and send email
+                logger.info(f"Password reset token would be generated for: {email}")
             
             return jsonify({
                 "success": True,
@@ -252,31 +261,38 @@ class AuthController:
             })
             
         except Exception as e:
+            logger.error(f"Password reset request failed for {email}: {str(e)}")
             return jsonify({
                 "success": False,
                 "error": {"message": f"Password reset request failed: {str(e)}"}
             }), 500
     
     @staticmethod
+    @log_function_call
     def reset_password(token, new_password):
         """
         Password reset confirmation
         """
+        logger = get_logger(__name__)
+        logger.info(f"Password reset attempt with token: {token[:10]}...")
+        
         try:
-            # Mock password reset - replace with actual implementation
             # In real implementation:
-            # 1. Validate reset token
+            # 1. Validate reset token from database
             # 2. Check token expiration
-            # 3. Hash new password
-            # 4. Update password in database
-            # 5. Invalidate reset token
+            # 3. Find associated account
+            # 4. Hash new password
+            # 5. Update password in database
+            # 6. Invalidate reset token
             
+            # For now, return error since token system not implemented
             return jsonify({
-                "success": True,
-                "message": "Password reset successful"
-            })
+                "success": False,
+                "error": {"message": "Password reset token system not yet implemented"}
+            }), 501
             
         except Exception as e:
+            logger.error(f"Password reset failed: {str(e)}")
             return jsonify({
                 "success": False,
                 "error": {"message": f"Password reset failed: {str(e)}"}

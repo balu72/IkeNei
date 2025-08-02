@@ -77,105 +77,116 @@ class AccountsController:
             }), 500
     
     @staticmethod
+    @log_function_call
     def get_account_by_id(account_id):
         """
         Get account by ID
         """
+        logger = get_logger(__name__)
+        logger.info(f"Retrieving account by ID: {account_id}")
+        
         try:
-            # Mock implementation - replace with actual database query
-            mock_account = {
-                "id": str(account_id),
-                "email": f"account{account_id}@example.com",
-                "account_name": f"Demo Account {account_id}",
-                "account_type": "standard",
-                "is_active": True,
-                "created_at": "2024-01-01T00:00:00Z",
-                "updated_at": "2024-01-01T00:00:00Z",
-                "settings": {
-                    "notifications_enabled": True,
-                    "theme": "light"
-                }
-            }
+            account = AccountRepository.get_account_by_id(account_id)
+            
+            if not account:
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Account not found"}
+                }), 404
             
             return jsonify({
                 "success": True,
-                "data": mock_account
+                "data": account.to_public_dict()
             })
             
         except Exception as e:
+            logger.error(f"Failed to retrieve account {account_id}: {str(e)}")
             return jsonify({
                 "success": False,
                 "error": {"message": f"Failed to retrieve account: {str(e)}"}
             }), 500
     
     @staticmethod
+    @log_function_call
     def update_account(account_id, data):
         """
         Update account information
         """
+        logger = get_logger(__name__)
+        logger.info(f"Updating account {account_id} with data: {data}")
+        
         try:
-            # Mock implementation - replace with actual database update
-            updated_account = {
-                "id": str(account_id),
-                "email": data.get('email', f"account{account_id}@example.com"),
-                "account_name": data.get('account_name', f"Demo Account {account_id}"),
-                "account_type": data.get('account_type', 'standard'),
-                "is_active": data.get('is_active', True),
-                "created_at": "2024-01-01T00:00:00Z",
-                "updated_at": datetime.utcnow().isoformat() + "Z"
-            }
+            account = AccountRepository.update_account(account_id, data)
+            
+            if not account:
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Account not found"}
+                }), 404
             
             return jsonify({
                 "success": True,
-                "data": updated_account,
+                "data": account.to_public_dict(),
                 "message": "Account updated successfully"
             })
             
         except Exception as e:
+            logger.error(f"Failed to update account {account_id}: {str(e)}")
             return jsonify({
                 "success": False,
                 "error": {"message": f"Failed to update account: {str(e)}"}
             }), 500
     
     @staticmethod
+    @log_function_call
     def update_account_status(account_id, is_active):
         """
         Update account active status
         """
+        logger = get_logger(__name__)
+        logger.info(f"Updating account {account_id} status to: {is_active}")
+        
         try:
-            # Mock implementation - replace with actual database update
-            updated_account = {
-                "id": str(account_id),
-                "email": f"account{account_id}@example.com",
-                "account_name": f"Demo Account {account_id}",
-                "account_type": "standard",
-                "is_active": is_active,
-                "created_at": "2024-01-01T00:00:00Z",
-                "updated_at": datetime.utcnow().isoformat() + "Z"
-            }
+            account = AccountRepository.update_account_status(account_id, is_active)
+            
+            if not account:
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Account not found"}
+                }), 404
             
             status_text = "activated" if is_active else "deactivated"
             
             return jsonify({
                 "success": True,
-                "data": updated_account,
+                "data": account.to_public_dict(),
                 "message": f"Account {status_text} successfully"
             })
             
         except Exception as e:
+            logger.error(f"Failed to update account status {account_id}: {str(e)}")
             return jsonify({
                 "success": False,
                 "error": {"message": f"Failed to update account status: {str(e)}"}
             }), 500
     
     @staticmethod
+    @log_function_call
     def delete_account(account_id):
         """
         Delete account
         """
+        logger = get_logger(__name__)
+        logger.info(f"Deleting account: {account_id}")
+        
         try:
-            # Mock implementation - replace with actual database deletion
-            # In a real implementation, you might want to soft delete or archive
+            success = AccountRepository.delete_account(account_id)
+            
+            if not success:
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Account not found"}
+                }), 404
             
             return jsonify({
                 "success": True,
@@ -183,6 +194,7 @@ class AccountsController:
             })
             
         except Exception as e:
+            logger.error(f"Failed to delete account {account_id}: {str(e)}")
             return jsonify({
                 "success": False,
                 "error": {"message": f"Failed to delete account: {str(e)}"}

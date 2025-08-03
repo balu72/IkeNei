@@ -96,39 +96,118 @@ IkeNei is an innovative tool that combines traditional 360-degree feedback metho
 
 ```
 IkeNei/
-├── README.md                    # This file
+├── README.md                    # Project documentation
 ├── .gitignore                   # Git ignore rules
 └── src/
-    ├── frontend/                # React frontend application
-    │   ├── components/          # Reusable React components
-    │   ├── contexts/            # React context providers
-    │   ├── pages/               # Page components
-    │   ├── assets/              # Static assets
-    │   ├── App.jsx              # Main application component
-    │   ├── main.jsx             # Application entry point
-    │   └── index.html           # HTML template
     ├── backend/                 # Python/Flask backend API
-    │   ├── config/              # Configuration files
+    │   ├── app.py               # Main Flask application
+    │   ├── config.py            # Application configuration
+    │   ├── requirements.txt     # Python dependencies
+    │   ├── README.md            # Backend documentation
+    │   ├── IMPLEMENTATION_STATUS.md # Implementation progress
     │   ├── controllers/         # API route handlers
+    │   │   ├── accounts_controller.py
+    │   │   ├── analytics_controller.py
+    │   │   ├── auth_controller.py
+    │   │   ├── billing_controller.py
+    │   │   ├── categories_controller.py
+    │   │   ├── dashboard_controller.py
+    │   │   ├── files_controller.py
+    │   │   ├── notifications_controller.py
+    │   │   ├── reports_controller.py
+    │   │   ├── respondents_controller.py
+    │   │   ├── settings_controller.py
+    │   │   ├── subjects_controller.py
+    │   │   ├── surveys_controller.py
+    │   │   └── traits_controller.py
+    │   ├── middleware/           # Authentication & request middleware
+    │   │   └── auth_middleware.py
+    │   └── routes/              # API route definitions
+    │       ├── accounts_routes.py
+    │       ├── analytics_routes.py
+    │       ├── auth_routes.py
+    │       ├── billing_routes.py
+    │       ├── categories_routes.py
+    │       ├── dashboard_routes.py
+    │       ├── files_routes.py
+    │       ├── notifications_routes.py
+    │       ├── reports_routes.py
+    │       ├── respondents_routes.py
+    │       ├── settings_routes.py
+    │       ├── subjects_routes.py
+    │       ├── surveys_routes.py
+    │       └── traits_routes.py
+    ├── database/                # MongoDB database layer
+    │   ├── README.md            # Database documentation
+    │   ├── SETUP.md             # Database setup instructions
+    │   ├── base_model.py        # Base model class
+    │   ├── connection.py        # Database connection
+    │   ├── config/              # Database configuration
+    │   │   ├── docker-compose.yml # MongoDB Docker setup
+    │   │   └── mongo-init.js    # MongoDB initialization
     │   ├── models/              # Data models
-    │   ├── services/            # Business logic
-    │   └── utils/               # Utility functions
-    ├── database/                # MongoDB schemas and migrations
-    │   ├── schemas/             # Database schemas
-    │   ├── migrations/          # Database migrations
+    │   │   ├── account_model.py
+    │   │   ├── respondent_model.py
+    │   │   ├── subject_model.py
+    │   │   ├── survey_model.py
+    │   │   └── trait_model.py
+    │   ├── repositories/        # Data access layer
+    │   │   ├── account_repository.py
+    │   │   ├── respondent_repository.py
+    │   │   ├── subject_repository.py
+    │   │   ├── survey_repository.py
+    │   │   └── trait_repository.py
     │   └── seeds/               # Sample data
-    ├── shared/                  # Shared code and utilities
-    │   ├── constants/           # Application constants
-    │   ├── types/               # Type definitions
-    │   └── validators/          # Data validation
-    ├── tests/                   # Test suites
-    │   ├── unit/                # Unit tests
-    │   ├── integration/         # Integration tests
-    │   └── e2e/                 # End-to-end tests
-    └── docs/                    # Technical documentation
-        ├── api/                 # API documentation
-        ├── architecture/        # System architecture
-        └── deployment/          # Deployment guides
+    │       └── development_seeds.py
+    ├── frontend/                # React frontend application
+    │   ├── package.json         # Frontend dependencies
+    │   ├── package-lock.json    # Dependency lock file
+    │   ├── vite.config.js       # Vite configuration
+    │   ├── eslint.config.js     # ESLint configuration
+    │   ├── README.md            # Frontend documentation
+    │   ├── .gitignore           # Frontend git ignore
+    │   ├── index.html           # HTML template
+    │   ├── main.jsx             # Application entry point
+    │   ├── App.jsx              # Main application component
+    │   ├── App.css              # Application styles
+    │   ├── index.css            # Global styles
+    │   ├── components/          # Reusable React components
+    │   │   ├── CreateRespondantModal.jsx
+    │   │   ├── CreateSubjectModal.jsx
+    │   │   ├── CreateSurveyModal.jsx
+    │   │   ├── Layout.jsx
+    │   │   ├── Login.jsx
+    │   │   └── Sidebar.jsx
+    │   ├── contexts/            # React context providers
+    │   │   └── AuthContext.jsx
+    │   ├── pages/               # Page components
+    │   │   ├── Home.jsx
+    │   │   ├── account_management_pages/
+    │   │   │   ├── AccountHome.jsx
+    │   │   │   ├── ProfileUpdate.jsx
+    │   │   │   ├── RunSurvey.jsx
+    │   │   │   └── Survey.jsx
+    │   │   ├── domain_admin_pages/
+    │   │   │   ├── CreateSurvey.jsx
+    │   │   │   ├── CreateTrait.jsx
+    │   │   │   ├── DefineReport.jsx
+    │   │   │   ├── DomainAdminHome.jsx
+    │   │   │   ├── DomainReports.jsx
+    │   │   │   ├── DomainSurveys.jsx
+    │   │   │   └── DomainTraits.jsx
+    │   │   └── sys_admin_pages/
+    │   │       ├── Accounts.jsx
+    │   │       ├── CreateAccount.jsx
+    │   │       ├── Settings.jsx
+    │   │       ├── Surveys.jsx
+    │   │       └── SysAdminHome.jsx
+    │   └── services/            # API service layer
+    │       └── api.js
+    └── utils/                   # Shared utilities
+        ├── logger.py            # Logging utilities
+        ├── pagination.py        # Pagination helpers
+        ├── response_helpers.py  # API response helpers
+        └── route_logger.py      # Route logging middleware
 ```
 
 ## 🚀 Getting Started

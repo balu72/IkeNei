@@ -25,6 +25,13 @@ IkeNei is an innovative tool that combines traditional 360-degree feedback metho
 - **Relationship Mapping**: Define relationships between subjects and respondents
 - **Feedback Collection**: Streamlined process for gathering multi-source feedback
 
+### 🔄 Survey Approval Workflow
+- **Domain Admin Survey Creation**: Domain Admins create surveys that require approval
+- **System Admin Review Process**: System Admins review and approve/reject surveys
+- **Role-Based Survey Visibility**: Account users only see approved surveys
+- **Approval Audit Trail**: Complete tracking of approval history and decisions
+- **Rejection Management**: Surveys can be rejected with reasons for improvement
+
 ### 📈 Analytics & Reporting
 - **Comprehensive Dashboards**: Visual insights into feedback trends and survey results
 - **Competency Mapping**: Track skills assessment across various competencies
@@ -398,14 +405,19 @@ Based on comprehensive analysis of frontend API calls, backend controllers, and 
 - ✅ `GET /traits/categories` - Full database integration with TraitRepository
 - ✅ `GET /traits/usage` - Clean implementation (returns timestamp)
 
-#### **Surveys APIs - Core CRUD (7/10 - 70%)**
+#### **Surveys APIs - Core CRUD + Approval Workflow (12/15 - 80%)**
 - ✅ `GET /surveys` - Full database integration with SurveyRepository
-- ✅ `POST /surveys` - Full database integration with SurveyRepository
+- ✅ `POST /surveys` - Full database integration with SurveyRepository + Approval workflow
 - ✅ `GET /surveys/{id}` - Full database integration with SurveyRepository
 - ✅ `PUT /surveys/{id}` - Full database integration with SurveyRepository
 - ✅ `DELETE /surveys/{id}` - Full database integration with SurveyRepository
 - ✅ `PATCH /surveys/{id}/status` - Full database integration with SurveyRepository
 - ✅ `GET /surveys/my-surveys` - Full database integration with SurveyRepository
+- ✅ `POST /surveys/{id}/approve` - Full approval workflow implementation
+- ✅ `POST /surveys/{id}/reject` - Full approval workflow implementation
+- ✅ `GET /surveys/pending` - Full database integration for pending surveys
+- ✅ `GET /surveys/approved` - Full database integration for approved surveys
+- ✅ `GET /surveys/by-role` - Role-based survey filtering implementation
 
 ### ⚠️ **PARTIALLY IMPLEMENTED APIs - Return Minimal/Placeholder Data (28 endpoints)**
 
@@ -471,9 +483,9 @@ Based on comprehensive analysis of frontend API calls, backend controllers, and 
 ### 📈 **Summary Statistics**
 
 #### **Overall API Implementation Status:**
-- **Total Frontend API Calls**: ~67 endpoints
-- **Fully Implemented (Database Integrated)**: 39 endpoints (58%)
-- **Partially Implemented (Skeleton/Placeholder)**: 28 endpoints (42%)
+- **Total Frontend API Calls**: ~72 endpoints
+- **Fully Implemented (Database Integrated)**: 44 endpoints (61%)
+- **Partially Implemented (Skeleton/Placeholder)**: 28 endpoints (39%)
 - **Broken/Non-functional**: 0 endpoints (0%)
 
 #### **By Functional Area:**
@@ -508,6 +520,132 @@ Based on comprehensive analysis of frontend API calls, backend controllers, and 
 - **Supporting Features**: Notifications, file management, categories
 
 **The system has a solid foundation with core CRUD operations fully implemented, but advanced features and analytics require database implementation to be production-ready.**
+
+---
+
+## 🔄 Survey Approval Workflow
+
+### 📋 **Workflow Overview**
+
+IkeNei implements a comprehensive survey approval workflow that ensures quality control and proper governance of survey content before it becomes available to end users.
+
+### **🎯 Approval Process Flow**
+
+```
+Domain Admin Creates Survey → Pending Approval → System Admin Reviews → Approved/Rejected → Available to Accounts
+```
+
+#### **Step 1: Survey Creation**
+- **Domain Admin** creates a new survey using the survey creation interface
+- Survey is automatically assigned status: `'pending_approval'`
+- Survey includes metadata: `created_by_role: 'domain_admin'`
+- Survey is **not visible** to Account users at this stage
+
+#### **Step 2: System Admin Review**
+- **System Admin** receives notification of pending survey
+- System Admin can view all pending surveys via dedicated interface
+- System Admin has two options:
+  - **Approve**: Survey status changes to `'approved'` with approval timestamp
+  - **Reject**: Survey status changes to `'rejected'` with optional rejection reason
+
+#### **Step 3: Post-Approval Actions**
+- **If Approved**: Survey becomes visible and runnable by Account users
+- **If Rejected**: Domain Admin can edit survey and resubmit for approval
+- **Audit Trail**: Complete record of approval/rejection with timestamps and approver information
+
+### **🔐 Role-Based Approval Matrix**
+
+| **Action** | **Account** | **Domain Admin** | **System Admin** |
+|------------|-------------|------------------|------------------|
+| **Create Survey** | ❌ | ✅ | ✅ |
+| **View All Approved Surveys** | ✅ | ✅ | ✅ |
+| **View All Surveys (Any Status)** | ❌ | ✅ | ✅ |
+| **View Pending Surveys** | ❌ | ❌ | ✅ |
+| **Approve Survey** | ❌ | ❌ | ✅ |
+| **Reject Survey** | ❌ | ❌ | ✅ |
+| **Run Approved Survey** | ✅ | ✅ | ✅ |
+| **Edit Own Surveys** | ❌ | ✅ | ✅ |
+| **Delete Own Surveys** | ❌ | ✅ | ✅ |
+
+### **📊 Survey Status Definitions**
+
+| **Status** | **Description** | **Visible To** | **Actions Available** |
+|------------|-----------------|----------------|----------------------|
+| `pending_approval` | Survey created by Domain Admin, awaiting System Admin review | Domain Admin, System Admin | System Admin: Approve/Reject |
+| `approved` | Survey approved by System Admin, ready for use | All Users | Account: Run Survey |
+| `rejected` | Survey rejected by System Admin with feedback | Domain Admin, System Admin | Domain Admin: Edit & Resubmit |
+| `active` | Survey is currently running and collecting responses | All Users | Monitor Progress |
+| `completed` | Survey has finished collecting responses | All Users | View Results |
+| `draft` | Survey created by System Admin (auto-approved) | Creator, System Admin | Edit, Submit |
+
+### **🔧 Technical Implementation**
+
+#### **Database Schema**
+```javascript
+{
+  "title": "Survey Title",
+  "status": "pending_approval",
+  "created_by_role": "domain_admin",
+  "approved_by": ObjectId("system_admin_id"),
+  "approved_at": ISODate("2025-08-03T12:00:00Z"),
+  "rejection_reason": "Needs more detailed questions",
+  // ... other survey fields
+}
+```
+
+#### **API Endpoints**
+- `POST /api/surveys/{id}/approve` - Approve survey (System Admin only)
+- `POST /api/surveys/{id}/reject` - Reject survey with reason (System Admin only)
+- `GET /api/surveys/pending` - Get surveys awaiting approval (System Admin only)
+- `GET /api/surveys/approved` - Get approved surveys (Account users)
+- `GET /api/surveys/by-role` - Get surveys filtered by user role
+
+#### **Frontend Integration**
+```javascript
+// Approve survey
+await surveysAPI.approveSurvey(surveyId, approverId);
+
+// Reject survey with reason
+await surveysAPI.rejectSurvey(surveyId, approverId, "Needs improvement");
+
+// Get pending surveys for System Admin
+const pendingSurveys = await surveysAPI.getPendingSurveys();
+
+// Get approved surveys for Account users
+const approvedSurveys = await surveysAPI.getApprovedSurveys();
+```
+
+### **📈 Workflow Benefits**
+
+#### **Quality Assurance**
+- **Content Review**: System Admins ensure survey quality and appropriateness
+- **Consistency**: Standardized approval process across all surveys
+- **Compliance**: Ensures surveys meet organizational standards
+
+#### **Governance & Control**
+- **Centralized Oversight**: System Admins maintain control over survey content
+- **Audit Trail**: Complete history of all approval decisions
+- **Role Separation**: Clear separation of creation and approval responsibilities
+
+#### **User Experience**
+- **Account Users**: Only see high-quality, approved surveys
+- **Domain Admins**: Clear feedback on rejected surveys for improvement
+- **System Admins**: Efficient review process with bulk operations
+
+### **🎯 Future Enhancements**
+
+#### **Planned Features**
+- **Bulk Approval**: Approve multiple surveys simultaneously
+- **Approval Templates**: Pre-defined approval criteria and checklists
+- **Email Notifications**: Automated notifications for approval status changes
+- **Approval Analytics**: Metrics on approval rates and turnaround times
+- **Collaborative Review**: Multiple System Admins can review and comment
+
+#### **Advanced Workflow Options**
+- **Multi-stage Approval**: Optional secondary approval for sensitive surveys
+- **Conditional Approval**: Approval with conditions or modifications
+- **Time-based Approval**: Automatic approval after specified time period
+- **Category-based Rules**: Different approval rules for different survey types
 
 ---
 

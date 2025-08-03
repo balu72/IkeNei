@@ -405,7 +405,7 @@ Based on comprehensive analysis of frontend API calls, backend controllers, and 
 - ✅ `GET /traits/categories` - Full database integration with TraitRepository
 - ✅ `GET /traits/usage` - Clean implementation (returns timestamp)
 
-#### **Surveys APIs - Core CRUD + Approval Workflow (12/15 - 80%)**
+#### **Surveys APIs - Complete CRUD + Approval + Run Workflow (13/15 - 87%)**
 - ✅ `GET /surveys` - Full database integration with SurveyRepository
 - ✅ `POST /surveys` - Full database integration with SurveyRepository + Approval workflow
 - ✅ `GET /surveys/{id}` - Full database integration with SurveyRepository
@@ -418,6 +418,7 @@ Based on comprehensive analysis of frontend API calls, backend controllers, and 
 - ✅ `GET /surveys/pending` - Full database integration for pending surveys
 - ✅ `GET /surveys/approved` - Full database integration for approved surveys
 - ✅ `GET /surveys/by-role` - Role-based survey filtering implementation
+- ✅ `POST /surveys/{id}/run` - Complete survey run workflow with subject/respondents/validation
 
 ### ⚠️ **PARTIALLY IMPLEMENTED APIs - Return Minimal/Placeholder Data (28 endpoints)**
 
@@ -484,8 +485,8 @@ Based on comprehensive analysis of frontend API calls, backend controllers, and 
 
 #### **Overall API Implementation Status:**
 - **Total Frontend API Calls**: ~72 endpoints
-- **Fully Implemented (Database Integrated)**: 44 endpoints (61%)
-- **Partially Implemented (Skeleton/Placeholder)**: 28 endpoints (39%)
+- **Fully Implemented (Database Integrated)**: 45 endpoints (63%)
+- **Partially Implemented (Skeleton/Placeholder)**: 27 endpoints (37%)
 - **Broken/Non-functional**: 0 endpoints (0%)
 
 #### **By Functional Area:**

@@ -6,13 +6,51 @@ This directory contains the backend API server for the IkeNei, handling business
 
 ```
 backend/
-├── controllers/        # Request handlers and business logic
-├── models/            # Data models and database schemas
-├── routes/            # API route definitions
-├── middleware/        # Custom middleware functions
-├── services/          # Business logic and external service integrations
-├── utils/             # Backend-specific utility functions
-└── config/            # Configuration files and environment setup
+├── .env                           # Environment configuration
+├── app.py                         # Main Flask application entry point
+├── config.py                      # Application configuration
+├── requirements.txt               # Python dependencies
+├── README.md                      # Backend documentation
+├── IMPLEMENTATION_STATUS.md       # Implementation progress tracking
+├── controllers/                   # Request handlers and business logic
+│   ├── __init__.py               # Controllers package initialization
+│   ├── accounts_controller.py    # Account management operations
+│   ├── analytics_controller.py   # Analytics and reporting logic
+│   ├── auth_controller.py        # Authentication and authorization
+│   ├── billing_controller.py     # Billing and usage tracking
+│   ├── categories_controller.py  # Category management
+│   ├── dashboard_controller.py   # Dashboard data aggregation
+│   ├── files_controller.py       # File upload and management
+│   ├── notifications_controller.py # Notification handling
+│   ├── reports_controller.py     # Report generation and management
+│   ├── respondents_controller.py # Respondent management
+│   ├── settings_controller.py    # System settings management
+│   ├── subjects_controller.py    # Subject management
+│   ├── surveys_controller.py     # Survey creation and management
+│   └── traits_controller.py      # Trait/competency management
+├── logs/                          # Application logs
+│   ├── access.log                # HTTP access logs
+│   ├── app.log                   # Application logs
+│   └── error.log                 # Error logs
+├── middleware/                    # Custom middleware functions
+│   ├── __init__.py               # Middleware package initialization
+│   └── auth_middleware.py        # JWT authentication middleware
+└── routes/                        # API route definitions
+    ├── __init__.py               # Routes package initialization
+    ├── accounts_routes.py        # Account management routes
+    ├── analytics_routes.py       # Analytics and reporting routes
+    ├── auth_routes.py            # Authentication routes
+    ├── billing_routes.py         # Billing and usage routes
+    ├── categories_routes.py      # Category management routes
+    ├── dashboard_routes.py       # Dashboard data routes
+    ├── files_routes.py           # File management routes
+    ├── notifications_routes.py   # Notification routes
+    ├── reports_routes.py         # Report management routes
+    ├── respondents_routes.py     # Respondent management routes
+    ├── settings_routes.py        # Settings management routes
+    ├── subjects_routes.py        # Subject management routes
+    ├── surveys_routes.py         # Survey management routes
+    └── traits_routes.py          # Trait/competency routes
 ```
 
 ## Key Features
@@ -48,28 +86,45 @@ backend/
 
 ## API Architecture
 
-### Controllers Directory
+### Controllers Directory (14 Controllers)
+- `accounts_controller.py` - Account management operations
+- `analytics_controller.py` - Analytics and reporting logic
 - `auth_controller.py` - Authentication and authorization
-- `account_controller.py` - Account management operations
-- `feedback_controller.py` - 360-degree feedback operations
-- `analytics_controller.py` - Analytics and reporting
-- `admin_controller.py` - Administrative functions
+- `billing_controller.py` - Billing and usage tracking
+- `categories_controller.py` - Category management
+- `dashboard_controller.py` - Dashboard data aggregation
+- `files_controller.py` - File upload and management
+- `notifications_controller.py` - Notification handling
+- `reports_controller.py` - Report generation and management
+- `respondents_controller.py` - Respondent management
+- `settings_controller.py` - System settings management
+- `subjects_controller.py` - Subject management
+- `surveys_controller.py` - Survey creation and management
+- `traits_controller.py` - Trait/competency management
 
-### Models Directory
-- `account.py` - Account document model
-- `feedback_form.py` - Feedback form document structure
-- `feedback_response.py` - Individual feedback response documents
-- `competency.py` - Skills and competency document definitions
-- `subject.py` - Subject document model
-- `respondent.py` - Respondent document model
-- `billing.py` - Billing document model
+### Routes Directory (14 Route Files)
+- `accounts_routes.py` - Account management API routes
+- `analytics_routes.py` - Analytics and reporting API routes
+- `auth_routes.py` - Authentication API routes
+- `billing_routes.py` - Billing and usage API routes
+- `categories_routes.py` - Category management API routes
+- `dashboard_routes.py` - Dashboard data API routes
+- `files_routes.py` - File management API routes
+- `notifications_routes.py` - Notification API routes
+- `reports_routes.py` - Report management API routes
+- `respondents_routes.py` - Respondent management API routes
+- `settings_routes.py` - Settings management API routes
+- `subjects_routes.py` - Subject management API routes
+- `surveys_routes.py` - Survey management API routes
+- `traits_routes.py` - Trait/competency API routes
 
-### Services Directory
-- `auth_service.py` - Authentication logic
-- `feedback_service.py` - Feedback processing
-- `email_service.py` - Email notifications
-- `report_service.py` - Report generation
-- `integration_service.py` - External API integrations
+### Middleware Directory
+- `auth_middleware.py` - JWT authentication and authorization middleware
+
+### Application Structure
+- `app.py` - Main Flask application with route registration and configuration
+- `config.py` - Application configuration and environment settings
+- `logs/` - Application logging (access, application, and error logs)
 
 ## API Endpoints
 

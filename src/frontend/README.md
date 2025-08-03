@@ -8,16 +8,16 @@ This directory contains the React frontend application for the IkeNei 360-degree
 frontend/
 ├── .env                           # Environment configuration
 ├── .gitignore                     # Git ignore rules
-├── App.css                        # Global styles
+├── App.css                        # Application styles
 ├── App.jsx                        # Main application component
 ├── eslint.config.js               # ESLint configuration
-├── index.css                      # Base styles
+├── index.css                      # Global styles
 ├── index.html                     # HTML template
 ├── main.jsx                       # Application entry point
 ├── package.json                   # Dependencies and scripts
 ├── package-lock.json              # Dependency lock file
-├── README.md                      # Documentation
-├── vite.config.js                 # Vite configuration
+├── README.md                      # Frontend documentation
+├── vite.config.js                 # Vite build configuration
 ├── components/                    # Reusable UI components
 │   ├── CreateRespondantModal.jsx  # Respondent creation modal
 │   ├── CreateSubjectModal.jsx     # Subject creation modal
@@ -27,7 +27,7 @@ frontend/
 │   └── Sidebar.jsx                # Navigation sidebar
 ├── contexts/                      # React context providers
 │   └── AuthContext.jsx            # Authentication context
-├── pages/                         # Page components by role
+├── pages/                         # Page components organized by role
 │   ├── Home.jsx                   # Generic home page
 │   ├── account_management_pages/  # Account role pages
 │   │   ├── AccountHome.jsx        # Account dashboard
@@ -80,14 +80,15 @@ frontend/
 
 ## Technology Stack
 
-- **Framework**: React 18
-- **Build Tool**: Vite
-- **Routing**: React Router v6
+- **Framework**: React 19
+- **Build Tool**: Vite 7
+- **Routing**: React Router v7
 - **State Management**: React Context API
-- **Styling**: CSS3 with custom styles
-- **Icons**: Heroicons
+- **Styling**: Tailwind CSS 4 with custom styles
+- **Icons**: Heroicons & React Icons
 - **HTTP Client**: Fetch API
 - **Authentication**: JWT tokens
+- **Development**: ESLint, PostCSS, Autoprefixer
 
 ## Application Architecture
 
@@ -326,14 +327,10 @@ export default ComponentName;
 
 ### ✅ Current Configuration (`.env`)
 ```env
-# API Configuration
+# Backend API Configuration
 VITE_API_BASE_URL=http://localhost:5000/api
 
-# Application Configuration
-VITE_APP_NAME=IkeNei
-VITE_APP_VERSION=1.0.0
-
-# Development Settings
+# Development Configuration
 VITE_NODE_ENV=development
 ```
 

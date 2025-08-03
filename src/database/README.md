@@ -1,239 +1,293 @@
 # Database Layer - IkeNei
 
-This directory contains all database-related files including schemas, migrations, seeds, and queries for the IkeNei application.
+This directory contains all database-related files including models, repositories, configuration, and seeds for the IkeNei MongoDB application.
 
 ## Directory Structure
 
 ```
 database/
-├── migrations/         # Database migration scripts
-├── seeds/             # Initial data and test data
-├── schemas/           # Database schema definitions
-├── queries/           # Complex SQL queries and stored procedures
-└── config/            # Database configuration files
+├── __init__.py                    # Database package initialization
+├── base_model.py                  # Base model class with common functionality
+├── connection.py                  # MongoDB connection management
+├── README.md                      # Database documentation
+├── SETUP.md                       # Database setup instructions
+├── config/                        # Database configuration
+│   ├── docker-compose.yml         # MongoDB Docker setup
+│   └── mongo-init.js              # MongoDB initialization script
+├── models/                        # MongoDB document models
+│   ├── account_model.py           # Account document model
+│   ├── respondent_model.py        # Respondent document model
+│   ├── subject_model.py           # Subject document model
+│   ├── survey_model.py            # Survey document model
+│   └── trait_model.py             # Trait/competency document model
+├── repositories/                  # Data access layer
+│   ├── account_repository.py      # Account data operations
+│   ├── respondent_repository.py   # Respondent data operations
+│   ├── subject_repository.py      # Subject data operations
+│   ├── survey_repository.py       # Survey data operations
+│   └── trait_repository.py        # Trait data operations
+└── seeds/                         # Initial and test data
+    └── development_seeds.py       # Development seed data
 ```
 
-## Database Design
+## Technology Stack
 
-### Core Entities
+- **Database**: MongoDB
+- **ODM**: PyMongo
+- **Connection Management**: Custom connection pooling
+- **Data Modeling**: Document-based with embedded and referenced relationships
+- **Indexing**: MongoDB compound and single field indexes
+- **Validation**: Schema validation at application level
 
-#### Accounts & Roles
-- **accounts** - Account profiles and authentication data (individual or organizational)
-- **roles** - Account roles and permissions
-- **account_roles** - Account role assignments
+## Database Architecture
 
-#### 360-Degree Feedback System
-- **subjects** - Individuals being assessed (each account has multiple subjects)
-- **respondents** - Individuals providing feedback (each subject has multiple respondents)
-- **feedback_forms** - Feedback form templates and configurations
-- **feedback_questions** - Individual questions within forms
-- **feedback_cycles** - Feedback collection periods
-- **feedback_invitations** - Invitations sent to feedback providers
-- **feedback_responses** - Individual feedback submissions
-- **feedback_ratings** - Numerical ratings for competencies
+### Models Layer (5 Models)
+- `account_model.py` - Account document structure and validation
+- `respondent_model.py` - Respondent document structure and validation
+- `subject_model.py` - Subject document structure and validation
+- `survey_model.py` - Survey document structure and validation
+- `trait_model.py` - Trait/competency document structure and validation
 
-#### Competency Framework
-- **competencies** - Skills and competency definitions
-- **competency_categories** - Grouping of related competencies
-- **competency_levels** - Proficiency levels for each competency
-- **account_competencies** - Account's current competency levels
+### Repository Layer (5 Repositories)
+- `account_repository.py` - Account data access operations
+- `respondent_repository.py` - Respondent data access operations
+- `subject_repository.py` - Subject data access operations
+- `survey_repository.py` - Survey data access operations
+- `trait_repository.py` - Trait data access operations
 
+### Core Components
+- `base_model.py` - Base model class with common functionality (timestamps, validation)
+- `connection.py` - MongoDB connection management and configuration
+- `development_seeds.py` - Sample data for development and testing
 
-#### Analytics & Reporting
-- **analytics_events** - Account interaction tracking
-- **reports** - Generated reports and their metadata
-- **dashboard_widgets** - Customizable dashboard configurations
+## MongoDB Collections
 
-#### Billing & Usage Tracking
-- **billing** - Survey usage tracking and billing records for each account
+### Core Collections
 
-## Schema Definitions
-
-### Accounts Table
-```sql
-CREATE TABLE accounts (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    email VARCHAR(255) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    account_name VARCHAR(255) NOT NULL,
-    account_type VARCHAR(50) DEFAULT 'standard',
-    is_active BOOLEAN DEFAULT true,
-    email_verified BOOLEAN DEFAULT false,
-    last_login_at TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+#### Accounts Collection
+```javascript
+{
+  "_id": ObjectId,
+  "email": String,
+  "password_hash": String,
+  "account_name": String,
+  "account_type": String, // "account", "domain_admin", "system_admin"
+  "role": String,
+  "is_active": Boolean,
+  "email_verified": Boolean,
+  "profile": {
+    "first_name": String,
+    "last_name": String,
+    "organization": String,
+    "department": String,
+    "position": String
+  },
+  "last_login_at": Date,
+  "created_at": Date,
+  "updated_at": Date
+}
 ```
 
-### Subjects Table
-```sql
-CREATE TABLE subjects (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    account_id UUID REFERENCES accounts(id),
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255),
-    position VARCHAR(200),
-    department VARCHAR(100),
-    is_active BOOLEAN DEFAULT true,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+#### Subjects Collection
+```javascript
+{
+  "_id": ObjectId,
+  "account_id": ObjectId, // Reference to accounts
+  "name": String,
+  "email": String,
+  "position": String,
+  "department": String,
+  "is_active": Boolean,
+  "created_at": Date,
+  "updated_at": Date
+}
 ```
 
-### Respondents Table
-```sql
-CREATE TABLE respondents (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    subject_id UUID REFERENCES subjects(id),
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255),
-    relationship VARCHAR(100),
-    is_active BOOLEAN DEFAULT true,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+#### Respondents Collection
+```javascript
+{
+  "_id": ObjectId,
+  "subject_id": ObjectId, // Reference to subjects
+  "account_id": ObjectId, // Reference to accounts
+  "name": String,
+  "email": String,
+  "relationship": String, // "supervisor", "peer", "direct_report", "self"
+  "is_active": Boolean,
+  "created_at": Date,
+  "updated_at": Date
+}
 ```
 
-### Feedback Forms Table
-```sql
-CREATE TABLE feedback_forms (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    account_id UUID REFERENCES accounts(id),
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
-    form_type VARCHAR(50) DEFAULT 'standard',
-    is_anonymous BOOLEAN DEFAULT false,
-    is_active BOOLEAN DEFAULT true,
-    settings JSONB DEFAULT '{}',
-    created_by UUID REFERENCES accounts(id),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+#### Surveys Collection
+```javascript
+{
+  "_id": ObjectId,
+  "account_id": ObjectId, // Reference to accounts
+  "title": String,
+  "description": String,
+  "survey_type": String, // "360_feedback", "self_assessment", "peer_review"
+  "status": String, // "draft", "active", "completed", "archived"
+  "is_anonymous": Boolean,
+  "traits": [ObjectId], // References to traits
+  "questions": [{
+    "trait_id": ObjectId,
+    "question_text": String,
+    "question_type": String, // "rating", "text", "multiple_choice"
+    "scale": {
+      "min": Number,
+      "max": Number,
+      "labels": [String]
+    }
+  }],
+  "settings": {
+    "allow_comments": Boolean,
+    "require_all_questions": Boolean,
+    "deadline": Date
+  },
+  "created_by": ObjectId, // Reference to accounts
+  "created_at": Date,
+  "updated_at": Date
+}
 ```
 
-### Competencies Table
-```sql
-CREATE TABLE competencies (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    account_id UUID REFERENCES accounts(id),
-    name VARCHAR(255) NOT NULL,
-    description TEXT,
-    category_id UUID REFERENCES competency_categories(id),
-    weight DECIMAL(3,2) DEFAULT 1.0,
-    is_active BOOLEAN DEFAULT true,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+#### Traits Collection
+```javascript
+{
+  "_id": ObjectId,
+  "account_id": ObjectId, // Reference to accounts (null for system traits)
+  "name": String,
+  "description": String,
+  "category": String, // "leadership", "communication", "technical", "teamwork"
+  "weight": Number, // 1.0 default
+  "is_active": Boolean,
+  "is_system_trait": Boolean, // true for default traits
+  "created_at": Date,
+  "updated_at": Date
+}
 ```
 
-### Billing Table
-```sql
-CREATE TABLE billing (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    account_id UUID REFERENCES accounts(id),
-    survey_id UUID REFERENCES feedback_forms(id),
-    survey_title VARCHAR(255) NOT NULL,
-    subjects_count INTEGER NOT NULL DEFAULT 0,
-    respondents_count INTEGER NOT NULL DEFAULT 0,
-    survey_conducted_at TIMESTAMP NOT NULL,
-    billing_amount DECIMAL(10,2),
-    billing_status VARCHAR(50) DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+## MongoDB Indexes
+
+### Performance Optimization Indexes
+```javascript
+// Accounts collection
+db.accounts.createIndex({ "email": 1 }, { unique: true })
+db.accounts.createIndex({ "account_type": 1 })
+db.accounts.createIndex({ "is_active": 1 })
+
+// Subjects collection
+db.subjects.createIndex({ "account_id": 1 })
+db.subjects.createIndex({ "account_id": 1, "is_active": 1 })
+db.subjects.createIndex({ "email": 1 })
+
+// Respondents collection
+db.respondents.createIndex({ "subject_id": 1 })
+db.respondents.createIndex({ "account_id": 1 })
+db.respondents.createIndex({ "account_id": 1, "is_active": 1 })
+
+// Surveys collection
+db.surveys.createIndex({ "account_id": 1 })
+db.surveys.createIndex({ "account_id": 1, "status": 1 })
+db.surveys.createIndex({ "created_by": 1 })
+db.surveys.createIndex({ "status": 1 })
+
+// Traits collection
+db.traits.createIndex({ "account_id": 1 })
+db.traits.createIndex({ "account_id": 1, "is_active": 1 })
+db.traits.createIndex({ "category": 1 })
+db.traits.createIndex({ "is_system_trait": 1 })
 ```
 
-## Migration Strategy
+## Data Access Patterns
 
-### Migration Files Naming Convention
-```
-YYYYMMDD_HHMMSS_description.sql
-```
-
-Example:
-- `20240101_120000_create_accounts_table.sql`
-- `20240101_130000_create_subjects_table.sql`
-- `20240101_140000_create_respondents_table.sql`
-- `20240101_150000_create_feedback_forms_table.sql`
-- `20240101_160000_create_competencies_table.sql`
-- `20240101_170000_create_billing_table.sql`
-
-### Migration Structure
-```sql
--- Up Migration
--- Description: Create accounts table
--- Date: 2024-01-01
-
-CREATE TABLE accounts (
-    -- table definition
-);
-
--- Create indexes
-CREATE INDEX idx_accounts_email ON accounts(email);
-CREATE INDEX idx_accounts_type ON accounts(account_type);
-
--- Down Migration (for rollback)
--- DROP TABLE accounts;
+### Repository Pattern Implementation
+```python
+# Example: Account Repository
+class AccountRepository:
+    def __init__(self, db_connection):
+        self.collection = db_connection.accounts
+    
+    def find_by_email(self, email):
+        return self.collection.find_one({"email": email})
+    
+    def create(self, account_data):
+        account_data["created_at"] = datetime.utcnow()
+        account_data["updated_at"] = datetime.utcnow()
+        result = self.collection.insert_one(account_data)
+        return str(result.inserted_id)
+    
+    def update(self, account_id, update_data):
+        update_data["updated_at"] = datetime.utcnow()
+        return self.collection.update_one(
+            {"_id": ObjectId(account_id)},
+            {"$set": update_data}
+        )
 ```
 
-## Seed Data
+### Aggregation Queries
+```javascript
+// Get survey statistics for an account
+db.surveys.aggregate([
+  { $match: { "account_id": ObjectId("...") } },
+  { $group: {
+    "_id": "$status",
+    "count": { $sum: 1 }
+  }},
+  { $sort: { "_id": 1 } }
+])
 
-### Development Seeds
-- Sample accounts (individual and organizational)
-- Test subjects for each account
-- Test respondents for each subject
-- Default competency frameworks
-- Sample feedback forms
-- Mock feedback responses
-- Sample billing records
-
-### Production Seeds
-- Default system roles
-- Standard competency categories
-- System configuration data
-
-## Query Optimization
-
-### Indexes Strategy
-```sql
--- Account lookup optimization
-CREATE INDEX idx_accounts_email ON accounts(email);
-CREATE INDEX idx_accounts_active ON accounts(is_active) WHERE is_active = true;
-
--- Subject and respondent optimization
-CREATE INDEX idx_subjects_account ON subjects(account_id);
-CREATE INDEX idx_subjects_active ON subjects(is_active) WHERE is_active = true;
-CREATE INDEX idx_respondents_subject ON respondents(subject_id);
-CREATE INDEX idx_respondents_active ON respondents(is_active) WHERE is_active = true;
-
--- Feedback system optimization
-CREATE INDEX idx_feedback_responses_form_cycle ON feedback_responses(form_id, cycle_id);
-CREATE INDEX idx_feedback_responses_subject ON feedback_responses(target_subject_id);
-
--- Billing optimization
-CREATE INDEX idx_billing_account ON billing(account_id);
-CREATE INDEX idx_billing_survey ON billing(survey_id);
-CREATE INDEX idx_billing_conducted_date ON billing(survey_conducted_at);
-CREATE INDEX idx_billing_status ON billing(billing_status);
+// Get trait usage across surveys
+db.surveys.aggregate([
+  { $unwind: "$traits" },
+  { $group: {
+    "_id": "$traits",
+    "usage_count": { $sum: 1 }
+  }},
+  { $lookup: {
+    "from": "traits",
+    "localField": "_id",
+    "foreignField": "_id",
+    "as": "trait_info"
+  }},
+  { $sort: { "usage_count": -1 } }
+])
 ```
 
-### Complex Queries
+## Development Seeds
 
-#### Feedback Analysis Query
-```sql
--- Get aggregated feedback scores for an account
-SELECT 
-    c.name as competency_name,
-    AVG(fr.rating) as average_rating,
-    COUNT(fr.id) as response_count,
-    STDDEV(fr.rating) as rating_variance
-FROM feedback_responses fr
-JOIN feedback_questions fq ON fr.question_id = fq.id
-JOIN competencies c ON fq.competency_id = c.id
-WHERE fr.target_account_id = $1
-    AND fr.cycle_id = $2
-GROUP BY c.id, c.name
-ORDER BY average_rating DESC;
+### Sample Data Structure
+```python
+# development_seeds.py structure
+SAMPLE_ACCOUNTS = [
+    {
+        "email": "account@example.com",
+        "role": "account",
+        "account_name": "Sample Account User"
+    },
+    {
+        "email": "domainadmin@example.com", 
+        "role": "domain_admin",
+        "account_name": "Domain Administrator"
+    },
+    {
+        "email": "systemadmin@example.com",
+        "role": "system_admin", 
+        "account_name": "System Administrator"
+    }
+]
+
+SAMPLE_TRAITS = [
+    {
+        "name": "Leadership",
+        "category": "leadership",
+        "is_system_trait": True
+    },
+    {
+        "name": "Communication",
+        "category": "communication", 
+        "is_system_trait": True
+    }
+]
 ```
 
 ## Data Privacy & Security
@@ -253,75 +307,147 @@ ORDER BY average_rating DESC;
 ## Backup & Recovery
 
 ### Backup Strategy
-- Daily automated backups
-- Point-in-time recovery capability
+- Daily automated backups using mongodump
+- Point-in-time recovery with oplog
 - Cross-region backup replication
 - Backup integrity verification
 
 ### Recovery Procedures
-- Database restoration scripts
+- Database restoration using mongorestore
 - Data consistency checks
-- Rollback procedures
+- Rollback procedures using oplog
 - Disaster recovery protocols
 
 ## Performance Monitoring
 
 ### Key Metrics
-- Query execution times
+- Query execution times using MongoDB Profiler
 - Index usage statistics
 - Connection pool utilization
-- Storage growth trends
+- Storage growth trends and collection stats
 
 ### Optimization Tools
-- Query plan analysis
-- Index recommendation engine
+- MongoDB Compass for query analysis
+- explain() method for query optimization
 - Performance baseline tracking
 - Automated optimization alerts
 
 ## Development Guidelines
 
-1. **Schema Changes**
-   - Always use migrations for schema changes
-   - Test migrations on staging environment
-   - Include rollback scripts
-   - Document breaking changes
+1. **Document Schema Design**
+   - Design documents to minimize joins (use embedding when appropriate)
+   - Use references for large or frequently changing data
+   - Implement schema validation at application level
+   - Document schema changes and versioning
 
 2. **Query Performance**
-   - Use EXPLAIN ANALYZE for complex queries
-   - Implement proper indexing strategy
-   - Avoid N+1 query problems
-   - Use connection pooling
+   - Use MongoDB explain() for query analysis
+   - Implement proper indexing strategy for common queries
+   - Avoid N+1 query problems with aggregation pipelines
+   - Use connection pooling and proper connection management
 
 3. **Data Integrity**
-   - Implement proper foreign key constraints
-   - Use transactions for multi-table operations
-   - Validate data at database level
-   - Implement soft deletes where appropriate
+   - Implement validation in models and repositories
+   - Use MongoDB transactions for multi-document operations
+   - Validate data at application level before database operations
+   - Implement soft deletes with is_active flags
 
 ## Getting Started
 
-1. Set up database connection
-2. Run initial migrations: `npm run migrate`
-3. Seed development data: `npm run seed:dev`
-4. Verify database setup: `npm run db:verify`
-5. Run database tests: `npm run test:db`
+1. **Setup MongoDB**
+   ```bash
+   # Using Docker (recommended)
+   cd src/database/config
+   docker-compose up -d
+   
+   # Or install MongoDB locally
+   # macOS: brew install mongodb-community
+   # Ubuntu: sudo apt install mongodb
+   ```
+
+2. **Initialize Database Connection**
+   ```python
+   from src.database.connection import get_database
+   db = get_database()
+   ```
+
+3. **Run Development Seeds**
+   ```python
+   from src.database.seeds.development_seeds import seed_development_data
+   seed_development_data()
+   ```
+
+4. **Verify Database Setup**
+   ```python
+   # Test connection and basic operations
+   from src.database.repositories.account_repository import AccountRepository
+   account_repo = AccountRepository(db)
+   accounts = account_repo.find_all()
+   ```
+
+5. **Create Indexes**
+   ```python
+   # Run index creation script
+   python -c "from src.database.connection import create_indexes; create_indexes()"
+   ```
 
 ## Environment Configuration
 
 ```env
-# Database Configuration
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=360planner_dev
-DB_USER=postgres
-DB_PASSWORD=your_password
-DB_SSL=false
+# MongoDB Configuration
+MONGODB_URI=mongodb://localhost:27017/ikenei
+MONGODB_DB_NAME=ikenei
+MONGODB_HOST=localhost
+MONGODB_PORT=27017
 
-# Connection Pool
-DB_POOL_MIN=2
-DB_POOL_MAX=10
-DB_POOL_IDLE_TIMEOUT=30000
+# MongoDB Authentication (if enabled)
+MONGODB_USERNAME=ikenei_user
+MONGODB_PASSWORD=your_secure_password
+
+# Connection Pool Settings
+MONGODB_MAX_POOL_SIZE=100
+MONGODB_MIN_POOL_SIZE=10
+MONGODB_MAX_IDLE_TIME_MS=30000
+MONGODB_CONNECT_TIMEOUT_MS=10000
+MONGODB_SERVER_SELECTION_TIMEOUT_MS=5000
+
+# SSL/TLS Configuration (for production)
+MONGODB_SSL=false
+MONGODB_SSL_CERT_PATH=/path/to/cert.pem
+MONGODB_SSL_CA_CERTS=/path/to/ca.pem
 
 # Backup Configuration
 BACKUP_SCHEDULE=0 2 * * *
 BACKUP_RETENTION_DAYS=30
+BACKUP_S3_BUCKET=ikenei-backups
+```
+
+## Docker Setup
+
+The `config/docker-compose.yml` provides a complete MongoDB setup:
+
+```yaml
+version: '3.8'
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: ikenei-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: ikenei
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - ikenei-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  ikenei-network:
+    driver: bridge

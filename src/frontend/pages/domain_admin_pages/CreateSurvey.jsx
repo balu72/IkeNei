@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { surveysAPI } from '../../services/api';
+import { surveysAPI, traitsAPI } from '../../services/api';
 
 const CreateSurvey = () => {
   const navigate = useNavigate();
@@ -12,40 +12,43 @@ const CreateSurvey = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Sample data - in real app, this would come from API
-  const availableTraits = [
-    'Strategic Thinking',
-    'Decision Making',
-    'Team Management',
-    'Verbal Communication',
-    'Written Communication',
-    'Active Listening',
-    'Presentation Skills',
-    'Delegation',
-    'Conflict Resolution',
-    'Performance Management',
-    'Planning & Organization',
-    'Risk Management',
-    'Resource Allocation',
-    'Timeline Management',
-    'Leadership',
-    'Innovation',
-    'Problem Solving',
-    'Adaptability'
-  ];
+  // API data state
+  const [availableTraits, setAvailableTraits] = useState([]);
+  const [targetSectors, setTargetSectors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const targetSectors = [
-    'Technology',
-    'Healthcare',
-    'Finance',
-    'Education',
-    'Manufacturing',
-    'Retail',
-    'Consulting',
-    'Government',
-    'Non-Profit',
-    'General/All Sectors'
-  ];
+  // Fetch data from APIs
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Fetch traits and trait categories for sectors
+        const [traitsRes, categoriesRes] = await Promise.all([
+          traitsAPI.getAll({ status: 'active' }), // Get only active traits
+          traitsAPI.getCategories() // Get trait categories which can serve as sectors
+        ]);
+        
+        if (traitsRes.success) {
+          setAvailableTraits(traitsRes.data || []);
+        }
+        
+        if (categoriesRes.success) {
+          setTargetSectors(categoriesRes.data || []);
+        }
+        
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError(err.message || 'Failed to load data');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -55,28 +58,35 @@ const CreateSurvey = () => {
     }));
   };
 
-  const handleTraitSelection = (trait) => {
+  const handleTraitSelection = (traitObj) => {
+    const traitId = traitObj.id || traitObj._id;
+    const traitName = traitObj.name;
+    
     setFormData(prev => {
-      const isSelected = prev.selectedTraits.some(t => t.name === trait);
+      const isSelected = prev.selectedTraits.some(t => t.id === traitId);
       if (isSelected) {
         return {
           ...prev,
-          selectedTraits: prev.selectedTraits.filter(t => t.name !== trait)
+          selectedTraits: prev.selectedTraits.filter(t => t.id !== traitId)
         };
       } else {
         return {
           ...prev,
-          selectedTraits: [...prev.selectedTraits, { name: trait, weightage: 0 }]
+          selectedTraits: [...prev.selectedTraits, { 
+            id: traitId, 
+            name: traitName, 
+            weightage: 0 
+          }]
         };
       }
     });
   };
 
-  const handleWeightageChange = (traitName, weightage) => {
+  const handleWeightageChange = (traitId, weightage) => {
     setFormData(prev => ({
       ...prev,
       selectedTraits: prev.selectedTraits.map(trait =>
-        trait.name === traitName ? { ...trait, weightage: parseInt(weightage) || 0 } : trait
+        trait.id === traitId ? { ...trait, weightage: parseInt(weightage) || 0 } : trait
       )
     }));
   };
@@ -145,6 +155,37 @@ const CreateSurvey = () => {
   const handleCancel = () => {
     navigate('/');
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center', padding: '2rem' }}>
+        <h1 className="page-title">Create New Survey</h1>
+        <div style={{ padding: '2rem' }}>
+          <p>Loading traits and categories...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center', padding: '2rem' }}>
+        <h1 className="page-title">Create New Survey</h1>
+        <div style={{ padding: '2rem', color: '#dc2626' }}>
+          <p>Error: {error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="btn-primary"
+            style={{ marginTop: '1rem' }}
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
@@ -233,7 +274,7 @@ const CreateSurvey = () => {
               backgroundColor: '#fafafa'
             }}>
               {availableTraits.map((trait) => (
-                <label key={trait} style={{
+                <label key={trait.id || trait._id} style={{
                   display: 'flex',
                   alignItems: 'center',
                   marginBottom: '0.5rem',
@@ -241,11 +282,11 @@ const CreateSurvey = () => {
                 }}>
                   <input
                     type="checkbox"
-                    checked={formData.selectedTraits.some(t => t.name === trait)}
+                    checked={formData.selectedTraits.some(t => t.id === (trait.id || trait._id))}
                     onChange={() => handleTraitSelection(trait)}
                     style={{ marginRight: '0.5rem' }}
                   />
-                  <span style={{ fontSize: '0.875rem' }}>{trait}</span>
+                  <span style={{ fontSize: '0.875rem' }}>{trait.name}</span>
                 </label>
               ))}
             </div>
@@ -264,7 +305,7 @@ const CreateSurvey = () => {
                 backgroundColor: '#f9fafb'
               }}>
                 {formData.selectedTraits.map((trait) => (
-                  <div key={trait.name} style={{
+                  <div key={trait.id} style={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
@@ -281,7 +322,7 @@ const CreateSurvey = () => {
                         min="0"
                         max="100"
                         value={trait.weightage}
-                        onChange={(e) => handleWeightageChange(trait.name, e.target.value)}
+                        onChange={(e) => handleWeightageChange(trait.id, e.target.value)}
                         style={{
                           width: '80px',
                           padding: '0.5rem',

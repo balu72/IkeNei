@@ -1,7 +1,38 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { reportsAPI } from '../../services/api';
 
 const DomainReports = () => {
   const navigate = useNavigate();
+  const [reportsData, setReportsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch reports data from API
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await reportsAPI.getAll();
+        
+        if (response.success) {
+          setReportsData(response.data || []);
+        } else {
+          setError(response.error?.message || 'Failed to load reports');
+        }
+        
+      } catch (err) {
+        console.error('Error fetching reports:', err);
+        setError(err.message || 'Failed to load reports');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchReports();
+  }, []);
 
   const handleCreateReport = () => {
     console.log('Create New Report clicked');
@@ -12,86 +43,45 @@ const DomainReports = () => {
     navigate('/');
   };
 
-  // Sample reports data - in real app, this would come from API
-  const reportsData = [
-    {
-      id: 1,
-      reportName: 'Leadership Development Report',
-      reportType: 'Individual Assessment',
-      associatedSurvey: 'Leadership Skills Assessment',
-      status: 'Active',
-      generatedCount: 25,
-      lastGenerated: '2024-01-15',
-      createdBy: 'Admin User',
-      description: 'Comprehensive leadership skills analysis with development recommendations'
-    },
-    {
-      id: 2,
-      reportName: 'Team Communication Analysis',
-      reportType: 'Team Report',
-      associatedSurvey: 'Communication Skills Survey',
-      status: 'Active',
-      generatedCount: 12,
-      lastGenerated: '2024-01-14',
-      createdBy: 'Domain Admin',
-      description: 'Team-wide communication effectiveness and improvement areas'
-    },
-    {
-      id: 3,
-      reportName: 'Project Management Scorecard',
-      reportType: 'Performance Report',
-      associatedSurvey: 'Project Management Skills',
-      status: 'Completed',
-      generatedCount: 8,
-      lastGenerated: '2024-01-10',
-      createdBy: 'Admin User',
-      description: 'Project management competency scoring with benchmarks'
-    },
-    {
-      id: 4,
-      reportName: 'Quarterly Skills Assessment',
-      reportType: 'Aggregate Report',
-      associatedSurvey: 'Multiple Surveys',
-      status: 'Draft',
-      generatedCount: 0,
-      lastGenerated: 'Never',
-      createdBy: 'Domain Admin',
-      description: 'Quarterly overview of all skills assessments across the domain'
-    },
-    {
-      id: 5,
-      reportName: '360 Feedback Summary',
-      reportType: 'Individual Assessment',
-      associatedSurvey: 'Team Management Review',
-      status: 'Active',
-      generatedCount: 18,
-      lastGenerated: '2024-01-12',
-      createdBy: 'Admin User',
-      description: 'Comprehensive 360-degree feedback analysis with peer insights'
-    },
-    {
-      id: 6,
-      reportName: 'Innovation Capability Report',
-      reportType: 'Department Report',
-      associatedSurvey: 'Innovation & Creativity Assessment',
-      status: 'Inactive',
-      generatedCount: 3,
-      lastGenerated: '2024-01-05',
-      createdBy: 'Domain Admin',
-      description: 'Department-level innovation and creativity assessment'
-    },
-    {
-      id: 8,
-      reportName: 'Executive Dashboard',
-      reportType: 'Executive Summary',
-      associatedSurvey: 'All Active Surveys',
-      status: 'Active',
-      generatedCount: 5,
-      lastGenerated: '2024-01-13',
-      createdBy: 'Domain Admin',
-      description: 'High-level executive summary of organizational capabilities'
+  const handleEditReport = async (reportId) => {
+    console.log('Edit report:', reportId);
+    // Navigate to edit page or open edit modal
+  };
+
+  const handleGenerateReport = async (reportId) => {
+    try {
+      const response = await reportsAPI.generate(reportId);
+      if (response.success) {
+        alert('Report generated successfully!');
+        // Refresh the reports list to update generated count
+        window.location.reload();
+      } else {
+        alert('Failed to generate report: ' + (response.error?.message || 'Unknown error'));
+      }
+    } catch (err) {
+      console.error('Error generating report:', err);
+      alert('Failed to generate report: ' + err.message);
     }
-  ];
+  };
+
+  const handleToggleStatus = async (reportId, currentStatus) => {
+    try {
+      const newStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
+      const response = await reportsAPI.updateStatus(reportId, newStatus);
+      
+      if (response.success) {
+        // Update local state
+        setReportsData(prev => prev.map(report => 
+          report.id === reportId ? { ...report, status: newStatus } : report
+        ));
+      } else {
+        alert('Failed to update status: ' + (response.error?.message || 'Unknown error'));
+      }
+    } catch (err) {
+      console.error('Error updating status:', err);
+      alert('Failed to update status: ' + err.message);
+    }
+  };
 
   const getStatusStyle = (status) => {
     const styles = {
@@ -142,6 +132,37 @@ const DomainReports = () => {
       fontWeight: '500'
     };
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div style={{ maxWidth: '1400px', margin: '0 auto', textAlign: 'center', padding: '2rem' }}>
+        <h1 className="page-title">Reports Management</h1>
+        <div style={{ padding: '2rem' }}>
+          <p>Loading reports...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div style={{ maxWidth: '1400px', margin: '0 auto', textAlign: 'center', padding: '2rem' }}>
+        <h1 className="page-title">Reports Management</h1>
+        <div style={{ padding: '2rem', color: '#dc2626' }}>
+          <p>Error: {error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="btn-primary"
+            style={{ marginTop: '1rem' }}
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
@@ -306,7 +327,7 @@ const DomainReports = () => {
                   <td style={{ padding: '1rem', verticalAlign: 'top' }}>
                     <div style={{ display: 'flex', gap: '0.5rem', flexDirection: 'column' }}>
                       <button
-                        onClick={() => console.log('Edit report:', report.id)}
+                        onClick={() => handleEditReport(report.id)}
                         style={{
                           padding: '0.25rem 0.5rem',
                           fontSize: '0.75rem',
@@ -320,7 +341,7 @@ const DomainReports = () => {
                         Edit
                       </button>
                       <button
-                        onClick={() => console.log('Generate report:', report.id)}
+                        onClick={() => handleGenerateReport(report.id)}
                         style={{
                           padding: '0.25rem 0.5rem',
                           fontSize: '0.75rem',
@@ -334,7 +355,7 @@ const DomainReports = () => {
                         Generate
                       </button>
                       <button
-                        onClick={() => console.log('Toggle status:', report.id)}
+                        onClick={() => handleToggleStatus(report.id, report.status)}
                         style={{
                           padding: '0.25rem 0.5rem',
                           fontSize: '0.75rem',

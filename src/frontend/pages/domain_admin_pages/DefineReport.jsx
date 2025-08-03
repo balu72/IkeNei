@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { reportsAPI, surveysAPI, traitsAPI, accountsAPI } from '../../services/api';
 
 const DefineReport = () => {
   const navigate = useNavigate();
@@ -28,7 +29,14 @@ const DefineReport = () => {
     }
   });
 
-  // Sample data - in real app, this would come from API
+  // API data state
+  const [surveys, setSurveys] = useState([]);
+  const [traits, setTraits] = useState([]);
+  const [accounts, setAccounts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Static options (these could also come from API if needed)
   const reportTypes = [
     'Individual Performance Report',
     'Team Performance Summary',
@@ -45,35 +53,6 @@ const DefineReport = () => {
     'Trait-based Analysis',
     'Account Performance',
     'Time-based Trends'
-  ];
-
-  const surveys = [
-    'Leadership Skills Assessment',
-    'Communication Skills Survey',
-    'Team Management Review',
-    'Project Management Skills'
-  ];
-
-  const traits = [
-    'Strategic Thinking',
-    'Decision Making',
-    'Team Management',
-    'Verbal Communication',
-    'Written Communication',
-    'Active Listening',
-    'Presentation Skills',
-    'Delegation',
-    'Conflict Resolution',
-    'Performance Management'
-  ];
-
-  const accounts = [
-    'John Doe',
-    'Jane Smith',
-    'Robert Brown',
-    'Lisa Anderson',
-    'Mike Johnson',
-    'Sarah Wilson'
   ];
 
   const chartTypes = [
@@ -94,6 +73,41 @@ const DefineReport = () => {
     'Trait',
     'Date Range'
   ];
+
+  // Fetch data from APIs
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Fetch surveys, traits, and accounts
+        const [surveysRes, traitsRes, accountsRes] = await Promise.all([
+          surveysAPI.getAll(),
+          traitsAPI.getAll({ status: 'active' }),
+          accountsAPI.getAll()
+        ]);
+        
+        if (surveysRes.success) {
+          setSurveys(surveysRes.data || []);
+        }
+        if (traitsRes.success) {
+          setTraits(traitsRes.data || []);
+        }
+        if (accountsRes.success) {
+          setAccounts(accountsRes.data || []);
+        }
+        
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError(err.message || 'Failed to load data');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -152,6 +166,37 @@ const DefineReport = () => {
   const handleCancel = () => {
     navigate('/');
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center', padding: '2rem' }}>
+        <h1 className="page-title">Define New Report</h1>
+        <div style={{ padding: '2rem' }}>
+          <p>Loading surveys, traits, and accounts...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center', padding: '2rem' }}>
+        <h1 className="page-title">Define New Report</h1>
+        <div style={{ padding: '2rem', color: '#dc2626' }}>
+          <p>Error: {error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="btn-primary"
+            style={{ marginTop: '1rem' }}
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ maxWidth: '900px', margin: '0 auto' }}>
@@ -374,7 +419,7 @@ const DefineReport = () => {
                   backgroundColor: '#fafafa'
                 }}>
                   {surveys.map((survey) => (
-                    <label key={survey} style={{
+                    <label key={survey.id || survey._id} style={{
                       display: 'flex',
                       alignItems: 'center',
                       marginBottom: '0.5rem',
@@ -382,11 +427,11 @@ const DefineReport = () => {
                     }}>
                       <input
                         type="checkbox"
-                        checked={formData.selectedSurveys.includes(survey)}
-                        onChange={() => handleMultiSelect('selectedSurveys', survey)}
+                        checked={formData.selectedSurveys.includes(survey.id || survey._id)}
+                        onChange={() => handleMultiSelect('selectedSurveys', survey.id || survey._id)}
                         style={{ marginRight: '0.5rem' }}
                       />
-                      <span style={{ fontSize: '0.75rem' }}>{survey}</span>
+                      <span style={{ fontSize: '0.75rem' }}>{survey.title || survey.name}</span>
                     </label>
                   ))}
                 </div>
@@ -406,7 +451,7 @@ const DefineReport = () => {
                   backgroundColor: '#fafafa'
                 }}>
                   {traits.map((trait) => (
-                    <label key={trait} style={{
+                    <label key={trait.id || trait._id} style={{
                       display: 'flex',
                       alignItems: 'center',
                       marginBottom: '0.5rem',
@@ -414,11 +459,11 @@ const DefineReport = () => {
                     }}>
                       <input
                         type="checkbox"
-                        checked={formData.selectedTraits.includes(trait)}
-                        onChange={() => handleMultiSelect('selectedTraits', trait)}
+                        checked={formData.selectedTraits.includes(trait.id || trait._id)}
+                        onChange={() => handleMultiSelect('selectedTraits', trait.id || trait._id)}
                         style={{ marginRight: '0.5rem' }}
                       />
-                      <span style={{ fontSize: '0.75rem' }}>{trait}</span>
+                      <span style={{ fontSize: '0.75rem' }}>{trait.name}</span>
                     </label>
                   ))}
                 </div>
@@ -438,7 +483,7 @@ const DefineReport = () => {
                   backgroundColor: '#fafafa'
                 }}>
                   {accounts.map((account) => (
-                    <label key={account} style={{
+                    <label key={account.id || account._id} style={{
                       display: 'flex',
                       alignItems: 'center',
                       marginBottom: '0.5rem',
@@ -446,11 +491,11 @@ const DefineReport = () => {
                     }}>
                       <input
                         type="checkbox"
-                        checked={formData.selectedAccounts.includes(account)}
-                        onChange={() => handleMultiSelect('selectedAccounts', account)}
+                        checked={formData.selectedAccounts.includes(account.id || account._id)}
+                        onChange={() => handleMultiSelect('selectedAccounts', account.id || account._id)}
                         style={{ marginRight: '0.5rem' }}
                       />
-                      <span style={{ fontSize: '0.75rem' }}>{account}</span>
+                      <span style={{ fontSize: '0.75rem' }}>{account.account_name || account.name}</span>
                     </label>
                   ))}
                 </div>

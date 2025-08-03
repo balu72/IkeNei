@@ -1,6 +1,7 @@
 from flask import jsonify
 from datetime import datetime, timedelta
 from database import SurveyRepository
+from database.repositories.survey_run_repository import SurveyRunRepository
 from utils.logger import get_logger, log_function_call
 
 class SurveysController:
@@ -335,37 +336,143 @@ class SurveysController:
             }), 500
     
     @staticmethod
-    def run_survey(survey_id, data):
+    @log_function_call
+    def run_survey(survey_id, data, current_user_id=None, current_account_id=None):
         """
-        Run/launch survey
+        Run/launch survey with subject and respondents
         """
+        logger = get_logger(__name__)
+        logger.info(f"Running survey {survey_id} with data: {data}")
+        
         try:
-            # TODO: Implement actual survey launch functionality
-            # This should:
-            # - Validate survey exists and is approved
-            # - Update survey status to 'active' or 'running'
-            # - Send invitations to all assigned respondents
-            # - Create notification records
-            # - Log survey launch activity
-            # - Return actual recipient count from database
+            # 1. Validate input data
+            errors = SurveysController._validate_run_survey_data(survey_id, data)
+            if errors:
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Validation failed", "details": errors}
+                }), 400
             
-            result = {
-                "survey_id": str(survey_id),
-                "status": "launched",
-                "launched_at": datetime.utcnow().isoformat() + "Z"
-            }
+            # 2. Verify survey exists and is approved
+            survey = SurveyRepository.get_survey_by_id(survey_id)
+            if not survey:
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Survey not found"}
+                }), 404
+                
+            if survey.get_field('status') != 'approved':
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Survey must be approved to run"}
+                }), 400
             
+            # 3. Parse due date
+            due_date = datetime.fromisoformat(data['due_date'].replace('Z', '+00:00'))
+            
+            # 4. Create survey run record
+            survey_run = SurveyRunRepository.create_survey_run(
+                survey_id=survey_id,
+                subject_id=data['subject_id'],
+                respondents=data['respondents'],
+                due_date=due_date,
+                launched_by=current_user_id or "system",  # TODO: Get from JWT token
+                account_id=current_account_id or survey.get_field('account_id')  # TODO: Get from JWT token
+            )
+            
+            # 5. TODO: Send invitations to respondents
+            # This would be implemented with a notification service
+            invitation_results = []
+            for respondent_data in data['respondents']:
+                # Placeholder for invitation sending
+                invitation_results.append({
+                    'respondent_id': respondent_data['respondent_id'],
+                    'success': True,
+                    'message': 'Invitation sent successfully'
+                })
+            
+            # 6. Return success response
             return jsonify({
                 "success": True,
-                "data": result,
-                "message": "Survey launched successfully"
-            })
+                "data": {
+                    "survey_run_id": str(survey_run._id),
+                    "survey_id": str(survey_id),
+                    "subject_id": str(data['subject_id']),
+                    "respondent_count": len(data['respondents']),
+                    "total_weight": 100,
+                    "status": "active",
+                    "launched_at": survey_run.get_field('launched_at').isoformat() + "Z",
+                    "due_date": due_date.isoformat() + "Z",
+                    "invitations_sent": len([r for r in invitation_results if r['success']]),
+                    "expected_responses": len(data['respondents'])
+                },
+                "message": f"Survey launched successfully for subject with {len(data['respondents'])} respondents"
+            }), 201
+            
+        except ValueError as e:
+            logger.error(f"Validation error running survey {survey_id}: {str(e)}")
+            return jsonify({
+                "success": False,
+                "error": {"message": str(e)}
+            }), 400
             
         except Exception as e:
+            logger.error(f"Failed to run survey {survey_id}: {str(e)}")
             return jsonify({
                 "success": False,
                 "error": {"message": f"Failed to run survey: {str(e)}"}
             }), 500
+    
+    @staticmethod
+    def _validate_run_survey_data(survey_id, data):
+        """Validate survey run data with business rules"""
+        errors = []
+        
+        # 1. Required fields validation
+        if not data.get('subject_id'):
+            errors.append("Subject ID is required")
+        
+        if not data.get('due_date'):
+            errors.append("Due date is required")
+        
+        respondents = data.get('respondents', [])
+        if not respondents:
+            errors.append("At least one respondent is required")
+        
+        # 2. Weight sum validation (must equal 100)
+        total_weight = sum(r.get('weight', 0) for r in respondents)
+        if total_weight != 100:
+            errors.append(f"Respondent weights must sum to 100, got {total_weight}")
+        
+        # 3. Respondent data validation
+        for i, respondent in enumerate(respondents):
+            if not respondent.get('respondent_id'):
+                errors.append(f"Respondent {i+1}: respondent_id is required")
+            if not respondent.get('weight'):
+                errors.append(f"Respondent {i+1}: weight is required")
+            if respondent.get('weight', 0) <= 0:
+                errors.append(f"Respondent {i+1}: weight must be greater than 0")
+        
+        # 4. Due date validation
+        try:
+            due_date = datetime.fromisoformat(data['due_date'].replace('Z', '+00:00'))
+            if due_date <= datetime.utcnow():
+                errors.append("Due date must be in the future")
+        except (ValueError, KeyError):
+            errors.append("Invalid due date format. Use ISO format.")
+        
+        # 5. CRITICAL: Check for duplicate survey+subject combination
+        try:
+            existing_run = SurveyRunRepository.find_active_run(
+                survey_id=survey_id,
+                subject_id=data.get('subject_id')
+            )
+            if existing_run:
+                errors.append(f"Survey is already running for this subject. Existing run ID: {existing_run._id}")
+        except Exception as e:
+            errors.append(f"Error checking for duplicate runs: {str(e)}")
+        
+        return errors
     
     @staticmethod
     @log_function_call

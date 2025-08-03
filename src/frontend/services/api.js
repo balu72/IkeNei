@@ -215,10 +215,27 @@ export const surveysAPI = {
     return apiRequest(`/surveys/${id}/responses`);
   },
 
-  runSurvey: async (id, data = {}) => {
+  runSurvey: async (id, runData) => {
+    // Validate required fields before sending
+    if (!runData.subject_id) {
+      throw new Error('Subject ID is required');
+    }
+    if (!runData.due_date) {
+      throw new Error('Due date is required');
+    }
+    if (!runData.respondents || !Array.isArray(runData.respondents) || runData.respondents.length === 0) {
+      throw new Error('At least one respondent is required');
+    }
+    
+    // Validate weight sum equals 100
+    const totalWeight = runData.respondents.reduce((sum, r) => sum + (r.weight || 0), 0);
+    if (totalWeight !== 100) {
+      throw new Error(`Respondent weights must sum to 100, got ${totalWeight}`);
+    }
+    
     return apiRequest(`/surveys/${id}/run`, {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify(runData),
     });
   },
 

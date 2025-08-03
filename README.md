@@ -32,6 +32,16 @@ IkeNei is an innovative tool that combines traditional 360-degree feedback metho
 - **Approval Audit Trail**: Complete tracking of approval history and decisions
 - **Rejection Management**: Surveys can be rejected with reasons for improvement
 
+### 📧 Email Notification & Response Collection System
+- **Automated Email Invitations**: SendGrid-powered email notifications to survey respondents
+- **Personalized Survey Links**: Unique, secure tokens for each respondent
+- **Token-Based Access**: No login required - secure access via email links
+- **1-5 Rating Scale Responses**: Standardized feedback collection with validation
+- **Real-time Response Tracking**: Automatic survey completion monitoring
+- **Professional Email Templates**: Branded HTML emails with responsive design
+- **Completion Confirmations**: Thank you emails sent after response submission
+- **Response Analytics**: Comprehensive analytics and reporting for survey results
+
 ### 📈 Analytics & Reporting
 - **Comprehensive Dashboards**: Visual insights into feedback trends and survey results
 - **Competency Mapping**: Track skills assessment across various competencies
@@ -125,6 +135,7 @@ IkeNei/
     │   │   ├── respondents_controller.py
     │   │   ├── settings_controller.py
     │   │   ├── subjects_controller.py
+    │   │   ├── survey_response_controller.py
     │   │   ├── surveys_controller.py
     │   │   └── traits_controller.py
     │   ├── middleware/           # Authentication & request middleware
@@ -142,6 +153,7 @@ IkeNei/
     │       ├── respondents_routes.py
     │       ├── settings_routes.py
     │       ├── subjects_routes.py
+    │       ├── survey_response_routes.py
     │       ├── surveys_routes.py
     │       └── traits_routes.py
     ├── database/                # MongoDB database layer
@@ -157,12 +169,16 @@ IkeNei/
     │   │   ├── respondent_model.py
     │   │   ├── subject_model.py
     │   │   ├── survey_model.py
+    │   │   ├── survey_response_model.py
+    │   │   ├── survey_run_model.py
     │   │   └── trait_model.py
     │   ├── repositories/        # Data access layer
     │   │   ├── account_repository.py
     │   │   ├── respondent_repository.py
     │   │   ├── subject_repository.py
     │   │   ├── survey_repository.py
+    │   │   ├── survey_response_repository.py
+    │   │   ├── survey_run_repository.py
     │   │   └── trait_repository.py
     │   └── seeds/               # Sample data
     │       └── development_seeds.py
@@ -210,6 +226,8 @@ IkeNei/
     │   │       └── SysAdminHome.jsx
     │   └── services/            # API service layer
     │       └── api.js
+    ├── services/                # Backend services
+    │   └── email_service.py     # Email notification service (SendGrid)
     └── utils/                   # Shared utilities
         ├── logger.py            # Logging utilities
         ├── pagination.py        # Pagination helpers
@@ -405,7 +423,7 @@ Based on comprehensive analysis of frontend API calls, backend controllers, and 
 - ✅ `GET /traits/categories` - Full database integration with TraitRepository
 - ✅ `GET /traits/usage` - Clean implementation (returns timestamp)
 
-#### **Surveys APIs - Complete CRUD + Approval + Run Workflow (13/15 - 87%)**
+#### **Surveys APIs - Complete CRUD + Approval + Run + Email Workflow (15/15 - 100%)**
 - ✅ `GET /surveys` - Full database integration with SurveyRepository
 - ✅ `POST /surveys` - Full database integration with SurveyRepository + Approval workflow
 - ✅ `GET /surveys/{id}` - Full database integration with SurveyRepository
@@ -418,7 +436,9 @@ Based on comprehensive analysis of frontend API calls, backend controllers, and 
 - ✅ `GET /surveys/pending` - Full database integration for pending surveys
 - ✅ `GET /surveys/approved` - Full database integration for approved surveys
 - ✅ `GET /surveys/by-role` - Role-based survey filtering implementation
-- ✅ `POST /surveys/{id}/run` - Complete survey run workflow with subject/respondents/validation
+- ✅ `POST /surveys/{id}/run` - Complete survey run workflow with email notifications
+- ✅ `GET /survey/respond/{token}` - Public survey form loading by token
+- ✅ `POST /survey/respond/{token}` - Public survey response submission with validation
 
 ### ⚠️ **PARTIALLY IMPLEMENTED APIs - Return Minimal/Placeholder Data (28 endpoints)**
 
@@ -484,9 +504,9 @@ Based on comprehensive analysis of frontend API calls, backend controllers, and 
 ### 📈 **Summary Statistics**
 
 #### **Overall API Implementation Status:**
-- **Total Frontend API Calls**: ~72 endpoints
-- **Fully Implemented (Database Integrated)**: 45 endpoints (63%)
-- **Partially Implemented (Skeleton/Placeholder)**: 27 endpoints (37%)
+- **Total Frontend API Calls**: ~74 endpoints
+- **Fully Implemented (Database Integrated)**: 47 endpoints (64%)
+- **Partially Implemented (Skeleton/Placeholder)**: 27 endpoints (36%)
 - **Broken/Non-functional**: 0 endpoints (0%)
 
 #### **By Functional Area:**

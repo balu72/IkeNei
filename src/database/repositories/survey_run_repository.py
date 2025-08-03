@@ -38,6 +38,51 @@ class SurveyRunRepository:
             raise
     
     @staticmethod
+    def get_respondent_by_token(response_token):
+        """Get survey run and respondent data by response token"""
+        try:
+            # Find survey run that contains this response token
+            collection = SurveyRun.get_collection()
+            
+            survey_run_data = collection.find_one({
+                'respondents.response_token': response_token,
+                'is_active': True
+            })
+            
+            if not survey_run_data:
+                return None, None
+            
+            # Create SurveyRun object
+            survey_run = SurveyRun(**survey_run_data)
+            
+            # Find the specific respondent with this token
+            respondent_data = None
+            for respondent in survey_run_data.get('respondents', []):
+                if respondent.get('response_token') == response_token:
+                    respondent_data = respondent
+                    break
+            
+            return survey_run, respondent_data
+            
+        except Exception as e:
+            logger.error(f"Failed to get respondent by token: {str(e)}")
+            raise
+    
+    @staticmethod
+    def update_respondent_status(survey_run_id, respondent_id, status):
+        """Update respondent status in survey run"""
+        try:
+            survey_run = SurveyRun.find_by_id(survey_run_id)
+            if not survey_run:
+                raise ValueError(f"Survey run not found: {survey_run_id}")
+            
+            return survey_run.update_respondent_status(respondent_id, status)
+            
+        except Exception as e:
+            logger.error(f"Failed to update respondent status: {str(e)}")
+            raise
+    
+    @staticmethod
     def find_active_run(survey_id, subject_id):
         """Find active survey run for survey+subject combination"""
         try:

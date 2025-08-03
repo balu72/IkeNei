@@ -15,6 +15,7 @@ from database import init_database, close_database, get_database_status
 from routes.auth_routes import auth_bp
 from routes.accounts_routes import accounts_bp
 from routes.surveys_routes import surveys_bp
+from routes.survey_response_routes import survey_response_bp
 from routes.traits_routes import traits_bp
 from routes.categories_routes import categories_bp
 from routes.reports_routes import reports_bp
@@ -49,6 +50,7 @@ def create_app():
         (auth_bp, 'Authentication'),
         (accounts_bp, 'Accounts'),
         (surveys_bp, 'Surveys'),
+        (survey_response_bp, 'Survey Responses'),
         (traits_bp, 'Traits'),
         (categories_bp, 'Categories'),
         (reports_bp, 'Reports'),

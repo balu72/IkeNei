@@ -22,12 +22,12 @@ const Login = () => {
 
   const demoLogin = (role) => {
     const demoCredentials = {
-      account: 'account@example.com',
-      domainadmin: 'domainadmin@example.com',
-      systemadmin: 'systemadmin@example.com'
+      account: 'uat@ikenei.ai',
+      domainadmin: 'dom@ikenei.ai',
+      systemadmin: 'su@ikenei.ai'
     };
     setEmail(demoCredentials[role]);
-    setPassword('password');
+    setPassword('');
   };
 
   return (

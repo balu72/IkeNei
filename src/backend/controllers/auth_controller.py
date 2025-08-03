@@ -51,7 +51,7 @@ class AuthController:
                 identity=str(account._id),
                 additional_claims={
                     "email": account.get_field('email'),
-                    "account_type": account.get_field('account_type')
+                    "role": account.get_field('role')
                 }
             )
             refresh_token = create_refresh_token(identity=str(account._id))
@@ -123,7 +123,7 @@ class AuthController:
                 email=data.get('email'),
                 password=data.get('password'),
                 account_name=data.get('account_name'),
-                account_type=data.get('account_type', 'standard')
+                role=data.get('role', 'account')
             )
             
             return jsonify({

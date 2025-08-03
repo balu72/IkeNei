@@ -143,9 +143,9 @@ export const AuthProvider = ({ children }) => {
     resetPassword,
     loading,
     isAuthenticated: !!user,
-    isAccount: user?.account_type === 'account',
-    isDomainAdmin: user?.account_type === 'domain_admin',
-    isSystemAdmin: user?.account_type === 'system_admin'
+    isAccount: user?.role === 'account',
+    isDomainAdmin: user?.role === 'domain_admin',
+    isSystemAdmin: user?.role === 'system_admin'
   };
 
   return (

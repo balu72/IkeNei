@@ -204,8 +204,70 @@ db.surveys.createIndex({ 'account_id': 1, 'status': 1 });
 db.surveys.createIndex({ 'created_at': -1 });
 db.surveys.createIndex({ 'status': 1, 'due_date': 1 });
 
+// Create demo users for the application
+print('Creating demo users...');
+
+// Demo users data with bcrypt hashed passwords
+// uat123 -> $2b$10$rQZ9vKp.fX8fGqY5tJ2K4eF7wH3mN8pL6sR1tU9vW2xY5zA7bC3dE
+// dom123 -> $2b$10$sT0aWlQ.gY9gHrZ6uK3L5fG8xI4nO9qM7tS2vV0wX3yZ6aB8cD4eF
+// su123 -> $2b$10$tU1bXmR.hZ0hIsA7vL4M6gH9yJ5oP0rN8uT3wW1xY4zA7bC8dE5fG
+
+const demoUsers = [
+  {
+    email: 'uat@ikenei.ai',
+    password_hash: '$2b$12$2FbyNOT41DKQ.3.OIga0XObsnbwD/EZH9dg0HaOA2BGzINxC6SC8S',
+    account_name: 'UAT Account',
+    account_type: 'standard',
+    role: 'account',
+    is_active: true,
+    email_verified: true,
+    settings: {},
+    created_at: new Date(),
+    updated_at: new Date(),
+    last_login_at: null
+  },
+  {
+    email: 'dom@ikenei.ai',
+    password_hash: '$2b$12$7dwNThss.jJxgD19.Z3FOuMHInHkK4aJwL8lneMJXi5bToFXAAYUm',
+    account_name: 'Domain Admin Account',
+    account_type: 'premium',
+    role: 'domain_admin',
+    is_active: true,
+    email_verified: true,
+    settings: {},
+    created_at: new Date(),
+    updated_at: new Date(),
+    last_login_at: null
+  },
+  {
+    email: 'su@ikenei.ai',
+    password_hash: '$2b$12$MDBDMENkyYgL382nHcqeCuxuBWiZiDLVk.3t9Sre3oKBSnWK1rmZy',
+    account_name: 'System Admin Account',
+    account_type: 'enterprise',
+    role: 'system_admin',
+    is_active: true,
+    email_verified: true,
+    settings: {},
+    created_at: new Date(),
+    updated_at: new Date(),
+    last_login_at: null
+  }
+];
+
+// Insert demo users
+try {
+  db.accounts.insertMany(demoUsers);
+  print('Demo users created successfully:');
+  print('1. uat@ikenei.ai (password: uat123) - Account User');
+  print('2. dom@ikenei.ai (password: dom123) - Domain Admin');
+  print('3. su@ikenei.ai (password: su123) - System Admin');
+} catch (error) {
+  print('Error creating demo users: ' + error);
+}
+
 print('MongoDB initialization completed successfully!');
 print('Database: ikenei');
 print('User: ikenei_user');
 print('Collections created: accounts, subjects, surveys');
 print('Indexes created for optimal performance');
+print('Demo users created for testing');

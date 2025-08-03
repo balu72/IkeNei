@@ -6,7 +6,7 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
     
     # MongoDB configuration
-    MONGO_URI = os.environ.get('MONGODB_URI') or 'mongodb://admin:admin123@localhost:27017/ikenei?authSource=admin'
+    MONGO_URI = os.environ.get('MONGODB_URI') or 'mongodb://localhost:27017/ikenei'
     MONGODB_DB_NAME = os.environ.get('MONGODB_DB_NAME') or 'ikenei'
     
     # JWT configuration

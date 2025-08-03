@@ -16,10 +16,10 @@ class Account(BaseModel):
     
     collection_name = 'accounts'
     
-    required_fields = ['email', 'password_hash', 'account_name', 'account_type']
+    required_fields = ['email', 'password_hash', 'account_name', 'role']
     
-    # Account types
-    ACCOUNT_TYPES = ['account', 'domain_admin', 'system_admin']
+    # User roles
+    USER_ROLES = ['account', 'domain_admin', 'system_admin']
     
     # Default settings
     DEFAULT_SETTINGS = {
@@ -45,17 +45,17 @@ class Account(BaseModel):
         if 'email_verified' not in kwargs:
             kwargs['email_verified'] = False
         
-        if 'account_type' not in kwargs:
-            kwargs['account_type'] = 'account'
+        if 'role' not in kwargs:
+            kwargs['role'] = 'account'
         
         super().__init__(**kwargs)
     
     @classmethod
-    def create_account(cls, email, password, account_name, account_type='account', **kwargs):
+    def create_account(cls, email, password, account_name, role='account', **kwargs):
         """Create a new account with hashed password"""
-        # Validate account type
-        if account_type not in cls.ACCOUNT_TYPES:
-            raise ValueError(f"Invalid account type. Must be one of: {', '.join(cls.ACCOUNT_TYPES)}")
+        # Validate role
+        if role not in cls.USER_ROLES:
+            raise ValueError(f"Invalid role. Must be one of: {', '.join(cls.USER_ROLES)}")
         
         # Check if email already exists
         existing_account = cls.find_by_email(email)
@@ -70,7 +70,7 @@ class Account(BaseModel):
             'email': email.lower().strip(),
             'password_hash': password_hash,
             'account_name': account_name.strip(),
-            'account_type': account_type,
+            'role': role,
             **kwargs
         }
         
@@ -253,7 +253,7 @@ class Account(BaseModel):
             'id': str(self._id) if self._id else None,
             'email': self.get_field('email'),
             'account_name': self.get_field('account_name'),
-            'account_type': self.get_field('account_type'),
+            'role': self.get_field('role'),
             'is_active': self.get_field('is_active'),
             'email_verified': self.get_field('email_verified'),
             'created_at': self.get_field('created_at').isoformat() + 'Z' if self.get_field('created_at') else None,

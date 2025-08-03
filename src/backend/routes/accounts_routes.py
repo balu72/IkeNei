@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from controllers.accounts_controller import AccountsController
-from middleware.auth_middleware import require_system_admin_role
+from middleware.auth_middleware import require_system_admin_role, require_admin_roles
 from utils.response_helpers import validation_error_response, handle_exception
 from utils.pagination import get_pagination_params, get_filter_params
 from utils.logger import get_logger
@@ -8,7 +8,7 @@ from utils.logger import get_logger
 accounts_bp = Blueprint('accounts', __name__)
 
 @accounts_bp.route('/api/accounts', methods=['GET'])
-@require_system_admin_role
+@require_admin_roles
 def get_accounts():
     """
     Get all accounts with filtering (search, state, type)

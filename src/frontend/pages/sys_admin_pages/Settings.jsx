@@ -1,104 +1,40 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { settingsAPI } from '../../services/api';
 
 const Settings = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
+  const [settingsData, setSettingsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Sample settings data - in real app, this would come from API
-  const [settingsData, setSettingsData] = useState([
-    {
-      id: 1,
-      settingName: 'User Registration',
-      category: 'Authentication',
-      description: 'Allow new accounts to register',
-      value: 'Enabled',
-      type: 'boolean',
-      lastModified: '2024-01-15'
-    },
-    {
-      id: 2,
-      settingName: 'Email Notifications',
-      category: 'Communication',
-      description: 'Send email notifications for survey completions',
-      value: 'Enabled',
-      type: 'boolean',
-      lastModified: '2024-01-10'
-    },
-    {
-      id: 3,
-      settingName: 'Session Timeout',
-      category: 'Security',
-      description: 'User session timeout duration in minutes',
-      value: '30',
-      type: 'number',
-      lastModified: '2024-01-12'
-    },
-    {
-      id: 4,
-      settingName: 'Max Survey Responses',
-      category: 'Survey',
-      description: 'Maximum number of responses per survey',
-      value: '1000',
-      type: 'number',
-      lastModified: '2024-01-08'
-    },
-    {
-      id: 5,
-      settingName: 'Data Backup Frequency',
-      category: 'System',
-      description: 'Automatic backup frequency in hours',
-      value: '24',
-      type: 'number',
-      lastModified: '2024-01-14'
-    },
-    {
-      id: 6,
-      settingName: 'Password Complexity',
-      category: 'Security',
-      description: 'Enforce strong password requirements',
-      value: 'Enabled',
-      type: 'boolean',
-      lastModified: '2024-01-11'
-    },
-    {
-      id: 7,
-      settingName: 'Survey Auto-Archive',
-      category: 'Survey',
-      description: 'Automatically archive completed surveys after days',
-      value: '90',
-      type: 'number',
-      lastModified: '2024-01-09'
-    },
-    {
-      id: 8,
-      settingName: 'API Rate Limiting',
-      category: 'System',
-      description: 'Enable API rate limiting for external requests',
-      value: 'Enabled',
-      type: 'boolean',
-      lastModified: '2024-01-13'
-    },
-    {
-      id: 9,
-      settingName: 'Maintenance Mode',
-      category: 'System',
-      description: 'Enable maintenance mode for system updates',
-      value: 'Disabled',
-      type: 'boolean',
-      lastModified: '2024-01-16'
-    },
-    {
-      id: 10,
-      settingName: 'Default Survey Duration',
-      category: 'Survey',
-      description: 'Default survey duration in days',
-      value: '14',
-      type: 'number',
-      lastModified: '2024-01-07'
-    }
-  ]);
+  // Fetch settings data from API
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await settingsAPI.getAll();
+        
+        if (response.success) {
+          setSettingsData(response.data || []);
+        } else {
+          setError(response.error?.message || 'Failed to load settings');
+        }
+        
+      } catch (err) {
+        console.error('Error fetching settings:', err);
+        setError(err.message || 'Failed to load settings');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchSettings();
+  }, []);
 
   // Get unique categories for filter dropdown
   const categories = [...new Set(settingsData.map(setting => setting.category))];
@@ -118,27 +54,47 @@ const Settings = () => {
     navigate('/');
   };
 
-  const handleToggleSetting = (settingId) => {
-    setSettingsData(prevSettings => 
-      prevSettings.map(setting => {
-        if (setting.id === settingId && setting.type === 'boolean') {
-          const newValue = setting.value === 'Enabled' ? 'Disabled' : 'Enabled';
-          return {
-            ...setting,
-            value: newValue,
-            lastModified: new Date().toISOString().split('T')[0]
-          };
-        }
-        return setting;
-      })
-    );
+  const handleToggleSetting = async (settingId) => {
+    const setting = settingsData.find(s => s.id === settingId);
+    if (!setting || setting.type !== 'boolean') return;
+
+    try {
+      const newValue = setting.value === 'Enabled' ? 'Disabled' : 'Enabled';
+      const response = await settingsAPI.toggle(setting.settingName || setting.key);
+      
+      if (response.success) {
+        setSettingsData(prevSettings => 
+          prevSettings.map(s => {
+            if (s.id === settingId) {
+              return {
+                ...s,
+                value: newValue,
+                lastModified: new Date().toISOString().split('T')[0]
+              };
+            }
+            return s;
+          })
+        );
+      } else {
+        alert('Failed to update setting: ' + (response.error?.message || 'Unknown error'));
+      }
+    } catch (err) {
+      console.error('Error toggling setting:', err);
+      alert('Failed to update setting: ' + err.message);
+    }
   };
 
-  const handleEditSetting = (settingId) => {
+  const handleEditSetting = async (settingId) => {
     const setting = settingsData.find(s => s.id === settingId);
-    if (setting && setting.type === 'number') {
-      const newValue = prompt(`Enter new value for ${setting.settingName}:`, setting.value);
-      if (newValue !== null && !isNaN(newValue) && newValue.trim() !== '') {
+    if (!setting || setting.type !== 'number') return;
+
+    const newValue = prompt(`Enter new value for ${setting.settingName}:`, setting.value);
+    if (newValue === null || isNaN(newValue) || newValue.trim() === '') return;
+
+    try {
+      const response = await settingsAPI.update(setting.settingName || setting.key, newValue.trim());
+      
+      if (response.success) {
         setSettingsData(prevSettings => 
           prevSettings.map(s => 
             s.id === settingId 
@@ -146,9 +102,69 @@ const Settings = () => {
               : s
           )
         );
+      } else {
+        alert('Failed to update setting: ' + (response.error?.message || 'Unknown error'));
       }
+    } catch (err) {
+      console.error('Error updating setting:', err);
+      alert('Failed to update setting: ' + err.message);
     }
   };
+
+  const handleResetSetting = async (settingId) => {
+    const setting = settingsData.find(s => s.id === settingId);
+    if (!setting) return;
+
+    if (!confirm(`Are you sure you want to reset "${setting.settingName}" to its default value?`)) return;
+
+    try {
+      const response = await settingsAPI.reset(setting.settingName || setting.key);
+      
+      if (response.success) {
+        // Refresh the settings data to get the reset value
+        const refreshResponse = await settingsAPI.getAll();
+        if (refreshResponse.success) {
+          setSettingsData(refreshResponse.data || []);
+        }
+      } else {
+        alert('Failed to reset setting: ' + (response.error?.message || 'Unknown error'));
+      }
+    } catch (err) {
+      console.error('Error resetting setting:', err);
+      alert('Failed to reset setting: ' + err.message);
+    }
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div style={{ maxWidth: '1400px', margin: '0 auto', textAlign: 'center', padding: '2rem' }}>
+        <h1 className="page-title">System Settings</h1>
+        <div style={{ padding: '2rem' }}>
+          <p>Loading system settings...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div style={{ maxWidth: '1400px', margin: '0 auto', textAlign: 'center', padding: '2rem' }}>
+        <h1 className="page-title">System Settings</h1>
+        <div style={{ padding: '2rem', color: '#dc2626' }}>
+          <p>Error: {error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="btn-primary"
+            style={{ marginTop: '1rem' }}
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const getValueStyle = (type, value) => {
     if (type === 'boolean') {
@@ -393,7 +409,7 @@ const Settings = () => {
                           </button>
                         )}
                         <button
-                          onClick={() => console.log('Reset to default:', setting.id)}
+                          onClick={() => handleResetSetting(setting.id)}
                           style={{
                             padding: '0.25rem 0.5rem',
                             fontSize: '0.75rem',

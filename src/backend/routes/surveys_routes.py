@@ -217,3 +217,86 @@ def run_survey(survey_id):
     
     except Exception as e:
         return handle_exception(e)
+
+@surveys_bp.route('/api/surveys/<int:survey_id>/approve', methods=['POST'])
+@require_admin_roles
+@log_route
+def approve_survey(survey_id):
+    """
+    Approve survey (System Admin only)
+    """
+    try:
+        data = request.get_json() or {}
+        approver_id = data.get('approver_id')  # This should come from JWT token in real implementation
+        
+        if not approver_id:
+            return validation_error_response({"approver_id": "Approver ID is required"})
+        
+        return SurveysController.approve_survey(survey_id, approver_id)
+    
+    except Exception as e:
+        return handle_exception(e)
+
+@surveys_bp.route('/api/surveys/<int:survey_id>/reject', methods=['POST'])
+@require_admin_roles
+@log_route
+def reject_survey(survey_id):
+    """
+    Reject survey (System Admin only)
+    """
+    try:
+        data = request.get_json() or {}
+        approver_id = data.get('approver_id')  # This should come from JWT token in real implementation
+        reason = data.get('reason')
+        
+        if not approver_id:
+            return validation_error_response({"approver_id": "Approver ID is required"})
+        
+        return SurveysController.reject_survey(survey_id, approver_id, reason)
+    
+    except Exception as e:
+        return handle_exception(e)
+
+@surveys_bp.route('/api/surveys/pending', methods=['GET'])
+@require_admin_roles
+@log_route
+def get_pending_surveys():
+    """
+    Get surveys pending approval (System Admin only)
+    """
+    try:
+        page, limit = get_pagination_params()
+        return SurveysController.get_pending_surveys(page, limit)
+    
+    except Exception as e:
+        return handle_exception(e)
+
+@surveys_bp.route('/api/surveys/approved', methods=['GET'])
+@require_auth
+@log_route
+def get_approved_surveys():
+    """
+    Get approved surveys (Account users)
+    """
+    try:
+        page, limit = get_pagination_params()
+        return SurveysController.get_approved_surveys(page, limit)
+    
+    except Exception as e:
+        return handle_exception(e)
+
+@surveys_bp.route('/api/surveys/by-role', methods=['GET'])
+@require_auth
+@log_route
+def get_surveys_by_role():
+    """
+    Get surveys filtered by user role
+    """
+    try:
+        page, limit = get_pagination_params()
+        user_role = request.args.get('role', 'account')  # This should come from JWT token in real implementation
+        
+        return SurveysController.get_surveys_by_role(user_role, page, limit)
+    
+    except Exception as e:
+        return handle_exception(e)

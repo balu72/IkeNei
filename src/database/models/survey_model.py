@@ -128,7 +128,7 @@ class Survey(BaseModel):
     
     def update_status(self, status):
         """Update survey status"""
-        valid_statuses = ['draft', 'active', 'paused', 'completed', 'archived']
+        valid_statuses = ['draft', 'pending_approval', 'approved', 'rejected', 'active', 'paused', 'completed', 'archived']
         if status not in valid_statuses:
             raise ValueError(f"Invalid status. Must be one of: {valid_statuses}")
         
@@ -154,6 +154,28 @@ class Survey(BaseModel):
     def archive(self):
         """Archive survey"""
         self.set_field('status', 'archived')
+        return self.save()
+    
+    def approve(self, approver_id):
+        """Approve survey"""
+        self.set_field('status', 'approved')
+        self.set_field('approved_by', ObjectId(approver_id) if isinstance(approver_id, str) else approver_id)
+        self.set_field('approved_at', datetime.utcnow())
+        return self.save()
+    
+    def reject(self, approver_id, reason=None):
+        """Reject survey"""
+        self.set_field('status', 'rejected')
+        self.set_field('approved_by', ObjectId(approver_id) if isinstance(approver_id, str) else approver_id)
+        self.set_field('approved_at', datetime.utcnow())
+        if reason:
+            self.set_field('rejection_reason', reason)
+        return self.save()
+    
+    def submit_for_approval(self, creator_role='domain_admin'):
+        """Submit survey for approval"""
+        self.set_field('status', 'pending_approval')
+        self.set_field('created_by_role', creator_role)
         return self.save()
     
     def update_response_count(self, count):
@@ -276,6 +298,10 @@ class Survey(BaseModel):
             'response_count': self.get_field('response_count', 0),
             'completion_rate': self.get_field('completion_rate', 0.0),
             'is_active': self.get_field('is_active'),
+            'approved_by': str(self.get_field('approved_by')) if self.get_field('approved_by') else None,
+            'approved_at': self.get_field('approved_at').isoformat() + 'Z' if self.get_field('approved_at') else None,
+            'rejection_reason': self.get_field('rejection_reason'),
+            'created_by_role': self.get_field('created_by_role'),
             'created_at': self.get_field('created_at').isoformat() + 'Z' if self.get_field('created_at') else None,
             'updated_at': self.get_field('updated_at').isoformat() + 'Z' if self.get_field('updated_at') else None
         }

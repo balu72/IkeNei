@@ -221,6 +221,36 @@ export const surveysAPI = {
       body: JSON.stringify(data),
     });
   },
+
+  // Survey approval workflow
+  approveSurvey: async (id, approverId) => {
+    return apiRequest(`/surveys/${id}/approve`, {
+      method: 'POST',
+      body: JSON.stringify({ approver_id: approverId }),
+    });
+  },
+
+  rejectSurvey: async (id, approverId, reason = null) => {
+    return apiRequest(`/surveys/${id}/reject`, {
+      method: 'POST',
+      body: JSON.stringify({ approver_id: approverId, reason }),
+    });
+  },
+
+  getPendingSurveys: async (params = {}) => {
+    const queryString = new URLSearchParams(params).toString();
+    return apiRequest(`/surveys/pending${queryString ? `?${queryString}` : ''}`);
+  },
+
+  getApprovedSurveys: async (params = {}) => {
+    const queryString = new URLSearchParams(params).toString();
+    return apiRequest(`/surveys/approved${queryString ? `?${queryString}` : ''}`);
+  },
+
+  getSurveysByRole: async (role, params = {}) => {
+    const queryString = new URLSearchParams({ role, ...params }).toString();
+    return apiRequest(`/surveys/by-role${queryString ? `?${queryString}` : ''}`);
+  },
 };
 
 // Traits API

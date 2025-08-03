@@ -39,12 +39,12 @@ class SurveysController:
     
     @staticmethod
     @log_function_call
-    def create_survey(data):
+    def create_survey(data, creator_role='domain_admin'):
         """
         Create a new survey
         """
         logger = get_logger(__name__)
-        logger.info(f"Creating new survey with data: {data}")
+        logger.info(f"Creating new survey with data: {data}, creator_role: {creator_role}")
         
         try:
             # Validate required fields
@@ -67,19 +67,28 @@ class SurveysController:
                         "error": {"message": "Invalid due_date format. Use ISO format."}
                     }), 400
             
+            # Set initial status based on creator role
+            initial_status = 'pending_approval' if creator_role == 'domain_admin' else 'draft'
+            
             # Create survey using repository
             survey = SurveyRepository.create_survey(
                 account_id=data.get('account_id'),
                 title=data.get('title'),
                 survey_type=data.get('survey_type'),
                 description=data.get('description'),
-                due_date=due_date
+                due_date=due_date,
+                status=initial_status,
+                created_by_role=creator_role
             )
+            
+            # If created by domain admin, submit for approval
+            if creator_role == 'domain_admin':
+                survey.submit_for_approval(creator_role)
             
             return jsonify({
                 "success": True,
                 "data": survey.to_public_dict(),
-                "message": "Survey created successfully"
+                "message": "Survey created successfully" + (" and submitted for approval" if creator_role == 'domain_admin' else "")
             }), 201
             
         except Exception as e:
@@ -333,7 +342,7 @@ class SurveysController:
         try:
             # TODO: Implement actual survey launch functionality
             # This should:
-            # - Validate survey exists and is ready to launch
+            # - Validate survey exists and is approved
             # - Update survey status to 'active' or 'running'
             # - Send invitations to all assigned respondents
             # - Create notification records
@@ -356,4 +365,185 @@ class SurveysController:
             return jsonify({
                 "success": False,
                 "error": {"message": f"Failed to run survey: {str(e)}"}
+            }), 500
+    
+    @staticmethod
+    @log_function_call
+    def approve_survey(survey_id, approver_id):
+        """
+        Approve survey (System Admin only)
+        """
+        logger = get_logger(__name__)
+        logger.info(f"Approving survey {survey_id} by approver {approver_id}")
+        
+        try:
+            survey = SurveyRepository.get_survey_by_id(survey_id)
+            
+            if not survey:
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Survey not found"}
+                }), 404
+            
+            if survey.get_field('status') != 'pending_approval':
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Survey is not pending approval"}
+                }), 400
+            
+            # Approve the survey
+            survey.approve(approver_id)
+            
+            return jsonify({
+                "success": True,
+                "data": survey.to_public_dict(),
+                "message": "Survey approved successfully"
+            })
+            
+        except Exception as e:
+            logger.error(f"Failed to approve survey {survey_id}: {str(e)}")
+            return jsonify({
+                "success": False,
+                "error": {"message": f"Failed to approve survey: {str(e)}"}
+            }), 500
+    
+    @staticmethod
+    @log_function_call
+    def reject_survey(survey_id, approver_id, reason=None):
+        """
+        Reject survey (System Admin only)
+        """
+        logger = get_logger(__name__)
+        logger.info(f"Rejecting survey {survey_id} by approver {approver_id}, reason: {reason}")
+        
+        try:
+            survey = SurveyRepository.get_survey_by_id(survey_id)
+            
+            if not survey:
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Survey not found"}
+                }), 404
+            
+            if survey.get_field('status') != 'pending_approval':
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Survey is not pending approval"}
+                }), 400
+            
+            # Reject the survey
+            survey.reject(approver_id, reason)
+            
+            return jsonify({
+                "success": True,
+                "data": survey.to_public_dict(),
+                "message": "Survey rejected successfully"
+            })
+            
+        except Exception as e:
+            logger.error(f"Failed to reject survey {survey_id}: {str(e)}")
+            return jsonify({
+                "success": False,
+                "error": {"message": f"Failed to reject survey: {str(e)}"}
+            }), 500
+    
+    @staticmethod
+    @log_function_call
+    def get_pending_surveys(page=1, limit=20):
+        """
+        Get surveys pending approval (System Admin only)
+        """
+        logger = get_logger(__name__)
+        logger.info(f"Retrieving pending surveys - page: {page}, limit: {limit}")
+        
+        try:
+            filters = {'status': 'pending_approval'}
+            result = SurveyRepository.get_all_surveys(
+                page=page,
+                per_page=limit,
+                filters=filters
+            )
+            
+            return jsonify({
+                "success": True,
+                "data": result['surveys'],
+                "pagination": result['pagination']
+            })
+            
+        except Exception as e:
+            logger.error(f"Failed to retrieve pending surveys: {str(e)}")
+            return jsonify({
+                "success": False,
+                "error": {"message": f"Failed to retrieve pending surveys: {str(e)}"}
+            }), 500
+    
+    @staticmethod
+    @log_function_call
+    def get_approved_surveys(page=1, limit=20):
+        """
+        Get approved surveys (Account users)
+        """
+        logger = get_logger(__name__)
+        logger.info(f"Retrieving approved surveys - page: {page}, limit: {limit}")
+        
+        try:
+            filters = {'status': 'approved'}
+            result = SurveyRepository.get_all_surveys(
+                page=page,
+                per_page=limit,
+                filters=filters
+            )
+            
+            return jsonify({
+                "success": True,
+                "data": result['surveys'],
+                "pagination": result['pagination']
+            })
+            
+        except Exception as e:
+            logger.error(f"Failed to retrieve approved surveys: {str(e)}")
+            return jsonify({
+                "success": False,
+                "error": {"message": f"Failed to retrieve approved surveys: {str(e)}"}
+            }), 500
+    
+    @staticmethod
+    @log_function_call
+    def get_surveys_by_role(user_role, page=1, limit=20):
+        """
+        Get surveys filtered by user role
+        """
+        logger = get_logger(__name__)
+        logger.info(f"Retrieving surveys for role: {user_role} - page: {page}, limit: {limit}")
+        
+        try:
+            if user_role == 'account':
+                # Only approved surveys
+                filters = {'status': 'approved'}
+            elif user_role in ['domain_admin', 'sys_admin']:
+                # All surveys
+                filters = None
+            else:
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Invalid user role"}
+                }), 400
+            
+            result = SurveyRepository.get_all_surveys(
+                page=page,
+                per_page=limit,
+                filters=filters
+            )
+            
+            return jsonify({
+                "success": True,
+                "data": result['surveys'],
+                "pagination": result['pagination']
+            })
+            
+        except Exception as e:
+            logger.error(f"Failed to retrieve surveys by role {user_role}: {str(e)}")
+            return jsonify({
+                "success": False,
+                "error": {"message": f"Failed to retrieve surveys by role: {str(e)}"}
             }), 500

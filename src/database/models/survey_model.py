@@ -32,7 +32,7 @@ class Survey(BaseModel):
         super().__init__(**kwargs)
     
     @classmethod
-    def create_survey(cls, account_id, title, survey_type, description=None, due_date=None, **kwargs):
+    def create_survey(cls, account_id, title, survey_type, description=None, due_date=None, questions=None, **kwargs):
         """Create a new survey"""
         # Validate account_id is ObjectId
         if isinstance(account_id, str):
@@ -41,6 +41,12 @@ class Survey(BaseModel):
             except Exception:
                 raise ValueError("Invalid account_id format")
         
+        # Validate questions if provided
+        if questions is not None:
+            validated_questions = cls._validate_questions(questions)
+        else:
+            validated_questions = []
+        
         # Create survey data
         survey_data = {
             'account_id': account_id,
@@ -48,14 +54,48 @@ class Survey(BaseModel):
             'survey_type': survey_type,
             'description': description.strip() if description else None,
             'due_date': due_date,
+            'questions': validated_questions,
             **kwargs
         }
         
         survey = cls(**survey_data)
         survey.save()
         
-        logger.info(f"Created new survey: {title} for account {account_id}")
+        logger.info(f"Created new survey: {title} for account {account_id} with {len(validated_questions)} questions")
         return survey
+    
+    @staticmethod
+    def _validate_questions(questions):
+        """Validate survey questions format"""
+        if not isinstance(questions, list):
+            raise ValueError("Questions must be a list")
+        
+        validated_questions = []
+        
+        for i, question in enumerate(questions):
+            if not isinstance(question, dict):
+                raise ValueError(f"Question {i+1} must be a dictionary")
+            
+            # Required fields
+            if 'text' not in question or not question['text'].strip():
+                raise ValueError(f"Question {i+1} must have non-empty text")
+            
+            # Set default values
+            question_data = {
+                'id': question.get('id', f'q{i+1}'),
+                'text': question['text'].strip(),
+                'type': question.get('type', 'rating_1_5'),
+                'required': question.get('required', True)
+            }
+            
+            # Validate question type
+            valid_types = ['rating_1_5', 'multiple_choice', 'text']
+            if question_data['type'] not in valid_types:
+                raise ValueError(f"Question {i+1} has invalid type. Must be one of: {valid_types}")
+            
+            validated_questions.append(question_data)
+        
+        return validated_questions
     
     @classmethod
     def find_by_account(cls, account_id, active_only=True):
@@ -295,6 +335,7 @@ class Survey(BaseModel):
             'survey_type': self.get_field('survey_type'),
             'status': self.get_field('status'),
             'due_date': self.get_field('due_date').isoformat() + 'Z' if self.get_field('due_date') else None,
+            'questions': self.get_field('questions', []),
             'response_count': self.get_field('response_count', 0),
             'completion_rate': self.get_field('completion_rate', 0.0),
             'is_active': self.get_field('is_active'),

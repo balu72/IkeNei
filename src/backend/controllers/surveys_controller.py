@@ -2,6 +2,9 @@ from flask import jsonify
 from datetime import datetime, timedelta
 from database import SurveyRepository
 from database.repositories.survey_run_repository import SurveyRunRepository
+from database.repositories.subject_repository import SubjectRepository
+from database.repositories.respondent_repository import RespondentRepository
+from services.email_service import email_service
 from utils.logger import get_logger, log_function_call
 
 class SurveysController:
@@ -380,16 +383,73 @@ class SurveysController:
                 account_id=current_account_id or survey.get_field('account_id')  # TODO: Get from JWT token
             )
             
-            # 5. TODO: Send invitations to respondents
-            # This would be implemented with a notification service
+            # 5. Send email invitations to respondents
             invitation_results = []
+            
+            # Get subject details for email
+            subject = SubjectRepository.get_subject_by_id(data['subject_id'])
+            if not subject:
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Subject not found"}
+                }), 404
+            
+            subject_name = subject.get_field('name')
+            survey_title = survey.get_field('title')
+            
             for respondent_data in data['respondents']:
-                # Placeholder for invitation sending
-                invitation_results.append({
-                    'respondent_id': respondent_data['respondent_id'],
-                    'success': True,
-                    'message': 'Invitation sent successfully'
-                })
+                try:
+                    # Get respondent details
+                    respondent = RespondentRepository.get_respondent_by_id(respondent_data['respondent_id'])
+                    if not respondent:
+                        invitation_results.append({
+                            'respondent_id': respondent_data['respondent_id'],
+                            'success': False,
+                            'message': 'Respondent not found'
+                        })
+                        continue
+                    
+                    # Find the response token for this respondent
+                    response_token = None
+                    for survey_respondent in survey_run.get_field('respondents', []):
+                        if str(survey_respondent['respondent_id']) == str(respondent_data['respondent_id']):
+                            response_token = survey_respondent['response_token']
+                            break
+                    
+                    if not response_token:
+                        invitation_results.append({
+                            'respondent_id': respondent_data['respondent_id'],
+                            'success': False,
+                            'message': 'Response token not found'
+                        })
+                        continue
+                    
+                    # Send email invitation
+                    email_result = email_service.send_survey_invitation(
+                        survey_run_id=str(survey_run._id),
+                        respondent_email=respondent.get_field('email'),
+                        respondent_name=respondent.get_field('name'),
+                        subject_name=subject_name,
+                        survey_title=survey_title,
+                        response_token=response_token,
+                        due_date=due_date
+                    )
+                    
+                    invitation_results.append({
+                        'respondent_id': respondent_data['respondent_id'],
+                        'success': email_result['success'],
+                        'message': email_result.get('message', 'Email sent'),
+                        'email': respondent.get_field('email'),
+                        'simulated': email_result.get('simulated', False)
+                    })
+                    
+                except Exception as e:
+                    logger.error(f"Failed to send invitation to respondent {respondent_data['respondent_id']}: {str(e)}")
+                    invitation_results.append({
+                        'respondent_id': respondent_data['respondent_id'],
+                        'success': False,
+                        'message': f'Failed to send invitation: {str(e)}'
+                    })
             
             # 6. Return success response
             return jsonify({

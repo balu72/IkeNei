@@ -16,20 +16,12 @@ class CategoriesController:
         logger.info("Retrieving respondent categories")
         
         try:
-            # These should eventually come from database
-            categories = [
-                'Peer',
-                'Subordinate', 
-                'Boss',
-                'Customer',
-                'Previous Employer',
-                'Super Boss',
-                'Parent',
-                'Teacher',
-                'Counseller',
-                'Third Party',
-                'Others'
-            ]
+            # TODO: Implement actual categories retrieval from database
+            # This should query categories collection or configuration table
+            # Categories could be stored in database for dynamic management
+            # or kept as static configuration if they rarely change
+            
+            categories = []
             
             return jsonify({
                 "success": True,

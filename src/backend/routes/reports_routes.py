@@ -158,3 +158,51 @@ def update_report_status(report_id):
     
     except Exception as e:
         return handle_exception(e)
+
+@reports_bp.route('/api/reports/report-types', methods=['GET'])
+@require_admin_roles
+def get_report_types():
+    """
+    Get available report types for DefineReport dropdown
+    """
+    try:
+        return ReportsController.get_report_types()
+    
+    except Exception as e:
+        return handle_exception(e)
+
+@reports_bp.route('/api/reports/data-sources', methods=['GET'])
+@require_admin_roles
+def get_data_sources():
+    """
+    Get available data sources for DefineReport dropdown
+    """
+    try:
+        return ReportsController.get_data_sources()
+    
+    except Exception as e:
+        return handle_exception(e)
+
+@reports_bp.route('/api/reports/chart-types', methods=['GET'])
+@require_admin_roles
+def get_chart_types():
+    """
+    Get available chart types for DefineReport dropdown
+    """
+    try:
+        return ReportsController.get_chart_types()
+    
+    except Exception as e:
+        return handle_exception(e)
+
+@reports_bp.route('/api/reports/group-by-options', methods=['GET'])
+@require_admin_roles
+def get_group_by_options():
+    """
+    Get available grouping options for DefineReport dropdown
+    """
+    try:
+        return ReportsController.get_group_by_options()
+    
+    except Exception as e:
+        return handle_exception(e)

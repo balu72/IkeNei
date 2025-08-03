@@ -65,3 +65,51 @@ def export_analytics_data():
     
     except Exception as e:
         return handle_exception(e)
+
+@analytics_bp.route('/api/analytics/overview', methods=['GET'])
+@require_system_admin_role
+def get_analytics_overview():
+    """
+    Get analytics overview (dashboard-style summary)
+    """
+    try:
+        return AnalyticsController.get_analytics_overview()
+    
+    except Exception as e:
+        return handle_exception(e)
+
+@analytics_bp.route('/api/analytics/system', methods=['GET'])
+@require_system_admin_role
+def get_system_analytics():
+    """
+    Get system analytics (alternative to system-health)
+    """
+    try:
+        return AnalyticsController.get_system_analytics()
+    
+    except Exception as e:
+        return handle_exception(e)
+
+@analytics_bp.route('/api/analytics/surveys/<int:survey_id>', methods=['GET'])
+@require_system_admin_role
+def get_specific_survey_analytics(survey_id):
+    """
+    Get analytics for specific survey
+    """
+    try:
+        return AnalyticsController.get_survey_analytics(survey_id)
+    
+    except Exception as e:
+        return handle_exception(e)
+
+@analytics_bp.route('/api/analytics/accounts/<int:account_id>', methods=['GET'])
+@require_system_admin_role
+def get_specific_account_analytics(account_id):
+    """
+    Get analytics for specific account
+    """
+    try:
+        return AnalyticsController.get_account_analytics(account_id)
+    
+    except Exception as e:
+        return handle_exception(e)

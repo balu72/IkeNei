@@ -374,6 +374,22 @@ export const reportsAPI = {
       body: JSON.stringify({ status }),
     });
   },
+
+  getReportTypes: async () => {
+    return apiRequest('/reports/report-types');
+  },
+
+  getDataSources: async () => {
+    return apiRequest('/reports/data-sources');
+  },
+
+  getChartTypes: async () => {
+    return apiRequest('/reports/chart-types');
+  },
+
+  getGroupByOptions: async () => {
+    return apiRequest('/reports/group-by-options');
+  },
 };
 
 // Dashboard API

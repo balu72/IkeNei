@@ -217,19 +217,25 @@ class TraitsController:
             }), 500
     
     @staticmethod
+    @log_function_call
     def get_trait_usage_statistics():
         """
         Get trait usage statistics
         """
+        logger = get_logger(__name__)
+        logger.info("Retrieving trait usage statistics")
+        
         try:
-            # This would be implemented with aggregation pipeline
-            # For now, return basic structure
+            # TODO: Implement actual trait usage statistics calculation
+            # This should use aggregation pipeline to calculate:
+            # - Total traits count from traits collection
+            # - Active traits count (status = 'active')
+            # - Categories count (distinct categories)
+            # - Most used traits (from survey responses or usage tracking)
+            # - Category distribution (traits per category)
+            
             stats = {
-                "total_traits": 0,
-                "active_traits": 0,
-                "categories_count": 0,
-                "most_used_traits": [],
-                "category_distribution": {}
+                "timestamp": datetime.utcnow().isoformat() + "Z"
             }
             
             return jsonify({
@@ -238,6 +244,7 @@ class TraitsController:
             })
             
         except Exception as e:
+            logger.error(f"Failed to retrieve trait usage statistics: {str(e)}")
             return jsonify({
                 "success": False,
                 "error": {"message": f"Failed to retrieve trait usage statistics: {str(e)}"}

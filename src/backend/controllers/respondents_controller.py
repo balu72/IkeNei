@@ -89,74 +89,114 @@ class RespondentsController:
             }), 500
     
     @staticmethod
+    @log_function_call
     def get_respondent_by_id(respondent_id):
         """
         Get respondent by ID
         """
+        logger = get_logger(__name__)
+        logger.info(f"Retrieving respondent by ID: {respondent_id}")
+        
         try:
-            mock_respondent = {
-                "id": str(respondent_id),
-                "name": "Alice Brown",
-                "email": "alice.brown@company.com",
-                "relationship": "Direct Report",
-                "subject_id": "1",
-                "subject_name": "John Smith",
-                "status": "active",
-                "response_status": "completed",
-                "invited_at": "2024-01-15T00:00:00Z",
-                "responded_at": "2024-01-18T00:00:00Z",
-                "created_at": "2024-01-15T00:00:00Z"
-            }
+            # TODO: Implement actual respondent retrieval from database
+            # This should:
+            # - Query respondents collection for specific respondent
+            # - Include subject information if needed
+            # - Check user permissions for accessing this respondent
+            # - Include response status and timestamps
+            
+            respondent = RespondentRepository.get_respondent_by_id(respondent_id)
+            
+            if not respondent:
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Respondent not found"}
+                }), 404
             
             return jsonify({
                 "success": True,
-                "data": mock_respondent
+                "data": respondent.to_public_dict()
             })
             
         except Exception as e:
+            logger.error(f"Failed to retrieve respondent {respondent_id}: {str(e)}")
             return jsonify({
                 "success": False,
                 "error": {"message": f"Failed to retrieve respondent: {str(e)}"}
             }), 500
     
     @staticmethod
+    @log_function_call
     def update_respondent(respondent_id, data):
         """
         Update respondent
         """
+        logger = get_logger(__name__)
+        logger.info(f"Updating respondent {respondent_id} with data: {data}")
+        
         try:
-            updated_respondent = {
-                "id": str(respondent_id),
-                "name": data.get('name', 'Updated Respondent'),
-                "email": data.get('email', 'updated@company.com'),
-                "relationship": data.get('relationship', 'Peer'),
-                "updated_at": datetime.utcnow().isoformat() + "Z"
-            }
+            # TODO: Implement actual respondent update in database
+            # This should:
+            # - Validate respondent exists
+            # - Check user permissions for updating this respondent
+            # - Validate email format if provided
+            # - Validate relationship type if provided
+            # - Update respondent record in database
+            
+            respondent = RespondentRepository.update_respondent(respondent_id, data)
+            
+            if not respondent:
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Respondent not found"}
+                }), 404
             
             return jsonify({
                 "success": True,
-                "data": updated_respondent,
+                "data": respondent.to_public_dict(),
                 "message": "Respondent updated successfully"
             })
             
         except Exception as e:
+            logger.error(f"Failed to update respondent {respondent_id}: {str(e)}")
             return jsonify({
                 "success": False,
                 "error": {"message": f"Failed to update respondent: {str(e)}"}
             }), 500
     
     @staticmethod
+    @log_function_call
     def delete_respondent(respondent_id):
         """
         Delete respondent
         """
+        logger = get_logger(__name__)
+        logger.info(f"Deleting respondent: {respondent_id}")
+        
         try:
+            # TODO: Implement actual respondent deletion from database
+            # This should:
+            # - Validate respondent exists
+            # - Check user permissions for deleting this respondent
+            # - Check if respondent has any survey responses (may need to handle cascading)
+            # - Remove respondent record from database
+            # - Log deletion activity
+            
+            success = RespondentRepository.delete_respondent(respondent_id)
+            
+            if not success:
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Respondent not found"}
+                }), 404
+            
             return jsonify({
                 "success": True,
                 "message": f"Respondent {respondent_id} deleted successfully"
             })
             
         except Exception as e:
+            logger.error(f"Failed to delete respondent {respondent_id}: {str(e)}")
             return jsonify({
                 "success": False,
                 "error": {"message": f"Failed to delete respondent: {str(e)}"}

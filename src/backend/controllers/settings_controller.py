@@ -12,42 +12,22 @@ class SettingsController:
         Get all settings with pagination and filtering
         """
         try:
-            mock_settings = [
-                {
-                    "key": "email_notifications",
-                    "value": True,
-                    "category": "notifications",
-                    "description": "Enable email notifications",
-                    "type": "boolean",
-                    "updated_at": "2024-01-15T00:00:00Z"
-                },
-                {
-                    "key": "survey_reminder_frequency",
-                    "value": "weekly",
-                    "category": "surveys",
-                    "description": "Default survey reminder frequency",
-                    "type": "string",
-                    "options": ["daily", "weekly", "monthly"],
-                    "updated_at": "2024-01-10T00:00:00Z"
-                },
-                {
-                    "key": "max_respondents_per_survey",
-                    "value": 50,
-                    "category": "limits",
-                    "description": "Maximum respondents allowed per survey",
-                    "type": "integer",
-                    "updated_at": "2024-01-05T00:00:00Z"
-                }
-            ]
+            # TODO: Implement actual settings retrieval from database
+            # This should query settings collection with:
+            # - Pagination support
+            # - Filtering by category, type, or key
+            # - Sorting by category or updated_at
+            
+            settings = []
             
             return jsonify({
                 "success": True,
-                "data": mock_settings,
+                "data": settings,
                 "pagination": {
                     "page": page,
                     "limit": limit,
-                    "total": len(mock_settings),
-                    "pages": 1
+                    "total": 0,
+                    "pages": 0
                 }
             })
             
@@ -63,15 +43,16 @@ class SettingsController:
         Update a specific setting
         """
         try:
-            updated_setting = {
-                "key": key,
-                "value": value,
-                "updated_at": datetime.utcnow().isoformat() + "Z"
-            }
+            # TODO: Implement actual setting update in database
+            # This should:
+            # - Validate setting key exists
+            # - Validate value type matches setting type
+            # - Update setting in database
+            # - Log setting change activity
             
             return jsonify({
                 "success": True,
-                "data": updated_setting,
+                "data": {"key": key, "value": value},
                 "message": f"Setting {key} updated successfully"
             })
             
@@ -82,23 +63,22 @@ class SettingsController:
             }), 500
     
     @staticmethod
-    def toggle_setting(key):
+    def toggle_boolean_setting(key):
         """
         Toggle a boolean setting
         """
         try:
-            # Mock toggle - in real implementation, get current value and toggle
-            new_value = True  # This would be the toggled value
-            
-            updated_setting = {
-                "key": key,
-                "value": new_value,
-                "updated_at": datetime.utcnow().isoformat() + "Z"
-            }
+            # TODO: Implement actual boolean setting toggle
+            # This should:
+            # - Validate setting exists and is boolean type
+            # - Get current value from database
+            # - Toggle the boolean value
+            # - Update setting in database
+            # - Log toggle activity
             
             return jsonify({
                 "success": True,
-                "data": updated_setting,
+                "data": {"key": key},
                 "message": f"Setting {key} toggled successfully"
             })
             
@@ -109,29 +89,21 @@ class SettingsController:
             }), 500
     
     @staticmethod
-    def reset_setting(key):
+    def reset_setting_to_default(key):
         """
         Reset setting to default value
         """
         try:
-            # Mock default values
-            defaults = {
-                "email_notifications": True,
-                "survey_reminder_frequency": "weekly",
-                "max_respondents_per_survey": 50
-            }
-            
-            default_value = defaults.get(key, None)
-            
-            reset_setting = {
-                "key": key,
-                "value": default_value,
-                "updated_at": datetime.utcnow().isoformat() + "Z"
-            }
+            # TODO: Implement actual setting reset to default
+            # This should:
+            # - Validate setting exists
+            # - Get default value from settings schema/config
+            # - Update setting to default value in database
+            # - Log reset activity
             
             return jsonify({
                 "success": True,
-                "data": reset_setting,
+                "data": {"key": key},
                 "message": f"Setting {key} reset to default value"
             })
             
@@ -147,36 +119,18 @@ class SettingsController:
         Get setting categories
         """
         try:
-            mock_categories = [
-                {
-                    "name": "notifications",
-                    "display_name": "Notifications",
-                    "description": "Email and system notification settings",
-                    "settings_count": 5
-                },
-                {
-                    "name": "surveys",
-                    "display_name": "Surveys",
-                    "description": "Survey-related configuration settings",
-                    "settings_count": 8
-                },
-                {
-                    "name": "limits",
-                    "display_name": "System Limits",
-                    "description": "System resource and usage limits",
-                    "settings_count": 6
-                },
-                {
-                    "name": "security",
-                    "display_name": "Security",
-                    "description": "Security and authentication settings",
-                    "settings_count": 4
-                }
-            ]
+            # TODO: Implement actual setting categories retrieval
+            # This should:
+            # - Query distinct categories from settings collection
+            # - Include category metadata (display names, descriptions)
+            # - Count settings per category
+            # - Return organized category structure
+            
+            categories = []
             
             return jsonify({
                 "success": True,
-                "data": mock_categories
+                "data": categories
             })
             
         except Exception as e:

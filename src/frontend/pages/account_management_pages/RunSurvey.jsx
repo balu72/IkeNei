@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { surveysAPI, subjectsAPI, respondentsAPI } from '../../services/api';
 
 const RunSurvey = () => {
   const navigate = useNavigate();
@@ -14,30 +15,47 @@ const RunSurvey = () => {
     ]
   });
 
-  // Sample data - in real app, this would come from API
-  const surveys = [
-    'Leadership Skills Assessment',
-    'Communication Skills Survey',
-    'Team Management Review',
-    'Project Management Skills'
-  ];
+  // API data state
+  const [surveys, setSurveys] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [respondents, setRespondents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const subjects = [
-    'John Doe',
-    'Jane Smith',
-    'Robert Brown',
-    'Lisa Anderson'
-  ];
-
-  const respondants = [
-    { name: 'Sarah Wilson', category: 'Peer' },
-    { name: 'Mike Johnson', category: 'Subordinate' },
-    { name: 'Emily Davis', category: 'Boss' },
-    { name: 'David Wilson', category: 'Customer' },
-    { name: 'Tom Harris', category: 'Peer' },
-    { name: 'Lisa Anderson', category: 'Super Boss' },
-    { name: 'Robert Brown', category: 'Subordinate' }
-  ];
+  // Fetch data from APIs
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Fetch active surveys, user's subjects, and user's respondents
+        const [surveysRes, subjectsRes, respondentsRes] = await Promise.all([
+          surveysAPI.getAvailable(), // Should return only active surveys
+          subjectsAPI.getAll(),      // Filtered by current user's account
+          respondentsAPI.getAll()    // Filtered by current user's account
+        ]);
+        
+        if (surveysRes.success) {
+          setSurveys(surveysRes.data || []);
+        }
+        if (subjectsRes.success) {
+          setSubjects(subjectsRes.data || []);
+        }
+        if (respondentsRes.success) {
+          setRespondents(respondentsRes.data || []);
+        }
+        
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError(err.message || 'Failed to load data');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []);
 
   const handleSurveyChange = (e) => {
     setFormData(prev => ({
@@ -55,16 +73,16 @@ const RunSurvey = () => {
     }));
   };
 
-  const handleRespondantChange = (subjectIndex, respondantName) => {
+  const handleRespondantChange = (subjectIndex, respondantId) => {
     setFormData(prev => ({
       ...prev,
       subjects: prev.subjects.map((item, i) => 
         i === subjectIndex 
           ? {
               ...item,
-              respondants: item.respondants.includes(respondantName)
-                ? item.respondants.filter(r => r !== respondantName)
-                : [...item.respondants, respondantName]
+              respondants: item.respondants.includes(respondantId)
+                ? item.respondants.filter(r => r !== respondantId)
+                : [...item.respondants, respondantId]
             }
           : item
       )
@@ -105,13 +123,13 @@ const RunSurvey = () => {
   };
 
   const getAvailableSubjects = (currentIndex) => {
-    const selectedSubjects = formData.subjects
+    const selectedSubjectIds = formData.subjects
       .map((item, index) => index !== currentIndex ? item.subject : null)
       .filter(Boolean);
-    return subjects.filter(subject => !selectedSubjects.includes(subject));
+    return subjects.filter(subject => !selectedSubjectIds.includes(subject.id));
   };
 
-  const handleStart = (e) => {
+  const handleStart = async (e) => {
     e.preventDefault();
     
     // Validation
@@ -126,14 +144,68 @@ const RunSurvey = () => {
       return;
     }
 
-    console.log('Survey execution data:', { ...formData, subjects: validSubjects });
-    alert('Survey started successfully!');
-    navigate('/');
+    try {
+      // Transform data for API
+      const transformedData = {
+        survey_id: formData.selectedSurvey,
+        subjects: validSubjects.map(subjectItem => ({
+          subject_id: subjectItem.subject,
+          respondent_ids: subjectItem.respondants,
+          category_weights: subjectItem.categoryWeights
+        }))
+      };
+
+      console.log('Survey execution data:', transformedData);
+      
+      // Call API to run survey
+      const response = await surveysAPI.runSurvey(formData.selectedSurvey, transformedData);
+      
+      if (response.success) {
+        alert('Survey started successfully!');
+        navigate('/');
+      } else {
+        alert('Failed to start survey: ' + (response.error?.message || 'Unknown error'));
+      }
+    } catch (err) {
+      console.error('Error starting survey:', err);
+      alert('Failed to start survey: ' + err.message);
+    }
   };
 
   const handleCancel = () => {
     navigate('/');
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center', padding: '2rem' }}>
+        <h1 className="page-title">Run Survey</h1>
+        <div style={{ padding: '2rem' }}>
+          <p>Loading surveys, subjects, and respondents...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center', padding: '2rem' }}>
+        <h1 className="page-title">Run Survey</h1>
+        <div style={{ padding: '2rem', color: '#dc2626' }}>
+          <p>Error: {error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="btn-primary"
+            style={{ marginTop: '1rem' }}
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
@@ -182,7 +254,9 @@ const RunSurvey = () => {
             >
               <option value="">Choose a survey</option>
               {surveys.map((survey) => (
-                <option key={survey} value={survey}>{survey}</option>
+                <option key={survey.id || survey._id} value={survey.id || survey._id}>
+                  {survey.title || survey.name}
+                </option>
               ))}
             </select>
           </div>
@@ -251,7 +325,9 @@ const RunSurvey = () => {
                   >
                     <option value="">Choose a subject</option>
                     {getAvailableSubjects(index).map((subject) => (
-                      <option key={subject} value={subject}>{subject}</option>
+                      <option key={subject.id || subject._id} value={subject.id || subject._id}>
+                        {subject.name}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -260,7 +336,7 @@ const RunSurvey = () => {
                 {subjectItem.subject && (
                   <div>
                     <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
-                      Select Respondants for {subjectItem.subject} * (Multiple selection)
+                      Select Respondants for {subjects.find(s => (s.id || s._id) === subjectItem.subject)?.name || 'Selected Subject'} * (Multiple selection)
                     </label>
                     <div style={{
                       border: '1px solid #d1d5db',
@@ -270,8 +346,8 @@ const RunSurvey = () => {
                       overflow: 'auto',
                       backgroundColor: 'white'
                     }}>
-                      {respondants.map((respondant) => (
-                        <label key={respondant.name} style={{
+                      {respondents.map((respondent) => (
+                        <label key={respondent.id || respondent._id} style={{
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
@@ -280,17 +356,17 @@ const RunSurvey = () => {
                           padding: '0.5rem',
                           border: '1px solid #e5e7eb',
                           borderRadius: '0.25rem',
-                          backgroundColor: subjectItem.respondants.includes(respondant.name) ? '#f0f9ff' : 'white'
+                          backgroundColor: subjectItem.respondants.includes(respondent.id || respondent._id) ? '#f0f9ff' : 'white'
                         }}>
                           <div style={{ display: 'flex', alignItems: 'center' }}>
                             <input
                               type="checkbox"
-                              checked={subjectItem.respondants.includes(respondant.name)}
-                              onChange={() => handleRespondantChange(index, respondant.name)}
+                              checked={subjectItem.respondants.includes(respondent.id || respondent._id)}
+                              onChange={() => handleRespondantChange(index, respondent.id || respondent._id)}
                               style={{ marginRight: '0.5rem' }}
                             />
                             <div>
-                              <span style={{ fontSize: '0.875rem', fontWeight: '500' }}>{respondant.name}</span>
+                              <span style={{ fontSize: '0.875rem', fontWeight: '500' }}>{respondent.name}</span>
                               <span style={{ 
                                 fontSize: '0.75rem', 
                                 color: '#6b7280',
@@ -299,7 +375,7 @@ const RunSurvey = () => {
                                 padding: '0.125rem 0.5rem',
                                 borderRadius: '0.75rem'
                               }}>
-                                {respondant.category}
+                                {respondent.relationship || respondent.category}
                               </span>
                             </div>
                           </div>
@@ -308,7 +384,9 @@ const RunSurvey = () => {
                     </div>
                     {subjectItem.respondants.length > 0 && (
                       <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.5rem' }}>
-                        Selected: {subjectItem.respondants.join(', ')}
+                        Selected: {subjectItem.respondants.map(id => 
+                          respondents.find(r => (r.id || r._id) === id)?.name || id
+                        ).join(', ')}
                       </p>
                     )}
 
@@ -320,9 +398,9 @@ const RunSurvey = () => {
                         </h5>
                         {(() => {
                           const selectedCategories = [...new Set(
-                            respondants
-                              .filter(r => subjectItem.respondants.includes(r.name))
-                              .map(r => r.category)
+                            respondents
+                              .filter(r => subjectItem.respondants.includes(r.id || r._id))
+                              .map(r => r.relationship || r.category)
                           )];
                           
                           return selectedCategories.map((category) => (

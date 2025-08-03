@@ -33,46 +33,12 @@ const DefineReport = () => {
   const [surveys, setSurveys] = useState([]);
   const [traits, setTraits] = useState([]);
   const [accounts, setAccounts] = useState([]);
+  const [reportTypes, setReportTypes] = useState([]);
+  const [dataSources, setDataSources] = useState([]);
+  const [chartTypes, setChartTypes] = useState([]);
+  const [groupByOptions, setGroupByOptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Static options (these could also come from API if needed)
-  const reportTypes = [
-    'Individual Performance Report',
-    'Team Performance Summary',
-    'Survey Response Analysis',
-    'Trait Competency Report',
-    'Comparative Analysis Report',
-    'Progress Tracking Report',
-    'Custom Dashboard Report'
-  ];
-
-  const dataSources = [
-    'All Survey Data',
-    'Specific Survey Results',
-    'Trait-based Analysis',
-    'Account Performance',
-    'Time-based Trends'
-  ];
-
-  const chartTypes = [
-    'Bar Chart',
-    'Line Chart',
-    'Pie Chart',
-    'Radar Chart',
-    'Heatmap',
-    'Scatter Plot',
-    'Table View'
-  ];
-
-  const groupByOptions = [
-    'Individual',
-    'Department',
-    'Role',
-    'Survey',
-    'Trait',
-    'Date Range'
-  ];
 
   // Fetch data from APIs
   useEffect(() => {
@@ -81,11 +47,23 @@ const DefineReport = () => {
         setLoading(true);
         setError(null);
         
-        // Fetch surveys, traits, and accounts
-        const [surveysRes, traitsRes, accountsRes] = await Promise.all([
+        // Fetch all required data from APIs
+        const [
+          surveysRes, 
+          traitsRes, 
+          accountsRes,
+          reportTypesRes,
+          dataSourcesRes,
+          chartTypesRes,
+          groupByRes
+        ] = await Promise.all([
           surveysAPI.getAll(),
           traitsAPI.getAll({ status: 'active' }),
-          accountsAPI.getAll()
+          accountsAPI.getAll(),
+          reportsAPI.getReportTypes ? reportsAPI.getReportTypes() : Promise.resolve({ success: true, data: [] }),
+          reportsAPI.getDataSources ? reportsAPI.getDataSources() : Promise.resolve({ success: true, data: [] }),
+          reportsAPI.getChartTypes ? reportsAPI.getChartTypes() : Promise.resolve({ success: true, data: [] }),
+          reportsAPI.getGroupByOptions ? reportsAPI.getGroupByOptions() : Promise.resolve({ success: true, data: [] })
         ]);
         
         if (surveysRes.success) {
@@ -96,6 +74,18 @@ const DefineReport = () => {
         }
         if (accountsRes.success) {
           setAccounts(accountsRes.data || []);
+        }
+        if (reportTypesRes.success) {
+          setReportTypes(reportTypesRes.data || []);
+        }
+        if (dataSourcesRes.success) {
+          setDataSources(dataSourcesRes.data || []);
+        }
+        if (chartTypesRes.success) {
+          setChartTypes(chartTypesRes.data || []);
+        }
+        if (groupByRes.success) {
+          setGroupByOptions(groupByRes.data || []);
         }
         
       } catch (err) {

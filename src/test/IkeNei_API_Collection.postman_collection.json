@@ -1,0 +1,2595 @@
+{
+	"info": {
+		"_postman_id": "ikenei-api-collection",
+		"name": "IkeNei API Collection",
+		"description": "Complete REST API collection for IkeNei Backend - A comprehensive survey and feedback management system",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "ikenei-backend"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{jwt_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"exec": [
+					""
+				],
+				"type": "text/javascript"
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"exec": [
+					""
+				],
+				"type": "text/javascript"
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:5000",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Account login with email/password"
+					},
+					"response": []
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"password123\",\n  \"account_name\": \"New Account\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						},
+						"description": "Account registration"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current Account",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/auth/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"me"
+							]
+						},
+						"description": "Get current account profile"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"account_name\": \"Updated Account Name\",\n  \"email\": \"updated@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"profile"
+							]
+						},
+						"description": "Update account profile"
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/auth/refresh",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"refresh"
+							]
+						},
+						"description": "Token refresh"
+					},
+					"response": []
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/forgot",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"forgot"
+							]
+						},
+						"description": "Password reset request"
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"reset_token_here\",\n  \"new_password\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/reset",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"reset"
+							]
+						},
+						"description": "Password reset confirmation"
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						},
+						"description": "Account logout"
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication endpoints for login, registration, and profile management"
+		},
+		{
+			"name": "Accounts Management",
+			"item": [
+				{
+					"name": "Get All Accounts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/accounts?page=1&limit=10&search=&state=&type=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"accounts"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "search",
+									"value": ""
+								},
+								{
+									"key": "state",
+									"value": ""
+								},
+								{
+									"key": "type",
+									"value": ""
+								}
+							]
+						},
+						"description": "Get all accounts with filtering (search, state, type)"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Account",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"account@example.com\",\n  \"account_name\": \"New Account\",\n  \"account_type\": \"standard\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/accounts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"accounts"
+							]
+						},
+						"description": "Create new account (System Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Account by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/accounts/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"accounts",
+								"1"
+							]
+						},
+						"description": "Get specific account details"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Account",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"account_name\": \"Updated Account Name\",\n  \"account_type\": \"premium\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/accounts/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"accounts",
+								"1"
+							]
+						},
+						"description": "Update account information"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Account Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"is_active\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/accounts/1/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"accounts",
+								"1",
+								"status"
+							]
+						},
+						"description": "Activate/deactivate account"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Account",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/accounts/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"accounts",
+								"1"
+							]
+						},
+						"description": "Delete account"
+					},
+					"response": []
+				}
+			],
+			"description": "Account management endpoints for system administrators"
+		},
+		{
+			"name": "Surveys",
+			"item": [
+				{
+					"name": "Get All Surveys",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/surveys?page=1&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"surveys"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get all surveys with filtering and pagination"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Survey",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Employee Feedback Survey\",\n  \"description\": \"Annual employee feedback and performance review survey\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/surveys",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"surveys"
+							]
+						},
+						"description": "Create new survey"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Survey by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/surveys/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"surveys",
+								"1"
+							]
+						},
+						"description": "Get specific survey details"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Survey",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Updated Survey Title\",\n  \"description\": \"Updated survey description\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/surveys/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"surveys",
+								"1"
+							]
+						},
+						"description": "Update survey"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Survey",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/surveys/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"surveys",
+								"1"
+							]
+						},
+						"description": "Delete survey"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Survey Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"active\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/surveys/1/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"surveys",
+								"1",
+								"status"
+							]
+						},
+						"description": "Change survey status (Active/Draft/Completed)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Available Surveys",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/surveys/available",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"surveys",
+								"available"
+							]
+						},
+						"description": "Get available surveys for current account"
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Survey Responses",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"responses\": [\n    {\n      \"question_id\": 1,\n      \"answer\": \"Excellent\"\n    },\n    {\n      \"question_id\": 2,\n      \"answer\": \"Very satisfied\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/surveys/1/responses",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"surveys",
+								"1",
+								"responses"
+							]
+						},
+						"description": "Submit survey responses"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Survey Responses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/surveys/1/responses",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"surveys",
+								"1",
+								"responses"
+							]
+						},
+						"description": "Get survey responses"
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Surveys",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/surveys/my-surveys",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"surveys",
+								"my-surveys"
+							]
+						},
+						"description": "Get surveys where account is subject/respondent"
+					},
+					"response": []
+				},
+				{
+					"name": "Run Survey",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"subject_ids\": [1, 2, 3],\n  \"respondent_ids\": [4, 5, 6]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/surveys/1/run",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"surveys",
+								"1",
+								"run"
+							]
+						},
+						"description": "Run/execute a survey"
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Survey",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"approver_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/surveys/1/approve",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"surveys",
+								"1",
+								"approve"
+							]
+						},
+						"description": "Approve survey (System Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Reject Survey",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"approver_id\": 1,\n  \"reason\": \"Survey needs more detailed questions\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/surveys/1/reject",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"surveys",
+								"1",
+								"reject"
+							]
+						},
+						"description": "Reject survey (System Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pending Surveys",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/surveys/pending?page=1&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"surveys",
+								"pending"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get surveys pending approval (System Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Approved Surveys",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/surveys/approved?page=1&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"surveys",
+								"approved"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get approved surveys (Account users)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Surveys by Role",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/surveys/by-role?role=account&page=1&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"surveys",
+								"by-role"
+							],
+							"query": [
+								{
+									"key": "role",
+									"value": "account"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get surveys filtered by user role"
+					},
+					"response": []
+				}
+			],
+			"description": "Survey management endpoints for creating, managing, and executing surveys"
+		},
+		{
+			"name": "Survey Responses",
+			"item": [
+				{
+					"name": "Get Survey by Token (Public)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/survey/respond/response_token_here",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"survey",
+								"respond",
+								"response_token_here"
+							]
+						},
+						"description": "Get survey form by response token (PUBLIC - no authentication required)"
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Survey Response (Public)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"responses\": [\n    {\n      \"question_id\": 1,\n      \"answer\": \"Excellent\"\n    },\n    {\n      \"question_id\": 2,\n      \"answer\": \"Very satisfied\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/survey/respond/response_token_here",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"survey",
+								"respond",
+								"response_token_here"
+							]
+						},
+						"description": "Submit survey response (PUBLIC - no authentication required)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Survey Run Responses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/survey-runs/1/responses",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"survey-runs",
+								"1",
+								"responses"
+							]
+						},
+						"description": "Get all responses for a survey run (ADMIN - authentication required)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Survey Run Analytics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/survey-runs/1/analytics",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"survey-runs",
+								"1",
+								"analytics"
+							]
+						},
+						"description": "Get analytics for a survey run (ADMIN - authentication required)"
+					},
+					"response": []
+				}
+			],
+			"description": "Survey response endpoints for public survey submission and response management"
+		},
+		{
+			"name": "Subjects",
+			"item": [
+				{
+					"name": "Get All Subjects",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/subjects",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"subjects"
+							]
+						},
+						"description": "Get account's subjects"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Subject",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"department\": \"Engineering\",\n  \"position\": \"Senior Developer\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/subjects",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"subjects"
+							]
+						},
+						"description": "Create new subject"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Subject by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/subjects/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"subjects",
+								"1"
+							]
+						},
+						"description": "Get subject details"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Subject",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"John Smith\",\n  \"email\": \"john.smith@example.com\",\n  \"department\": \"Engineering\",\n  \"position\": \"Lead Developer\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/subjects/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"subjects",
+								"1"
+							]
+						},
+						"description": "Update subject"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Subject",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/subjects/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"subjects",
+								"1"
+							]
+						},
+						"description": "Delete subject"
+					},
+					"response": []
+				}
+			],
+			"description": "Subject management endpoints for managing survey subjects"
+		},
+		{
+			"name": "Respondents",
+			"item": [
+				{
+					"name": "Get All Respondents",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/respondents?subject_id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"respondents"
+							],
+							"query": [
+								{
+									"key": "subject_id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Get account's respondents with optional subject filter"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Respondent",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"subject_id\": 1,\n  \"name\": \"Jane Smith\",\n  \"email\": \"jane.smith@example.com\",\n  \"relationship\": \"Peer\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/respondents",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"respondents"
+							]
+						},
+						"description": "Create new respondent"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Respondent by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/respondents/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"respondents",
+								"1"
+							]
+						},
+						"description": "Get respondent details"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Respondent",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"jane.doe@example.com\",\n  \"relationship\": \"Subordinate\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/respondents/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"respondents",
+								"1"
+							]
+						},
+						"description": "Update respondent"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Respondent",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/respondents/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"respondents",
+								"1"
+							]
+						},
+						"description": "Delete respondent"
+					},
+					"response": []
+				}
+			],
+			"description": "Respondent management endpoints for managing survey respondents"
+		},
+		{
+			"name": "Traits",
+			"item": [
+				{
+					"name": "Get All Traits",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/traits?page=1&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"traits"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get all traits with filtering"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Trait",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Leadership\",\n  \"description\": \"Ability to lead and guide teams effectively\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/traits",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"traits"
+							]
+						},
+						"description": "Create new trait"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Trait by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/traits/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"traits",
+								"1"
+							]
+						},
+						"description": "Get specific trait details"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Trait",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Leadership\",\n  \"description\": \"Enhanced leadership skills and team management\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/traits/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"traits",
+								"1"
+							]
+						},
+						"description": "Update trait"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Trait",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/traits/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"traits",
+								"1"
+							]
+						},
+						"description": "Delete trait"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Trait Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"active\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/traits/1/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"traits",
+								"1",
+								"status"
+							]
+						},
+						"description": "Change trait status (Active/Draft/Inactive)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Trait Categories",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/traits/categories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"traits",
+								"categories"
+							]
+						},
+						"description": "Get trait categories"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Trait Usage Statistics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/traits/usage",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"traits",
+								"usage"
+							]
+						},
+						"description": "Get trait usage statistics"
+					},
+					"response": []
+				}
+			],
+			"description": "Trait management endpoints for managing survey traits and competencies"
+		},
+		{
+			"name": "Reports",
+			"item": [
+				{
+					"name": "Get All Reports",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/reports?page=1&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get all report templates"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Report",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Employee Performance Report\",\n  \"description\": \"Comprehensive employee performance analysis\",\n  \"report_type\": \"feedback_summary\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/reports",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports"
+							]
+						},
+						"description": "Create new report template"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Report by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/reports/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"1"
+							]
+						},
+						"description": "Get specific report template"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Report",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Performance Report\",\n  \"description\": \"Enhanced employee performance analysis\",\n  \"report_type\": \"competency_analysis\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/reports/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"1"
+							]
+						},
+						"description": "Update report template"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Report",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/reports/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"1"
+							]
+						},
+						"description": "Delete report template"
+					},
+					"response": []
+				},
+				{
+					"name": "Generate Report",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"parameters\": {\n    \"date_range\": \"last_30_days\",\n    \"include_charts\": true\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/reports/1/generate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"1",
+								"generate"
+							]
+						},
+						"description": "Generate report instance"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Report Instances",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/reports/1/instances?page=1&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"1",
+								"instances"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get generated report instances"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Report Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"active\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/reports/1/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"1",
+								"status"
+							]
+						},
+						"description": "Change report status"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Report Types",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/reports/report-types",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"report-types"
+							]
+						},
+						"description": "Get available report types for DefineReport dropdown"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Data Sources",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/reports/data-sources",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"data-sources"
+							]
+						},
+						"description": "Get available data sources for DefineReport dropdown"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Chart Types",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/reports/chart-types",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"chart-types"
+							]
+						},
+						"description": "Get available chart types for DefineReport dropdown"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Group By Options",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/reports/group-by-options",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"group-by-options"
+							]
+						},
+						"description": "Get available grouping options for DefineReport dropdown"
+					},
+					"response": []
+				}
+			],
+			"description": "Report management endpoints for creating and generating reports"
+		},
+		{
+			"name": "Analytics",
+			"item": [
+				{
+					"name": "Get Survey Analytics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/analytics/surveys",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"surveys"
+							]
+						},
+						"description": "Get survey analytics"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Account Analytics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/analytics/accounts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"accounts"
+							]
+						},
+						"description": "Get account analytics"
+					},
+					"response": []
+				},
+				{
+					"name": "Get System Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/analytics/system-health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"system-health"
+							]
+						},
+						"description": "Get system health metrics"
+					},
+					"response": []
+				},
+				{
+					"name": "Generate Analytics Reports",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/analytics/reports",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"reports"
+							]
+						},
+						"description": "Generate analytics reports"
+					},
+					"response": []
+				},
+				{
+					"name": "Export Analytics Data",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"format\": \"csv\",\n  \"date_range\": \"last_30_days\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/analytics/export",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"export"
+							]
+						},
+						"description": "Export analytics data"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Analytics Overview",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/analytics/overview",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"overview"
+							]
+						},
+						"description": "Get analytics overview (dashboard-style summary)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get System Analytics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/analytics/system",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"system"
+							]
+						},
+						"description": "Get system analytics"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Specific Survey Analytics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/analytics/surveys/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"surveys",
+								"1"
+							]
+						},
+						"description": "Get analytics for specific survey"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Specific Account Analytics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/analytics/accounts/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"accounts",
+								"1"
+							]
+						},
+						"description": "Get analytics for specific account"
+					},
+					"response": []
+				}
+			],
+			"description": "Analytics endpoints for system administrators to view metrics and insights"
+		},
+		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "Get Dashboard Stats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/dashboard/stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"dashboard",
+								"stats"
+							]
+						},
+						"description": "Get role-specific dashboard statistics"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Dashboard Activity",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/dashboard/activity",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"dashboard",
+								"activity"
+							]
+						},
+						"description": "Get recent activity feed"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Dashboard Analytics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/dashboard/analytics",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"dashboard",
+								"analytics"
+							]
+						},
+						"description": "Get analytics data for charts"
+					},
+					"response": []
+				}
+			],
+			"description": "Dashboard endpoints for role-specific dashboard data and statistics"
+		},
+		{
+			"name": "Billing",
+			"item": [
+				{
+					"name": "Get All Billing Records",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/billing?page=1&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"billing"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get billing records with filtering (account, date range, status)"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Billing Record",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"account_id\": 1,\n  \"survey_id\": 1,\n  \"survey_title\": \"Employee Feedback Survey\",\n  \"subjects_count\": 5,\n  \"respondents_count\": 25\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/billing",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"billing"
+							]
+						},
+						"description": "Create new billing record (auto-generated on survey completion)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Billing Record by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/billing/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"billing",
+								"1"
+							]
+						},
+						"description": "Get specific billing record details"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Billing Record",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"billing_amount\": 150.00,\n  \"billing_status\": \"paid\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/billing/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"billing",
+								"1"
+							]
+						},
+						"description": "Update billing record (amount, status)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Billing Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"paid\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/billing/1/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"billing",
+								"1",
+								"status"
+							]
+						},
+						"description": "Update billing status (pending, paid, failed)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Account Billing Records",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/billing/account/1?page=1&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"billing",
+								"account",
+								"1"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get billing records for specific account"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Billing Summary",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/billing/summary",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"billing",
+								"summary"
+							]
+						},
+						"description": "Get billing summary and statistics"
+					},
+					"response": []
+				},
+				{
+					"name": "Calculate Billing Amount",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"subjects_count\": 5,\n  \"respondents_count\": 25\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/billing/calculate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"billing",
+								"calculate"
+							]
+						},
+						"description": "Calculate billing amount for survey usage"
+					},
+					"response": []
+				}
+			],
+			"description": "Billing management endpoints for tracking and managing survey usage costs"
+		},
+		{
+			"name": "Files",
+			"item": [
+				{
+					"name": "Upload File",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "type",
+									"value": "document",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/upload",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"upload"
+							]
+						},
+						"description": "Upload files (avatars, documents)"
+					},
+					"response": []
+				},
+				{
+					"name": "Download File",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/files/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"files",
+								"1"
+							]
+						},
+						"description": "Download/view files"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete File",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/files/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"files",
+								"1"
+							]
+						},
+						"description": "Delete files"
+					},
+					"response": []
+				}
+			],
+			"description": "File management endpoints for uploading, downloading, and managing files"
+		},
+		{
+			"name": "Notifications",
+			"item": [
+				{
+					"name": "Get All Notifications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/notifications",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"notifications"
+							]
+						},
+						"description": "Get account notifications"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Notification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Survey Invitation\",\n  \"message\": \"You have been invited to participate in a survey\",\n  \"type\": \"survey_invitation\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/notifications",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"notifications"
+							]
+						},
+						"description": "Create notification"
+					},
+					"response": []
+				},
+				{
+					"name": "Mark Notification as Read",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/notifications/1/read",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"1",
+								"read"
+							]
+						},
+						"description": "Mark notification as read"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Notification",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/notifications/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"1"
+							]
+						},
+						"description": "Delete notification"
+					},
+					"response": []
+				}
+			],
+			"description": "Notification management endpoints for managing user notifications"
+		},
+		{
+			"name": "Settings",
+			"item": [
+				{
+					"name": "Get All Settings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/settings?page=1&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"settings"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get all system settings with filtering"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Setting",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"value\": \"new_setting_value\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/settings/setting_key",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"settings",
+								"setting_key"
+							]
+						},
+						"description": "Update specific setting"
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Setting",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/settings/setting_key/toggle",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"settings",
+								"setting_key",
+								"toggle"
+							]
+						},
+						"description": "Toggle boolean settings"
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Setting",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/settings/reset/setting_key",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"settings",
+								"reset",
+								"setting_key"
+							]
+						},
+						"description": "Reset setting to default"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Setting Categories",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/settings/categories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"settings",
+								"categories"
+							]
+						},
+						"description": "Get setting categories"
+					},
+					"response": []
+				}
+			],
+			"description": "System settings management endpoints for system administrators"
+		},
+		{
+			"name": "Categories",
+			"item": [
+				{
+					"name": "Get Respondent Categories",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/categories/respondent-categories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"categories",
+								"respondent-categories"
+							]
+						},
+						"description": "Get available respondent categories"
+					},
+					"response": []
+				}
+			],
+			"description": "Category management endpoints for managing various system categories"
+		},
+		{
+			"name": "System Health",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"health"
+							]
+						},
+						"description": "General health check endpoint"
+					},
+					"response": []
+				},
+				{
+					"name": "Database Health Check",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health/database",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"health",
+								"database"
+							]
+						},
+						"description": "Database health check endpoint"
+					},
+					"response": []
+				}
+			],
+			"description": "System health monitoring endpoints"
+		}
+	]
+}

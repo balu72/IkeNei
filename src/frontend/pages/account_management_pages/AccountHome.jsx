@@ -141,7 +141,8 @@ const AccountHome = () => {
       if (response.success) {
         alert('Subject created successfully!');
         setShowSubjectModal(false);
-        // Optionally refresh the page or update the subjects list
+        // Refresh dashboard data to show updated counts and table
+        fetchDashboardData();
       } else {
         alert('Failed to create subject: ' + (response.error?.message || 'Unknown error'));
       }
@@ -389,54 +390,90 @@ const AccountHome = () => {
                   </td>
                 </tr>
               ) : (
-                dashboardData.subjects.map((subject, index) => (
-                  <tr key={subject.id || index} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                    <td style={{ padding: '1rem', color: '#374151' }}>
-                      {subject.name || 'Unknown Subject'}
-                    </td>
-                    <td style={{ padding: '1rem', color: '#374151' }}>
-                      {subject.respondents ? subject.respondents.join(', ') : 'No respondents assigned'}
-                    </td>
-                    <td style={{ padding: '1rem', color: '#374151' }}>
-                      {subject.survey_name || 'No survey assigned'}
-                    </td>
-                    <td style={{ padding: '1rem' }}>
-                      <span style={{
-                        backgroundColor: subject.status === 'active' ? '#dcfce7' : 
-                                       subject.status === 'closed' ? '#fee2e2' : '#fef3c7',
-                        color: subject.status === 'active' ? '#166534' : 
-                               subject.status === 'closed' ? '#dc2626' : '#d97706',
-                        padding: '0.25rem 0.75rem',
-                        borderRadius: '1rem',
-                        fontSize: '0.75rem',
-                        fontWeight: '500'
-                      }}>
-                        {subject.status || 'Open'}
-                      </span>
-                    </td>
-                    <td style={{ padding: '1rem' }}>
-                      {subject.status === 'closed' ? (
-                        <a 
-                          href="#" 
-                          style={{
-                            color: '#3b82f6',
-                            textDecoration: 'underline',
-                            fontSize: '0.875rem',
-                            fontWeight: '500'
-                          }}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            console.log('View report for', subject.name);
-                          }}
-                        >
-                          View Report
-                        </a>
-                      ) : (
-                        <span style={{ color: '#6b7280' }}>-</span>
-                      )}
-                    </td>
-                  </tr>
-                ))
+                dashboardData.subjects.map((subject, index) => {
+                  // Find respondents for this subject
+                  const subjectRespondents = dashboardData.respondents.filter(
+                    respondent => respondent.subject_id === subject.id
+                  );
+                  
+                  return (
+                    <tr key={subject.id || index} style={{ borderBottom: '1px solid #e5e7eb' }}>
+                      <td style={{ padding: '1rem', color: '#374151' }}>
+                        <div>
+                          <div style={{ fontWeight: '500' }}>{subject.name || 'Unknown Subject'}</div>
+                          {subject.position && (
+                            <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+                              {subject.position}
+                            </div>
+                          )}
+                          {subject.department && (
+                            <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+                              {subject.department}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td style={{ padding: '1rem', color: '#374151' }}>
+                        {subjectRespondents.length > 0 ? (
+                          <div>
+                            <div style={{ fontWeight: '500' }}>
+                              {subjectRespondents.length} respondent{subjectRespondents.length !== 1 ? 's' : ''}
+                            </div>
+                            <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+                              {subjectRespondents.slice(0, 2).map(r => r.name).join(', ')}
+                              {subjectRespondents.length > 2 && ` +${subjectRespondents.length - 2} more`}
+                            </div>
+                          </div>
+                        ) : (
+                          <span style={{ color: '#6b7280', fontStyle: 'italic' }}>
+                            No respondents assigned
+                          </span>
+                        )}
+                      </td>
+                      <td style={{ padding: '1rem', color: '#374151' }}>
+                        <span style={{ color: '#6b7280', fontStyle: 'italic' }}>
+                          No survey assigned
+                        </span>
+                      </td>
+                      <td style={{ padding: '1rem' }}>
+                        <span style={{
+                          backgroundColor: subject.status === 'active' ? '#dcfce7' : 
+                                         subject.status === 'inactive' ? '#fee2e2' : '#fef3c7',
+                          color: subject.status === 'active' ? '#166534' : 
+                                 subject.status === 'inactive' ? '#dc2626' : '#d97706',
+                          padding: '0.25rem 0.75rem',
+                          borderRadius: '1rem',
+                          fontSize: '0.75rem',
+                          fontWeight: '500',
+                          textTransform: 'capitalize'
+                        }}>
+                          {subject.status || 'Active'}
+                        </span>
+                      </td>
+                      <td style={{ padding: '1rem' }}>
+                        {subject.status === 'completed' ? (
+                          <a 
+                            href="#" 
+                            style={{
+                              color: '#3b82f6',
+                              textDecoration: 'underline',
+                              fontSize: '0.875rem',
+                              fontWeight: '500'
+                            }}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              console.log('View report for', subject.name);
+                            }}
+                          >
+                            View Report
+                          </a>
+                        ) : (
+                          <span style={{ color: '#6b7280' }}>-</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>

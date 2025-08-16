@@ -218,6 +218,37 @@ class TraitsController:
     
     @staticmethod
     @log_function_call
+    def update_trait_status(trait_id, status):
+        """
+        Update trait status
+        """
+        logger = get_logger(__name__)
+        logger.info(f"Updating trait {trait_id} status to {status}")
+        
+        try:
+            trait = TraitRepository.update_trait(trait_id, {"status": status})
+            
+            if not trait:
+                return jsonify({
+                    "success": False,
+                    "error": {"message": "Trait not found"}
+                }), 404
+            
+            return jsonify({
+                "success": True,
+                "data": trait.to_public_dict(),
+                "message": f"Trait status updated to {status}"
+            })
+            
+        except Exception as e:
+            logger.error(f"Failed to update trait {trait_id} status: {str(e)}")
+            return jsonify({
+                "success": False,
+                "error": {"message": f"Failed to update trait status: {str(e)}"}
+            }), 500
+    
+    @staticmethod
+    @log_function_call
     def get_trait_usage_statistics():
         """
         Get trait usage statistics

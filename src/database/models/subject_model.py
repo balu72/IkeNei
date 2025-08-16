@@ -38,13 +38,13 @@ class Subject(BaseModel):
             except Exception:
                 raise ValueError("Invalid account_id format")
         
-        # Create subject data
+        # Create subject data - ensure strings are not None to satisfy database schema
         subject_data = {
             'account_id': account_id,
             'name': name.strip(),
-            'email': email.strip() if email else None,
-            'position': position.strip() if position else None,
-            'department': department.strip() if department else None,
+            'email': email.strip() if email else '',
+            'position': position.strip() if position else '',
+            'department': department.strip() if department else '',
             **kwargs
         }
         

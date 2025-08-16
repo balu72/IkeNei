@@ -53,10 +53,13 @@ class Survey(BaseModel):
             'title': title.strip(),
             'survey_type': survey_type,
             'description': description.strip() if description else None,
-            'due_date': due_date,
             'questions': validated_questions,
             **kwargs
         }
+        
+        # Only include due_date if it's provided
+        if due_date is not None:
+            survey_data['due_date'] = due_date
         
         survey = cls(**survey_data)
         survey.save()
@@ -336,6 +339,8 @@ class Survey(BaseModel):
             'status': self.get_field('status'),
             'due_date': self.get_field('due_date').isoformat() + 'Z' if self.get_field('due_date') else None,
             'questions': self.get_field('questions', []),
+            'traits': self.get_field('traits', []),
+            'target_sector': self.get_field('target_sector'),
             'response_count': self.get_field('response_count', 0),
             'completion_rate': self.get_field('completion_rate', 0.0),
             'is_active': self.get_field('is_active'),

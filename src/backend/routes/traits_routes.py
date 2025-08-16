@@ -52,7 +52,7 @@ def create_trait():
     except Exception as e:
         return handle_exception(e)
 
-@traits_bp.route('/api/traits/<int:trait_id>', methods=['GET'])
+@traits_bp.route('/api/traits/<trait_id>', methods=['GET'])
 @require_admin_roles
 @log_route
 def get_trait(trait_id):
@@ -65,7 +65,7 @@ def get_trait(trait_id):
     except Exception as e:
         return handle_exception(e)
 
-@traits_bp.route('/api/traits/<int:trait_id>', methods=['PUT'])
+@traits_bp.route('/api/traits/<trait_id>', methods=['PUT'])
 @require_domain_admin_role
 @log_route
 def update_trait(trait_id):
@@ -83,7 +83,7 @@ def update_trait(trait_id):
     except Exception as e:
         return handle_exception(e)
 
-@traits_bp.route('/api/traits/<int:trait_id>', methods=['DELETE'])
+@traits_bp.route('/api/traits/<trait_id>', methods=['DELETE'])
 @require_domain_admin_role
 @log_route
 def delete_trait(trait_id):
@@ -96,7 +96,7 @@ def delete_trait(trait_id):
     except Exception as e:
         return handle_exception(e)
 
-@traits_bp.route('/api/traits/<int:trait_id>/status', methods=['PATCH'])
+@traits_bp.route('/api/traits/<trait_id>/status', methods=['PATCH'])
 @require_domain_admin_role
 @log_route
 def update_trait_status(trait_id):

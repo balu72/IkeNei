@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import { accountsAPI } from '../../services/api';
 
 const Accounts = () => {
   const navigate = useNavigate();
+  const { isSystemAdmin } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterState, setFilterState] = useState('all');
   const [accountsData, setAccountsData] = useState([]);
@@ -130,14 +132,16 @@ const Accounts = () => {
           </select>
         </div>
 
-        {/* Create Account Button */}
-        <button
-          onClick={handleCreateAccount}
-          className="btn-primary"
-          style={{ fontSize: '0.875rem' }}
-        >
-          Create New Account
-        </button>
+        {/* Create Account Button - Only show for System Admins */}
+        {isSystemAdmin && (
+          <button
+            onClick={handleCreateAccount}
+            className="btn-primary"
+            style={{ fontSize: '0.875rem' }}
+          >
+            Create New Account
+          </button>
+        )}
       </div>
 
       {/* Error Message */}

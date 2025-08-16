@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { surveysAPI, traitsAPI } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 const CreateSurvey = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     surveyName: '',
     description: '',
     selectedTraits: [],
-    targetSector: ''
+    targetSector: '',
+    surveyType: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -109,6 +112,10 @@ const CreateSurvey = () => {
       alert('Please enter a description');
       return;
     }
+    if (!formData.surveyType) {
+      alert('Please select a survey type');
+      return;
+    }
     if (formData.selectedTraits.length === 0) {
       alert('Please select at least one trait');
       return;
@@ -132,8 +139,10 @@ const CreateSurvey = () => {
       const surveyData = {
         title: formData.surveyName,
         description: formData.description,
+        survey_type: formData.surveyType,
         traits: formData.selectedTraits,
-        target_sector: formData.targetSector
+        target_sector: formData.targetSector,
+        account_id: user?.id || user?.account_id
       };
       
       const response = await surveysAPI.create(surveyData);
@@ -258,6 +267,32 @@ const CreateSurvey = () => {
               }}
               placeholder="Enter survey description and purpose"
             />
+          </div>
+
+          {/* Survey Type */}
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+              Survey Type *
+            </label>
+            <select
+              name="surveyType"
+              value={formData.surveyType}
+              onChange={handleInputChange}
+              required
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                border: '1px solid #d1d5db',
+                borderRadius: '0.375rem',
+                fontSize: '0.875rem'
+              }}
+            >
+              <option value="">Select survey type</option>
+              <option value="360_feedback">360° Feedback</option>
+              <option value="performance">Performance Review</option>
+              <option value="skills">Skills Assessment</option>
+              <option value="custom">Custom Survey</option>
+            </select>
           </div>
 
           {/* Traits Selection */}

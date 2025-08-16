@@ -185,7 +185,22 @@ class AuthController:
             current_user_id = get_jwt_identity()
             logger.info(f"Updating profile for user: {current_user_id}")
             
-            account = AccountRepository.update_account(current_user_id, data)
+            # Map frontend field names to backend field names
+            field_mapping = {
+                'name': 'account_name',
+                'zipCode': 'zip_code',
+                'accountType': 'account_type'
+            }
+            
+            # Transform the data to match backend field names
+            transformed_data = {}
+            for key, value in data.items():
+                backend_key = field_mapping.get(key, key)
+                transformed_data[backend_key] = value
+            
+            logger.info(f"Transformed profile data: {transformed_data}")
+            
+            account = AccountRepository.update_account(current_user_id, transformed_data)
             
             if not account:
                 return jsonify({

@@ -252,10 +252,19 @@ class Account(BaseModel):
         return {
             'id': str(self._id) if self._id else None,
             'email': self.get_field('email'),
-            'account_name': self.get_field('account_name'),
+            'name': self.get_field('account_name'),  # Frontend expects 'name'
+            'account_name': self.get_field('account_name'),  # Keep for backward compatibility
             'role': self.get_field('role'),
             'is_active': self.get_field('is_active'),
             'email_verified': self.get_field('email_verified'),
+            'phone': self.get_field('phone'),
+            'address': self.get_field('address'),
+            'city': self.get_field('city'),
+            'state': self.get_field('state'),
+            'zipCode': self.get_field('zip_code'),
+            'country': self.get_field('country'),
+            'accountType': self.get_field('account_type'),
+            'department': self.get_field('department'),
             'created_at': self.get_field('created_at').isoformat() + 'Z' if self.get_field('created_at') else None,
             'last_login_at': self.get_field('last_login_at').isoformat() + 'Z' if self.get_field('last_login_at') else None
         }

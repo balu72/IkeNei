@@ -139,13 +139,52 @@ const DomainSurveys = () => {
                 surveysData.map((survey) => (
                   <tr key={survey.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
                     <td style={{ padding: '1rem', color: '#374151', verticalAlign: 'top' }}>
-                      {survey.name || survey.surveyName}
+                      <div>
+                        <div style={{ fontWeight: '600', marginBottom: '0.25rem' }}>
+                          {survey.title || 'Untitled Survey'}
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+                          {survey.survey_type ? survey.survey_type.replace('_', ' ').toUpperCase() : 'Unknown Type'}
+                        </div>
+                      </div>
                     </td>
                     <td style={{ padding: '1rem', color: '#374151', verticalAlign: 'top' }}>
-                      {survey.traits ? survey.traits.map(trait => trait.name).join(', ') : 'No traits assigned'}
+                      {survey.traits && survey.traits.length > 0 ? (
+                        <div>
+                          {survey.traits.map((trait, index) => (
+                            <div key={trait.id || index} style={{ 
+                              marginBottom: index < survey.traits.length - 1 ? '0.25rem' : '0',
+                              fontSize: '0.875rem'
+                            }}>
+                              {trait.name}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <span style={{ color: '#6b7280', fontSize: '0.875rem', fontStyle: 'italic' }}>
+                          No traits configured
+                        </span>
+                      )}
                     </td>
                     <td style={{ padding: '1rem', color: '#374151', verticalAlign: 'top' }}>
-                      {survey.traits ? survey.traits.map(trait => `${trait.weight}%`).join(', ') : 'N/A'}
+                      {survey.traits && survey.traits.length > 0 ? (
+                        <div>
+                          {survey.traits.map((trait, index) => (
+                            <div key={trait.id || index} style={{ 
+                              marginBottom: index < survey.traits.length - 1 ? '0.25rem' : '0',
+                              fontSize: '0.875rem',
+                              display: 'flex',
+                              alignItems: 'center'
+                            }}>
+                              <span style={{ fontWeight: '500' }}>{trait.weightage || 0}%</span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <span style={{ color: '#6b7280', fontSize: '0.875rem', fontStyle: 'italic' }}>
+                          No weightage configured
+                        </span>
+                      )}
                     </td>
                     <td style={{ padding: '1rem', verticalAlign: 'top' }}>
                       <span style={{

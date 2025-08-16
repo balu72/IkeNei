@@ -22,20 +22,48 @@ const ProfileUpdate = () => {
   });
 
   useEffect(() => {
-    if (user) {
-      setFormData({
-        name: user.name || '',
-        email: user.email || '',
-        phone: user.phone || '',
-        address: user.address || '',
-        city: user.city || '',
-        state: user.state || '',
-        zipCode: user.zipCode || '',
-        country: user.country || '',
-        accountType: user.accountType || '',
-        department: user.department || ''
-      });
-    }
+    const fetchProfileData = async () => {
+      try {
+        // First, populate with existing user data from context
+        if (user) {
+          setFormData({
+            name: user.name || user.account_name || '',
+            email: user.email || '',
+            phone: user.phone || '',
+            address: user.address || '',
+            city: user.city || '',
+            state: user.state || '',
+            zipCode: user.zipCode || '',
+            country: user.country || '',
+            accountType: user.accountType || '',
+            department: user.department || ''
+          });
+        }
+
+        // Then fetch the latest profile data from backend to ensure it's up-to-date
+        const response = await authAPI.getCurrentUser();
+        if (response.success && response.data) {
+          const profileData = response.data;
+          setFormData({
+            name: profileData.name || profileData.account_name || '',
+            email: profileData.email || '',
+            phone: profileData.phone || '',
+            address: profileData.address || '',
+            city: profileData.city || '',
+            state: profileData.state || '',
+            zipCode: profileData.zipCode || '',
+            country: profileData.country || '',
+            accountType: profileData.accountType || '',
+            department: profileData.department || ''
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching profile data:', error);
+        // If API call fails, we'll still have the data from context
+      }
+    };
+
+    fetchProfileData();
   }, [user]);
 
   const handleChange = (e) => {

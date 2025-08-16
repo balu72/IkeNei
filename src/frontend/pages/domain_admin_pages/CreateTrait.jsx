@@ -6,6 +6,7 @@ const CreateTrait = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     traitName: '',
+    category: '',
     description: '',
     items: [
       {
@@ -61,6 +62,10 @@ const CreateTrait = () => {
       alert('Please enter a trait name');
       return;
     }
+    if (!formData.category.trim()) {
+      alert('Please enter a category');
+      return;
+    }
     if (!formData.description.trim()) {
       alert('Please enter a description');
       return;
@@ -86,6 +91,7 @@ const CreateTrait = () => {
       // Prepare data for API call
       const traitData = {
         name: formData.traitName,
+        category: formData.category,
         description: formData.description,
         items: formData.items
       };
@@ -157,6 +163,28 @@ const CreateTrait = () => {
                 fontSize: '0.875rem'
               }}
               placeholder="Enter trait name (e.g., Strategic Thinking, Leadership)"
+            />
+          </div>
+
+          {/* Category */}
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+              Category *
+            </label>
+            <input
+              type="text"
+              name="category"
+              value={formData.category}
+              onChange={handleInputChange}
+              required
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                border: '1px solid #d1d5db',
+                borderRadius: '0.375rem',
+                fontSize: '0.875rem'
+              }}
+              placeholder="Enter trait category (e.g., Leadership, Technical, Communication)"
             />
           </div>
 
@@ -292,6 +320,9 @@ const CreateTrait = () => {
             </h4>
             <p style={{ fontSize: '0.875rem', color: '#0369a1', marginBottom: '0.5rem' }}>
               <strong>Trait:</strong> {formData.traitName || 'Not specified'}
+            </p>
+            <p style={{ fontSize: '0.875rem', color: '#0369a1', marginBottom: '0.5rem' }}>
+              <strong>Category:</strong> {formData.category || 'Not specified'}
             </p>
             <p style={{ fontSize: '0.875rem', color: '#0369a1', marginBottom: '0.5rem' }}>
               <strong>Total Items:</strong> {formData.items.length}

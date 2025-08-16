@@ -72,27 +72,37 @@ class SurveysController:
                     }), 400
             
             # Set initial status based on creator role
-            initial_status = 'pending_approval' if creator_role == 'domain_admin' else 'draft'
+            initial_status = 'draft'  # Use 'draft' as it's allowed by database schema
+            
+            # Prepare survey creation parameters
+            survey_params = {
+                'account_id': data.get('account_id'),
+                'title': data.get('title'),
+                'survey_type': data.get('survey_type'),
+                'description': data.get('description'),
+                'status': initial_status,
+                'created_by_role': creator_role
+            }
+            
+            # Only include due_date if it's provided
+            if due_date is not None:
+                survey_params['due_date'] = due_date
+            
+            # Include traits if provided
+            if data.get('traits'):
+                survey_params['traits'] = data.get('traits')
+            
+            # Include target_sector if provided
+            if data.get('target_sector'):
+                survey_params['target_sector'] = data.get('target_sector')
             
             # Create survey using repository
-            survey = SurveyRepository.create_survey(
-                account_id=data.get('account_id'),
-                title=data.get('title'),
-                survey_type=data.get('survey_type'),
-                description=data.get('description'),
-                due_date=due_date,
-                status=initial_status,
-                created_by_role=creator_role
-            )
-            
-            # If created by domain admin, submit for approval
-            if creator_role == 'domain_admin':
-                survey.submit_for_approval(creator_role)
+            survey = SurveyRepository.create_survey(**survey_params)
             
             return jsonify({
                 "success": True,
                 "data": survey.to_public_dict(),
-                "message": "Survey created successfully" + (" and submitted for approval" if creator_role == 'domain_admin' else "")
+                "message": "Survey created successfully"
             }), 201
             
         except Exception as e:
@@ -268,12 +278,10 @@ class SurveysController:
                 filters=None
             )
             
-            # Convert to public dict format
-            surveys_data = [survey.to_public_dict() for survey in result['surveys']]
-            
+            # The repository already returns surveys in public dict format
             return jsonify({
                 "success": True,
-                "data": surveys_data
+                "data": result['surveys']
             })
             
         except Exception as e:

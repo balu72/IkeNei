@@ -31,21 +31,34 @@ const SysAdminHome = () => {
           systemHealth: '--'
         };
 
+        // Debug logging
+        console.log('Dashboard API Responses:', {
+          statsResponse,
+          accountsResponse,
+          surveysResponse
+        });
+
         // Use stats API if available, otherwise calculate from individual APIs
-        if (statsResponse.success && statsResponse.data) {
+        if (statsResponse.success && statsResponse.data && statsResponse.data.totalAccounts !== undefined) {
           newDashboardData.totalAccounts = statsResponse.data.totalAccounts || 0;
           newDashboardData.activeSurveys = statsResponse.data.activeSurveys || 0;
           newDashboardData.systemHealth = statsResponse.data.systemHealth || '--';
         } else {
           // Fallback to individual API responses
-          if (accountsResponse.success) {
-            newDashboardData.totalAccounts = accountsResponse.data?.length || 0;
+          if (accountsResponse.success && accountsResponse.data) {
+            newDashboardData.totalAccounts = Array.isArray(accountsResponse.data) ? accountsResponse.data.length : 0;
+            console.log('Total accounts calculated:', newDashboardData.totalAccounts);
           }
-          if (surveysResponse.success) {
-            const activeSurveys = surveysResponse.data?.filter(s => s.status === 'active' || s.state === 'Active') || [];
+          if (surveysResponse.success && surveysResponse.data) {
+            const surveyData = Array.isArray(surveysResponse.data) ? surveysResponse.data : [];
+            const activeSurveys = surveyData.filter(s => s.status === 'active' || s.state === 'Active');
             newDashboardData.activeSurveys = activeSurveys.length;
+            console.log('Active surveys calculated:', newDashboardData.activeSurveys, 'from', surveyData.length, 'total surveys');
           }
+          newDashboardData.systemHealth = 'Online';
         }
+
+        console.log('Final dashboard data:', newDashboardData);
 
         setDashboardData(newDashboardData);
       } catch (err) {

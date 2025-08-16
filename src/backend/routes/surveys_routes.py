@@ -68,7 +68,7 @@ def create_survey():
         logger.error(f"=== EXIT: POST /api/surveys - ERROR: {str(e)} ===")
         return handle_exception(e)
 
-@surveys_bp.route('/api/surveys/<int:survey_id>', methods=['GET'])
+@surveys_bp.route('/api/surveys/<string:survey_id>', methods=['GET'])
 @require_auth
 def get_survey(survey_id):
     """
@@ -86,7 +86,7 @@ def get_survey(survey_id):
         logger.error(f"=== EXIT: GET /api/surveys/{survey_id} - ERROR: {str(e)} ===")
         return handle_exception(e)
 
-@surveys_bp.route('/api/surveys/<int:survey_id>', methods=['PUT'])
+@surveys_bp.route('/api/surveys/<string:survey_id>', methods=['PUT'])
 @require_domain_admin_role
 @log_route
 def update_survey(survey_id):
@@ -104,7 +104,7 @@ def update_survey(survey_id):
     except Exception as e:
         return handle_exception(e)
 
-@surveys_bp.route('/api/surveys/<int:survey_id>', methods=['DELETE'])
+@surveys_bp.route('/api/surveys/<string:survey_id>', methods=['DELETE'])
 @require_domain_admin_role
 @log_route
 def delete_survey(survey_id):
@@ -117,31 +117,54 @@ def delete_survey(survey_id):
     except Exception as e:
         return handle_exception(e)
 
-@surveys_bp.route('/api/surveys/<int:survey_id>/status', methods=['PATCH'])
-@require_domain_admin_role
+@surveys_bp.route('/api/surveys/<string:survey_id>/status', methods=['PATCH'])
+@require_admin_roles
 @log_route
 def update_survey_status(survey_id):
     """
     Change survey status (Active/Draft/Completed)
     """
+    logger = get_logger(__name__)
+    logger.info(f"=== ROUTE MATCHED: PATCH /api/surveys/{survey_id}/status ===")
+    
     try:
         data = request.get_json()
+        logger.info(f"Request data: {data}")
+        logger.info(f"Survey ID: {survey_id} (type: {type(survey_id)})")
         
         if not data or not data.get('status'):
+            logger.warning("Status update failed: No status provided")
             return validation_error_response({"status": "Status is required"})
         
         status = data.get('status')
-        valid_statuses = ['active', 'draft', 'completed']
+        logger.info(f"Requested status: {status}")
+        
+        valid_statuses = ['draft', 'active', 'inactive', 'completed', 'archived']
         
         if status.lower() not in valid_statuses:
+            logger.warning(f"Status update failed: Invalid status '{status}'")
             return validation_error_response({
                 "status": f"Status must be one of: {', '.join(valid_statuses)}"
             })
         
-        return SurveysController.update_survey_status(survey_id, status)
+        logger.info(f"Calling SurveysController.update_survey_status with survey_id={survey_id}, status={status}")
+        result = SurveysController.update_survey_status(survey_id, status)
+        logger.info("=== EXIT: PATCH /api/surveys/status - SUCCESS ===")
+        return result
     
     except Exception as e:
+        logger.error(f"=== EXIT: PATCH /api/surveys/status - ERROR: {str(e)} ===")
+        logger.exception("Full exception details:")
         return handle_exception(e)
+
+@surveys_bp.route('/api/surveys/<string:survey_id>/status', methods=['GET'])
+def debug_survey_status(survey_id):
+    """
+    Debug route to test if routing is working
+    """
+    logger = get_logger(__name__)
+    logger.info(f"=== DEBUG ROUTE MATCHED: GET /api/surveys/{survey_id}/status ===")
+    return {"message": f"Debug route working for survey {survey_id}", "survey_id": survey_id}
 
 @surveys_bp.route('/api/surveys/available', methods=['GET'])
 @require_auth
@@ -156,7 +179,7 @@ def get_available_surveys():
     except Exception as e:
         return handle_exception(e)
 
-@surveys_bp.route('/api/surveys/<int:survey_id>/responses', methods=['POST'])
+@surveys_bp.route('/api/surveys/<string:survey_id>/responses', methods=['POST'])
 @require_auth
 @log_route
 def submit_survey_responses(survey_id):
@@ -177,7 +200,7 @@ def submit_survey_responses(survey_id):
     except Exception as e:
         return handle_exception(e)
 
-@surveys_bp.route('/api/surveys/<int:survey_id>/responses', methods=['GET'])
+@surveys_bp.route('/api/surveys/<string:survey_id>/responses', methods=['GET'])
 @require_auth
 @log_route
 def get_survey_responses(survey_id):
@@ -203,7 +226,7 @@ def get_my_surveys():
     except Exception as e:
         return handle_exception(e)
 
-@surveys_bp.route('/api/surveys/<int:survey_id>/run', methods=['POST'])
+@surveys_bp.route('/api/surveys/<string:survey_id>/run', methods=['POST'])
 @require_auth
 @log_route
 def run_survey(survey_id):
@@ -218,7 +241,7 @@ def run_survey(survey_id):
     except Exception as e:
         return handle_exception(e)
 
-@surveys_bp.route('/api/surveys/<int:survey_id>/approve', methods=['POST'])
+@surveys_bp.route('/api/surveys/<string:survey_id>/approve', methods=['POST'])
 @require_admin_roles
 @log_route
 def approve_survey(survey_id):
@@ -237,7 +260,7 @@ def approve_survey(survey_id):
     except Exception as e:
         return handle_exception(e)
 
-@surveys_bp.route('/api/surveys/<int:survey_id>/reject', methods=['POST'])
+@surveys_bp.route('/api/surveys/<string:survey_id>/reject', methods=['POST'])
 @require_admin_roles
 @log_route
 def reject_survey(survey_id):

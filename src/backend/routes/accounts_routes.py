@@ -74,7 +74,7 @@ def create_account():
         logger.error(f"=== EXIT: POST /api/accounts - ERROR: {str(e)} ===")
         return handle_exception(e)
 
-@accounts_bp.route('/api/accounts/<int:account_id>', methods=['GET'])
+@accounts_bp.route('/api/accounts/<account_id>', methods=['GET'])
 @require_system_admin_role
 def get_account(account_id):
     """
@@ -92,7 +92,7 @@ def get_account(account_id):
         logger.error(f"=== EXIT: GET /api/accounts/{account_id} - ERROR: {str(e)} ===")
         return handle_exception(e)
 
-@accounts_bp.route('/api/accounts/<int:account_id>', methods=['PUT'])
+@accounts_bp.route('/api/accounts/<account_id>', methods=['PUT'])
 @require_system_admin_role
 def update_account(account_id):
     """
@@ -127,7 +127,7 @@ def update_account(account_id):
         logger.error(f"=== EXIT: PUT /api/accounts/{account_id} - ERROR: {str(e)} ===")
         return handle_exception(e)
 
-@accounts_bp.route('/api/accounts/<int:account_id>/status', methods=['PATCH'])
+@accounts_bp.route('/api/accounts/<account_id>/status', methods=['PATCH'])
 @require_system_admin_role
 def update_account_status(account_id):
     """
@@ -159,7 +159,7 @@ def update_account_status(account_id):
         logger.error(f"=== EXIT: PATCH /api/accounts/{account_id}/status - ERROR: {str(e)} ===")
         return handle_exception(e)
 
-@accounts_bp.route('/api/accounts/<int:account_id>', methods=['DELETE'])
+@accounts_bp.route('/api/accounts/<account_id>', methods=['DELETE'])
 @require_system_admin_role
 def delete_account(account_id):
     """

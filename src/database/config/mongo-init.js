@@ -154,8 +154,8 @@ db.createCollection('surveys', {
         },
         status: {
           bsonType: 'string',
-          enum: ['draft', 'active', 'completed', 'archived'],
-          description: 'must be one of: draft, active, completed, archived'
+          enum: ['draft', 'active', 'inactive', 'completed', 'archived'],
+          description: 'must be one of: draft, active, inactive, completed, archived'
         },
         settings: {
           bsonType: 'object',

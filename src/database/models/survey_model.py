@@ -171,12 +171,21 @@ class Survey(BaseModel):
     
     def update_status(self, status):
         """Update survey status"""
-        valid_statuses = ['draft', 'pending_approval', 'approved', 'rejected', 'active', 'paused', 'completed', 'archived']
+        logger.info(f"Updating survey {self._id} status to: {status}")
+        valid_statuses = ['draft', 'pending_approval', 'approved', 'rejected', 'active', 'paused', 'completed', 'archived', 'inactive']
         if status not in valid_statuses:
+            logger.error(f"Invalid status '{status}' for survey {self._id}. Valid statuses: {valid_statuses}")
             raise ValueError(f"Invalid status. Must be one of: {valid_statuses}")
         
+        logger.info(f"Status '{status}' is valid, updating survey {self._id}")
         self.set_field('status', status)
-        return self.save()
+        try:
+            result = self.save()
+            logger.info(f"Successfully updated survey {self._id} status to: {status}")
+            return result
+        except Exception as e:
+            logger.error(f"Failed to save survey {self._id} with status {status}: {str(e)}")
+            raise
     
     def activate(self):
         """Activate survey"""

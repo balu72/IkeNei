@@ -33,18 +33,22 @@ const Surveys = () => {
   }, []);
 
   // Get unique sectors for filter dropdown (using account_name as sector substitute)
-  const sectors = [...new Set(surveysData.map(survey => survey.account_name).filter(Boolean))];
+  const sectors = [...new Set(surveysData.map(survey => {
+    // Handle different possible field names for account/sector
+    return survey.account_name || survey.sector || survey.domain || survey.organization || 'Unknown';
+  }).filter(Boolean))];
 
   // Filter surveys based on search term, state filter, and sector filter
   const filteredSurveys = surveysData.filter(survey => {
-    const matchesSearch = survey.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         survey.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = survey.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         survey.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (survey.account_name && survey.account_name.toLowerCase().includes(searchTerm.toLowerCase()));
     
-    const matchesState = filterState === 'all' || 
-                        (filterState === 'active' && survey.status === 'active') ||
-                        (filterState === 'passive' && survey.status !== 'active');
-    const matchesSector = filterSector === 'all' || survey.account_name === filterSector;
+    const matchesState = filterState === 'all' || survey.status === filterState;
+    
+    // Improved sector matching with fallback options
+    const surveyAccountName = survey.account_name || survey.sector || survey.domain || survey.organization || 'Unknown';
+    const matchesSector = filterSector === 'all' || surveyAccountName === filterSector;
     
     return matchesSearch && matchesState && matchesSector;
   });
@@ -53,16 +57,39 @@ const Surveys = () => {
     navigate('/');
   };
 
-  const handleToggleState = (surveyId, currentState) => {
-    console.log(`Toggle survey ${surveyId} from ${currentState} to ${currentState === 'Active' ? 'Passive' : 'Active'}`);
-    // In real app, this would make an API call to update the survey state
-    alert(`Survey ${currentState === 'Active' ? 'retired' : 'activated'} successfully!`);
+  const handleStatusChange = async (surveyId, newStatus) => {
+    try {
+      const response = await surveysAPI.updateStatus(surveyId, newStatus);
+      
+      if (response.success) {
+        // Update the local state to reflect the change
+        setSurveysData(prevData => 
+          prevData.map(survey => 
+            survey.id === surveyId 
+              ? { ...survey, status: newStatus }
+              : survey
+          )
+        );
+        alert(`Survey status updated to ${newStatus} successfully!`);
+      } else {
+        setError('Failed to update survey status');
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to update survey status');
+    }
   };
 
-  const getStateStyle = (state) => {
+  const getStateStyle = (status) => {
+    const styles = {
+      'draft': { backgroundColor: '#f3f4f6', color: '#374151' },
+      'active': { backgroundColor: '#dcfce7', color: '#166534' },
+      'inactive': { backgroundColor: '#fef3c7', color: '#d97706' },
+      'completed': { backgroundColor: '#dbeafe', color: '#1e40af' },
+      'archived': { backgroundColor: '#f3e8ff', color: '#7c3aed' }
+    };
+    
     return {
-      backgroundColor: state === 'Active' ? '#dcfce7' : '#fef3c7',
-      color: state === 'Active' ? '#166534' : '#d97706',
+      ...styles[status] || styles['draft'],
       padding: '0.25rem 0.75rem',
       borderRadius: '1rem',
       fontSize: '0.75rem',
@@ -70,16 +97,49 @@ const Surveys = () => {
     };
   };
 
-  const getToggleButtonStyle = (state) => {
-    return {
-      padding: '0.25rem 0.5rem',
-      fontSize: '0.75rem',
-      border: '1px solid #d1d5db',
-      borderRadius: '0.25rem',
-      backgroundColor: state === 'Active' ? '#fef3c7' : '#dcfce7',
-      color: state === 'Active' ? '#d97706' : '#166534',
-      cursor: 'pointer'
+  const getStatusDisplayName = (status) => {
+    const names = {
+      'draft': 'Draft',
+      'active': 'Active',
+      'inactive': 'Inactive',
+      'completed': 'Completed',
+      'archived': 'Archived'
     };
+    return names[status] || status;
+  };
+
+  const StatusDropdown = ({ currentStatus, onStatusChange, surveyId }) => {
+    const statusOptions = ['draft', 'active', 'inactive', 'completed', 'archived'];
+    
+    const handleChange = (e) => {
+      const newStatus = e.target.value;
+      if (newStatus !== currentStatus) {
+        onStatusChange(surveyId, newStatus);
+      }
+    };
+
+    return (
+      <select
+        value={currentStatus}
+        onChange={handleChange}
+        style={{
+          padding: '0.5rem',
+          border: '1px solid #d1d5db',
+          borderRadius: '0.375rem',
+          fontSize: '0.75rem',
+          backgroundColor: 'white',
+          color: '#374151',
+          cursor: 'pointer',
+          minWidth: '100px'
+        }}
+      >
+        {statusOptions.map(status => (
+          <option key={status} value={status}>
+            {getStatusDisplayName(status)}
+          </option>
+        ))}
+      </select>
+    );
   };
 
   return (
@@ -144,8 +204,11 @@ const Surveys = () => {
             }}
           >
             <option value="all">All States</option>
+            <option value="draft">Draft</option>
             <option value="active">Active</option>
-            <option value="passive">Passive</option>
+            <option value="inactive">Inactive</option>
+            <option value="completed">Completed</option>
+            <option value="archived">Archived</option>
           </select>
 
           {/* Sector Filter */}
@@ -255,24 +318,23 @@ const Surveys = () => {
                         fontSize: '0.75rem',
                         fontWeight: '500'
                       }}>
-                        {survey.account_name || 'N/A'}
+                        {survey.account_name || survey.sector || survey.domain || survey.organization || 'Unknown'}
                       </span>
                     </td>
                     <td style={{ padding: '1rem', verticalAlign: 'top' }}>
-                      <span style={getStateStyle(survey.status === 'active' ? 'Active' : 'Passive')}>
-                        {survey.status === 'active' ? 'Active' : 'Passive'}
+                      <span style={getStateStyle(survey.status)}>
+                        {getStatusDisplayName(survey.status)}
                       </span>
                     </td>
                     <td style={{ padding: '1rem', verticalAlign: 'top' }}>
-                      <div style={{ display: 'flex', gap: '0.5rem', flexDirection: 'column' }}>
+                      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexDirection: 'column' }}>
+                        <StatusDropdown 
+                          currentStatus={survey.status}
+                          onStatusChange={handleStatusChange}
+                          surveyId={survey.id}
+                        />
                         <button
-                          onClick={() => handleToggleState(survey.id, survey.status === 'active' ? 'Active' : 'Passive')}
-                          style={getToggleButtonStyle(survey.status === 'active' ? 'Active' : 'Passive')}
-                        >
-                          {survey.status === 'active' ? 'Retire' : 'Activate'}
-                        </button>
-                        <button
-                          onClick={() => console.log('View details:', survey.id)}
+                          onClick={() => navigate(`/survey-details/${survey.id}`)}
                           style={{
                             padding: '0.25rem 0.5rem',
                             fontSize: '0.75rem',
@@ -309,10 +371,17 @@ const Surveys = () => {
       {/* Summary Stats */}
       <div style={{ 
         display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+        gridTemplateColumns: 'repeat(6, 1fr)', 
         gap: '1rem',
         marginTop: '2rem'
       }}>
+        <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>
+          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#374151', marginBottom: '0.5rem' }}>
+            {surveysData.filter(s => s.status === 'draft').length}
+          </div>
+          <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Draft Surveys</p>
+        </div>
+        
         <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>
           <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#10b981', marginBottom: '0.5rem' }}>
             {surveysData.filter(s => s.status === 'active').length}
@@ -322,16 +391,23 @@ const Surveys = () => {
         
         <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>
           <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#f59e0b', marginBottom: '0.5rem' }}>
-            {surveysData.filter(s => s.status !== 'active').length}
+            {surveysData.filter(s => s.status === 'inactive').length}
           </div>
-          <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Retired Surveys</p>
+          <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Inactive Surveys</p>
         </div>
         
         <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>
-          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#3b82f6', marginBottom: '0.5rem' }}>
-            {sectors.length}
+          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1e40af', marginBottom: '0.5rem' }}>
+            {surveysData.filter(s => s.status === 'completed').length}
           </div>
-          <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Active Sectors</p>
+          <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Completed Surveys</p>
+        </div>
+        
+        <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>
+          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#7c3aed', marginBottom: '0.5rem' }}>
+            {surveysData.filter(s => s.status === 'archived').length}
+          </div>
+          <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Archived Surveys</p>
         </div>
         
         <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>

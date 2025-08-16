@@ -17,7 +17,9 @@ import DomainReports from './pages/domain_admin_pages/DomainReports';
 import SysAdminHome from './pages/sys_admin_pages/SysAdminHome';
 import CreateAccount from './pages/sys_admin_pages/CreateAccount';
 import Accounts from './pages/sys_admin_pages/Accounts';
+import EditAccount from './pages/sys_admin_pages/EditAccount';
 import Surveys from './pages/sys_admin_pages/Surveys';
+import SurveyDetails from './pages/sys_admin_pages/SurveyDetails';
 import Settings from './pages/sys_admin_pages/Settings';
 import './App.css';
 
@@ -102,8 +104,10 @@ const AppRoutes = () => {
         
         {/* System Admin Routes */}
         <Route path="account-management" element={<Accounts />} />
+        <Route path="edit-account/:accountId" element={<EditAccount />} />
         <Route path="system-settings" element={<Settings />} />
         <Route path="analytics" element={<Surveys />} />
+        <Route path="survey-details/:surveyId" element={<SurveyDetails />} />
         
         {/* Catch all route */}
         <Route path="*" element={<Navigate to="/" replace />} />

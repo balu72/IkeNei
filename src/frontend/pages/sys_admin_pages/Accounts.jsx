@@ -37,7 +37,7 @@ const Accounts = () => {
   const filteredAccounts = accountsData.filter(account => {
     const matchesSearch = account.account_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          account.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         account.account_type.toLowerCase().includes(searchTerm.toLowerCase());
+                         (account.accountType && account.accountType.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesState = filterState === 'all' || 
                         (filterState === 'active' && account.is_active) ||
@@ -52,6 +52,33 @@ const Accounts = () => {
 
   const handleBack = () => {
     navigate('/');
+  };
+
+  const handleToggleAccountStatus = async (accountId, currentStatus) => {
+    try {
+      const newStatus = !currentStatus;
+      const response = await accountsAPI.updateStatus(accountId, newStatus);
+      
+      if (response.success) {
+        // Update the local state to reflect the change
+        setAccountsData(prevData => 
+          prevData.map(account => 
+            account.id === accountId 
+              ? { ...account, is_active: newStatus }
+              : account
+          )
+        );
+      } else {
+        setError('Failed to update account status');
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to update account status');
+    }
+  };
+
+  const handleEditAccount = (accountId) => {
+    // Navigate to the edit account page
+    navigate(`/edit-account/${accountId}`);
   };
 
   const getStateStyle = (state) => {
@@ -207,14 +234,16 @@ const Accounts = () => {
                 }}>
                   State
                 </th>
-                <th style={{ 
-                  padding: '1rem', 
-                  textAlign: 'left', 
-                  fontWeight: '600',
-                  color: '#374151'
-                }}>
-                  Actions
-                </th>
+                {isSystemAdmin && (
+                  <th style={{ 
+                    padding: '1rem', 
+                    textAlign: 'left', 
+                    fontWeight: '600',
+                    color: '#374151'
+                  }}>
+                    Actions
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -228,50 +257,52 @@ const Accounts = () => {
                       {account.email}
                     </td>
                     <td style={{ padding: '1rem', color: '#374151' }}>
-                      {account.account_type}
+                      {account.accountType || 'Not specified'}
                     </td>
                     <td style={{ padding: '1rem' }}>
                       <span style={getStateStyle(account.is_active ? 'Active' : 'Passive')}>
                         {account.is_active ? 'Active' : 'Passive'}
                       </span>
                     </td>
-                    <td style={{ padding: '1rem' }}>
-                      <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <button
-                          onClick={() => console.log('Edit account:', account.id)}
-                          style={{
-                            padding: '0.25rem 0.5rem',
-                            fontSize: '0.75rem',
-                            border: '1px solid #d1d5db',
-                            borderRadius: '0.25rem',
-                            backgroundColor: 'white',
-                            color: '#374151',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => console.log('Toggle state:', account.id)}
-                          style={{
-                            padding: '0.25rem 0.5rem',
-                            fontSize: '0.75rem',
-                            border: '1px solid #d1d5db',
-                            borderRadius: '0.25rem',
-                            backgroundColor: account.is_active ? '#fef3c7' : '#dcfce7',
-                            color: account.is_active ? '#d97706' : '#166534',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          {account.is_active ? 'Deactivate' : 'Activate'}
-                        </button>
-                      </div>
-                    </td>
+                    {isSystemAdmin && (
+                      <td style={{ padding: '1rem' }}>
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                          <button
+                            onClick={() => handleEditAccount(account.id)}
+                            style={{
+                              padding: '0.25rem 0.5rem',
+                              fontSize: '0.75rem',
+                              border: '1px solid #d1d5db',
+                              borderRadius: '0.25rem',
+                              backgroundColor: 'white',
+                              color: '#374151',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleToggleAccountStatus(account.id, account.is_active)}
+                            style={{
+                              padding: '0.25rem 0.5rem',
+                              fontSize: '0.75rem',
+                              border: '1px solid #d1d5db',
+                              borderRadius: '0.25rem',
+                              backgroundColor: account.is_active ? '#fef3c7' : '#dcfce7',
+                              color: account.is_active ? '#d97706' : '#166534',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            {account.is_active ? 'Deactivate' : 'Activate'}
+                          </button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" style={{ 
+                  <td colSpan={isSystemAdmin ? "5" : "4"} style={{ 
                     padding: '2rem', 
                     textAlign: 'center', 
                     color: '#6b7280',

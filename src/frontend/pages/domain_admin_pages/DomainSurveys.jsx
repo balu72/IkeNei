@@ -8,6 +8,35 @@ const DomainSurveys = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const getStateStyle = (status) => {
+    const styles = {
+      'draft': { backgroundColor: '#f3f4f6', color: '#374151' },
+      'active': { backgroundColor: '#dcfce7', color: '#166534' },
+      'inactive': { backgroundColor: '#fef3c7', color: '#d97706' },
+      'completed': { backgroundColor: '#dbeafe', color: '#1e40af' },
+      'archived': { backgroundColor: '#f3e8ff', color: '#7c3aed' }
+    };
+    
+    return {
+      ...styles[status] || styles['draft'],
+      padding: '0.25rem 0.75rem',
+      borderRadius: '1rem',
+      fontSize: '0.75rem',
+      fontWeight: '500'
+    };
+  };
+
+  const getStatusDisplayName = (status) => {
+    const names = {
+      'draft': 'Draft',
+      'active': 'Active',
+      'inactive': 'Inactive',
+      'completed': 'Completed',
+      'archived': 'Archived'
+    };
+    return names[status] || status;
+  };
+
   // Fetch surveys data from API
   useEffect(() => {
     const fetchSurveys = async () => {
@@ -187,15 +216,8 @@ const DomainSurveys = () => {
                       )}
                     </td>
                     <td style={{ padding: '1rem', verticalAlign: 'top' }}>
-                      <span style={{
-                        backgroundColor: survey.status === 'active' ? '#dcfce7' : survey.status === 'draft' ? '#fef3c7' : '#fee2e2',
-                        color: survey.status === 'active' ? '#166534' : survey.status === 'draft' ? '#d97706' : '#dc2626',
-                        padding: '0.25rem 0.75rem',
-                        borderRadius: '1rem',
-                        fontSize: '0.75rem',
-                        fontWeight: '500'
-                      }}>
-                        {survey.status === 'active' ? 'Active' : survey.status === 'draft' ? 'Draft' : 'Completed'}
+                      <span style={getStateStyle(survey.status)}>
+                        {getStatusDisplayName(survey.status)}
                       </span>
                     </td>
                     <td style={{ padding: '1rem', verticalAlign: 'top' }}>
@@ -243,10 +265,17 @@ const DomainSurveys = () => {
       {/* Summary Stats */}
       <div style={{ 
         display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+        gridTemplateColumns: 'repeat(6, 1fr)', 
         gap: '1rem',
         marginTop: '2rem'
       }}>
+        <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>
+          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#374151', marginBottom: '0.5rem' }}>
+            {surveysData.filter(s => s.status === 'draft').length}
+          </div>
+          <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Draft Surveys</p>
+        </div>
+        
         <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>
           <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#10b981', marginBottom: '0.5rem' }}>
             {surveysData.filter(s => s.status === 'active').length}
@@ -256,16 +285,23 @@ const DomainSurveys = () => {
         
         <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>
           <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#f59e0b', marginBottom: '0.5rem' }}>
-            {surveysData.filter(s => s.status === 'draft').length}
+            {surveysData.filter(s => s.status === 'inactive').length}
           </div>
-          <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Draft Surveys</p>
+          <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Inactive Surveys</p>
         </div>
         
         <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>
-          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#dc2626', marginBottom: '0.5rem' }}>
+          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1e40af', marginBottom: '0.5rem' }}>
             {surveysData.filter(s => s.status === 'completed').length}
           </div>
           <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Completed Surveys</p>
+        </div>
+        
+        <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>
+          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#7c3aed', marginBottom: '0.5rem' }}>
+            {surveysData.filter(s => s.status === 'archived').length}
+          </div>
+          <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Archived Surveys</p>
         </div>
         
         <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>

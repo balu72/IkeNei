@@ -210,25 +210,36 @@ class SurveysController:
         Update survey status
         """
         logger = get_logger(__name__)
-        logger.info(f"Updating survey {survey_id} status to: {status}")
+        logger.info(f"=== CONTROLLER ENTRY: update_survey_status ===")
+        logger.info(f"Survey ID: {survey_id} (type: {type(survey_id)})")
+        logger.info(f"Status: {status} (type: {type(status)})")
         
         try:
+            logger.info(f"Calling SurveyRepository.update_survey_status...")
             survey = SurveyRepository.update_survey_status(survey_id, status)
+            logger.info(f"Repository returned: {survey}")
             
             if not survey:
+                logger.warning(f"Survey not found: {survey_id}")
                 return jsonify({
                     "success": False,
                     "error": {"message": "Survey not found"}
                 }), 404
             
+            logger.info(f"Converting survey to public dict...")
+            survey_dict = survey.to_public_dict()
+            logger.info(f"Survey dict created successfully")
+            
             return jsonify({
                 "success": True,
-                "data": survey.to_public_dict(),
+                "data": survey_dict,
                 "message": f"Survey status updated to {status}"
             })
             
         except Exception as e:
+            logger.error(f"=== CONTROLLER ERROR: update_survey_status ===")
             logger.error(f"Failed to update survey status {survey_id}: {str(e)}")
+            logger.exception("Full exception details:")
             return jsonify({
                 "success": False,
                 "error": {"message": f"Failed to update survey status: {str(e)}"}

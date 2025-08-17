@@ -96,31 +96,6 @@ def delete_trait(trait_id):
     except Exception as e:
         return handle_exception(e)
 
-@traits_bp.route('/api/traits/<trait_id>/status', methods=['PATCH'])
-@require_domain_admin_role
-@log_route
-def update_trait_status(trait_id):
-    """
-    Change trait status (Active/Draft/Inactive)
-    """
-    try:
-        data = request.get_json()
-        
-        if not data or not data.get('status'):
-            return validation_error_response({"status": "Status is required"})
-        
-        status = data.get('status')
-        valid_statuses = ['active', 'draft', 'inactive']
-        
-        if status.lower() not in valid_statuses:
-            return validation_error_response({
-                "status": f"Status must be one of: {', '.join(valid_statuses)}"
-            })
-        
-        return TraitsController.update_trait_status(trait_id, status)
-    
-    except Exception as e:
-        return handle_exception(e)
 
 @traits_bp.route('/api/traits/categories', methods=['GET'])
 @require_admin_roles
@@ -131,19 +106,6 @@ def get_trait_categories():
     """
     try:
         return TraitsController.get_trait_categories()
-    
-    except Exception as e:
-        return handle_exception(e)
-
-@traits_bp.route('/api/traits/usage', methods=['GET'])
-@require_admin_roles
-@log_route
-def get_trait_usage():
-    """
-    Get trait usage statistics
-    """
-    try:
-        return TraitsController.get_trait_usage_statistics()
     
     except Exception as e:
         return handle_exception(e)

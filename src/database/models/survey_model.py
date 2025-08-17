@@ -32,7 +32,7 @@ class Survey(BaseModel):
         super().__init__(**kwargs)
     
     @classmethod
-    def create_survey(cls, account_id, title, survey_type, description=None, due_date=None, questions=None, **kwargs):
+    def create_survey(cls, account_id, title, survey_type, description=None, due_date=None, questions=None, traits=None, **kwargs):
         """Create a new survey"""
         # Validate account_id is ObjectId
         if isinstance(account_id, str):
@@ -47,6 +47,12 @@ class Survey(BaseModel):
         else:
             validated_questions = []
         
+        # Validate traits if provided
+        if traits is not None:
+            validated_traits = cls._validate_traits(traits)
+        else:
+            validated_traits = []
+        
         # Create survey data
         survey_data = {
             'account_id': account_id,
@@ -54,6 +60,7 @@ class Survey(BaseModel):
             'survey_type': survey_type,
             'description': description.strip() if description else None,
             'questions': validated_questions,
+            'traits': validated_traits,
             **kwargs
         }
         
@@ -64,7 +71,7 @@ class Survey(BaseModel):
         survey = cls(**survey_data)
         survey.save()
         
-        logger.info(f"Created new survey: {title} for account {account_id} with {len(validated_questions)} questions")
+        logger.info(f"Created new survey: {title} for account {account_id} with {len(validated_questions)} questions and {len(validated_traits)} traits")
         return survey
     
     @staticmethod
@@ -99,6 +106,52 @@ class Survey(BaseModel):
             validated_questions.append(question_data)
         
         return validated_questions
+    
+    @staticmethod
+    def _validate_traits(traits):
+        """Validate survey traits format"""
+        if not isinstance(traits, list):
+            raise ValueError("Traits must be a list")
+        
+        validated_traits = []
+        total_weightage = 0
+        
+        for i, trait in enumerate(traits):
+            if not isinstance(trait, dict):
+                raise ValueError(f"Trait {i+1} must be a dictionary")
+            
+            # Required fields
+            if 'id' not in trait or not trait['id']:
+                raise ValueError(f"Trait {i+1} must have an id")
+            
+            if 'name' not in trait or not trait['name'].strip():
+                raise ValueError(f"Trait {i+1} must have a name")
+            
+            if 'weightage' not in trait:
+                raise ValueError(f"Trait {i+1} must have a weightage")
+            
+            # Validate weightage
+            try:
+                weightage = int(trait['weightage'])
+                if weightage < 0 or weightage > 100:
+                    raise ValueError(f"Trait {i+1} weightage must be between 0 and 100")
+            except (ValueError, TypeError):
+                raise ValueError(f"Trait {i+1} weightage must be a valid number")
+            
+            trait_data = {
+                'id': trait['id'],
+                'name': trait['name'].strip(),
+                'weightage': weightage
+            }
+            
+            validated_traits.append(trait_data)
+            total_weightage += weightage
+        
+        # Validate total weightage
+        if validated_traits and total_weightage != 100:
+            raise ValueError(f"Total trait weightage must equal 100%, got {total_weightage}%")
+        
+        return validated_traits
     
     @classmethod
     def find_by_account(cls, account_id, active_only=True):

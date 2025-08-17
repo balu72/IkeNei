@@ -199,10 +199,77 @@ db.subjects.createIndex({ 'account_id': 1, 'is_active': 1 });
 db.subjects.createIndex({ 'email': 1 });
 db.subjects.createIndex({ 'account_id': 1, 'name': 1 });
 
+// Traits collection
+db.createCollection('traits', {
+  validator: {
+    $jsonSchema: {
+      bsonType: 'object',
+      required: ['name', 'category', 'description', 'items'],
+      properties: {
+        name: {
+          bsonType: 'string',
+          minLength: 1,
+          description: 'must be a non-empty string'
+        },
+        category: {
+          bsonType: 'string',
+          minLength: 1,
+          description: 'must be a non-empty string'
+        },
+        description: {
+          bsonType: 'string',
+          description: 'must be a string'
+        },
+        items: {
+          bsonType: 'array',
+          description: 'must be an array of assessment questions',
+          items: {
+            bsonType: 'object',
+            required: ['question', 'type'],
+            properties: {
+              question: {
+                bsonType: 'string',
+                minLength: 1,
+                description: 'must be a non-empty string'
+              },
+              type: {
+                bsonType: 'string',
+                enum: ['rating', 'text', 'multiple_choice', 'boolean'],
+                description: 'must be one of: rating, text, multiple_choice, boolean'
+              },
+              options: {
+                bsonType: 'array',
+                description: 'must be an array for multiple choice questions'
+              },
+              required: {
+                bsonType: 'bool',
+                description: 'must be a boolean'
+              }
+            }
+          }
+        },
+        created_at: {
+          bsonType: 'date',
+          description: 'must be a date'
+        },
+        updated_at: {
+          bsonType: 'date',
+          description: 'must be a date'
+        }
+      }
+    }
+  }
+});
+
 // Survey indexes
 db.surveys.createIndex({ 'account_id': 1, 'status': 1 });
 db.surveys.createIndex({ 'created_at': -1 });
 db.surveys.createIndex({ 'status': 1, 'due_date': 1 });
+
+// Trait indexes
+db.traits.createIndex({ 'category': 1 });
+db.traits.createIndex({ 'name': 1 });
+db.traits.createIndex({ 'created_at': -1 });
 
 // Create demo users for the application
 print('Creating demo users...');

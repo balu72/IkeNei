@@ -12,13 +12,14 @@ class TraitRepository:
     """Repository for Trait database operations"""
     
     @staticmethod
-    def create_trait(name, category, description=None, **kwargs):
+    def create_trait(name, category, description=None, items=None, **kwargs):
         """Create a new trait"""
         try:
             return Trait.create_trait(
                 name=name,
                 category=category,
                 description=description,
+                items=items,
                 **kwargs
             )
         except Exception as e:
@@ -51,9 +52,6 @@ class TraitRepository:
                 
                 if filters.get('category'):
                     query['category'] = filters['category']
-                
-                if filters.get('status'):
-                    query['status'] = filters['status']
                 
                 if filters.get('is_active') is not None:
                     query['is_active'] = filters['is_active']

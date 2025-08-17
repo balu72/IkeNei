@@ -60,7 +60,8 @@ class TraitsController:
             trait = TraitRepository.create_trait(
                 name=data.get('name'),
                 category=data.get('category'),
-                description=data.get('description')
+                description=data.get('description'),
+                items=data.get('items', [])
             )
             
             return jsonify({
@@ -214,69 +215,4 @@ class TraitsController:
             return jsonify({
                 "success": False,
                 "error": {"message": f"Failed to retrieve traits for category: {str(e)}"}
-            }), 500
-    
-    @staticmethod
-    @log_function_call
-    def update_trait_status(trait_id, status):
-        """
-        Update trait status
-        """
-        logger = get_logger(__name__)
-        logger.info(f"Updating trait {trait_id} status to {status}")
-        
-        try:
-            trait = TraitRepository.update_trait(trait_id, {"status": status})
-            
-            if not trait:
-                return jsonify({
-                    "success": False,
-                    "error": {"message": "Trait not found"}
-                }), 404
-            
-            return jsonify({
-                "success": True,
-                "data": trait.to_public_dict(),
-                "message": f"Trait status updated to {status}"
-            })
-            
-        except Exception as e:
-            logger.error(f"Failed to update trait {trait_id} status: {str(e)}")
-            return jsonify({
-                "success": False,
-                "error": {"message": f"Failed to update trait status: {str(e)}"}
-            }), 500
-    
-    @staticmethod
-    @log_function_call
-    def get_trait_usage_statistics():
-        """
-        Get trait usage statistics
-        """
-        logger = get_logger(__name__)
-        logger.info("Retrieving trait usage statistics")
-        
-        try:
-            # TODO: Implement actual trait usage statistics calculation
-            # This should use aggregation pipeline to calculate:
-            # - Total traits count from traits collection
-            # - Active traits count (status = 'active')
-            # - Categories count (distinct categories)
-            # - Most used traits (from survey responses or usage tracking)
-            # - Category distribution (traits per category)
-            
-            stats = {
-                "timestamp": datetime.utcnow().isoformat() + "Z"
-            }
-            
-            return jsonify({
-                "success": True,
-                "data": stats
-            })
-            
-        except Exception as e:
-            logger.error(f"Failed to retrieve trait usage statistics: {str(e)}")
-            return jsonify({
-                "success": False,
-                "error": {"message": f"Failed to retrieve trait usage statistics: {str(e)}"}
             }), 500

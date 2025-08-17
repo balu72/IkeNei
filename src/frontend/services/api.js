@@ -310,9 +310,6 @@ export const traitsAPI = {
     return apiRequest('/traits/categories');
   },
 
-  getUsage: async () => {
-    return apiRequest('/traits/usage');
-  },
 };
 
 // Subjects API

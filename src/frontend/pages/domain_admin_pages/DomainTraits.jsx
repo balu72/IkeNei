@@ -40,34 +40,17 @@ const DomainTraits = () => {
     navigate('/');
   };
 
-  const handleToggleStatus = async (traitId, currentStatus) => {
-    try {
-      const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
-      const response = await traitsAPI.updateStatus(traitId, newStatus);
-      
-      if (response.success) {
-        // Update the local state to reflect the change
-        setTraitsData(prevData => 
-          prevData.map(trait => 
-            trait.id === traitId 
-              ? { ...trait, status: newStatus }
-              : trait
-          )
-        );
-      } else {
-        alert('Failed to update trait status: ' + (response.error?.message || 'Unknown error'));
-      }
-    } catch (error) {
-      console.error('Error toggling trait status:', error);
-      alert('Failed to update trait status: ' + error.message);
-    }
-  };
 
   const handleEditTrait = async (traitId) => {
     try {
       // Fetch the trait data for editing
+      console.log('Fetching trait with ID:', traitId);
       const response = await traitsAPI.getById(traitId);
+      console.log('Raw API response:', response);
+      
       if (response.success) {
+        console.log('Trait data from API:', response.data);
+        console.log('Items in response.data:', response.data.items);
         setEditingTrait(response.data);
         setShowEditModal(true);
       } else {
@@ -108,30 +91,6 @@ const DomainTraits = () => {
     setEditingTrait(null);
   };
 
-  const getStatusStyle = (status) => {
-    const styles = {
-      'active': {
-        backgroundColor: '#dcfce7',
-        color: '#166534'
-      },
-      'draft': {
-        backgroundColor: '#fef3c7',
-        color: '#d97706'
-      },
-      'inactive': {
-        backgroundColor: '#fee2e2',
-        color: '#dc2626'
-      }
-    };
-    
-    return {
-      ...styles[status],
-      padding: '0.25rem 0.75rem',
-      borderRadius: '1rem',
-      fontSize: '0.75rem',
-      fontWeight: '500'
-    };
-  };
 
   const getCategoryStyle = (category) => {
     const colors = {
@@ -195,7 +154,7 @@ const DomainTraits = () => {
       {/* Traits Table */}
       <div>
         <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem' }}>
-          All Traits & Competencies
+          All Traits (Total Traits: {traitsData.length}, Categories: {[...new Set(traitsData.map(t => t.category))].length})
         </h2>
         
         <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
@@ -238,24 +197,6 @@ const DomainTraits = () => {
                   textAlign: 'left', 
                   fontWeight: '600',
                   color: '#374151',
-                  minWidth: '100px'
-                }}>
-                  Status
-                </th>
-                <th style={{ 
-                  padding: '1rem', 
-                  textAlign: 'left', 
-                  fontWeight: '600',
-                  color: '#374151',
-                  minWidth: '120px'
-                }}>
-                  Used in Surveys
-                </th>
-                <th style={{ 
-                  padding: '1rem', 
-                  textAlign: 'left', 
-                  fontWeight: '600',
-                  color: '#374151',
                   minWidth: '120px'
                 }}>
                   Last Modified
@@ -286,63 +227,30 @@ const DomainTraits = () => {
                     <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'top', lineHeight: '1.5' }}>
                       {trait.description}
                     </td>
-                    <td style={{ padding: '1rem', verticalAlign: 'top' }}>
-                      <span style={getStatusStyle(trait.status)}>
-                        {trait.status}
-                      </span>
-                    </td>
-                    <td style={{ padding: '1rem', color: '#374151', verticalAlign: 'top', textAlign: 'center' }}>
-                      <span style={{
-                        backgroundColor: (trait.usage_count || 0) > 0 ? '#dbeafe' : '#f3f4f6',
-                        color: (trait.usage_count || 0) > 0 ? '#1e40af' : '#6b7280',
-                        padding: '0.25rem 0.5rem',
-                        borderRadius: '0.375rem',
-                        fontSize: '0.75rem',
-                        fontWeight: '600'
-                      }}>
-                        {trait.usage_count || 0}
-                      </span>
-                    </td>
                     <td style={{ padding: '1rem', color: '#6b7280', verticalAlign: 'top' }}>
                       {trait.updated_at ? new Date(trait.updated_at).toLocaleDateString() : 'N/A'}
                     </td>
                     <td style={{ padding: '1rem', verticalAlign: 'top' }}>
-                      <div style={{ display: 'flex', gap: '0.5rem', flexDirection: 'column' }}>
-                        <button
-                          onClick={() => handleEditTrait(trait.id)}
-                          style={{
-                            padding: '0.25rem 0.5rem',
-                            fontSize: '0.75rem',
-                            border: '1px solid #d1d5db',
-                            borderRadius: '0.25rem',
-                            backgroundColor: 'white',
-                            color: '#374151',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleToggleStatus(trait.id, trait.status)}
-                          style={{
-                            padding: '0.25rem 0.5rem',
-                            fontSize: '0.75rem',
-                            border: '1px solid #d1d5db',
-                            borderRadius: '0.25rem',
-                            backgroundColor: trait.status === 'active' ? '#fef3c7' : '#dcfce7',
-                            color: trait.status === 'active' ? '#d97706' : '#166534',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          {trait.status === 'active' ? 'Deactivate' : 'Activate'}
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => handleEditTrait(trait.id)}
+                        style={{
+                          padding: '0.25rem 0.5rem',
+                          fontSize: '0.75rem',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '0.25rem',
+                          backgroundColor: 'white',
+                          color: '#374151',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Edit
+                      </button>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="7" style={{ 
+                  <td colSpan="5" style={{ 
                     padding: '2rem', 
                     textAlign: 'center', 
                     color: '#6b7280',
@@ -357,41 +265,6 @@ const DomainTraits = () => {
         </div>
       </div>
 
-      {/* Summary Stats */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-        gap: '1rem',
-        marginTop: '2rem'
-      }}>
-        <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>
-          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#10b981', marginBottom: '0.5rem' }}>
-            {traitsData.filter(t => t.status === 'active').length}
-          </div>
-          <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Active Traits</p>
-        </div>
-        
-        <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>
-          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#f59e0b', marginBottom: '0.5rem' }}>
-            {traitsData.filter(t => t.status === 'draft').length}
-          </div>
-          <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Draft Traits</p>
-        </div>
-        
-        <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>
-          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#dc2626', marginBottom: '0.5rem' }}>
-            {traitsData.filter(t => t.status === 'inactive').length}
-          </div>
-          <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Inactive Traits</p>
-        </div>
-        
-        <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>
-          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#3b82f6', marginBottom: '0.5rem' }}>
-            {[...new Set(traitsData.map(t => t.category))].length}
-          </div>
-          <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Categories</p>
-        </div>
-      </div>
 
       {/* Edit Trait Modal */}
       {showEditModal && editingTrait && (
@@ -407,12 +280,27 @@ const DomainTraits = () => {
 
 // Edit Trait Modal Component
 const EditTraitModal = ({ trait, onSave, onClose }) => {
+  // Temporary debugging to see what data we're receiving
+  console.log('EditTraitModal - Full trait object:', JSON.stringify(trait, null, 2));
+  console.log('EditTraitModal - trait.items specifically:', trait.items);
+  console.log('EditTraitModal - typeof trait.items:', typeof trait.items);
+  console.log('EditTraitModal - Array.isArray(trait.items):', Array.isArray(trait.items));
+  
   const [formData, setFormData] = useState({
     name: trait.name || '',
     category: trait.category || '',
-    description: trait.description || ''
+    description: trait.description || '',
+    items: trait.items && Array.isArray(trait.items) && trait.items.length > 0 ? trait.items : [
+      {
+        question: '',
+        level: '',
+        type: 'text'
+      }
+    ]
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const levels = ['basic', 'medium', 'advanced'];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -420,6 +308,31 @@ const EditTraitModal = ({ trait, onSave, onClose }) => {
       ...prev,
       [name]: value
     }));
+  };
+
+  const handleItemChange = (index, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      items: prev.items.map((item, i) => 
+        i === index ? { ...item, [field]: value } : item
+      )
+    }));
+  };
+
+  const addItem = () => {
+    setFormData(prev => ({
+      ...prev,
+      items: [...prev.items, { question: '', level: '', type: 'text' }]
+    }));
+  };
+
+  const removeItem = (index) => {
+    if (formData.items.length > 1) {
+      setFormData(prev => ({
+        ...prev,
+        items: prev.items.filter((_, i) => i !== index)
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -439,6 +352,19 @@ const EditTraitModal = ({ trait, onSave, onClose }) => {
     if (!formData.description.trim()) {
       alert('Please enter a description');
       return;
+    }
+    
+    // Validate items
+    for (let i = 0; i < formData.items.length; i++) {
+      const item = formData.items[i];
+      if (!item.question.trim()) {
+        alert(`Please enter a question for item ${i + 1}`);
+        return;
+      }
+      if (!item.level) {
+        alert(`Please select a level for item ${i + 1}`);
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -541,6 +467,139 @@ const EditTraitModal = ({ trait, onSave, onClose }) => {
               }}
               placeholder="Describe the trait"
             />
+          </div>
+
+          {/* Items Section */}
+          <div style={{ marginBottom: '2rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: '600', color: '#374151' }}>
+                Assessment Questions
+              </h3>
+              <button
+                type="button"
+                onClick={addItem}
+                style={{
+                  fontSize: '0.75rem',
+                  padding: '0.5rem 1rem',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '0.375rem',
+                  backgroundColor: 'white',
+                  color: '#374151',
+                  cursor: 'pointer'
+                }}
+              >
+                + Add Question
+              </button>
+            </div>
+
+            {formData.items.map((item, index) => (
+              <div key={index} style={{ 
+                border: '1px solid #e5e7eb', 
+                borderRadius: '0.5rem', 
+                padding: '1.5rem', 
+                marginBottom: '1rem',
+                backgroundColor: index % 2 === 0 ? '#fafafa' : '#f0f9ff'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                  <h4 style={{ fontSize: '0.875rem', fontWeight: '600', color: '#374151' }}>
+                    Question {index + 1}
+                  </h4>
+                  {formData.items.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeItem(index)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#dc2626',
+                        cursor: 'pointer',
+                        fontSize: '0.875rem'
+                      }}
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+
+                {/* Question */}
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+                    Question *
+                  </label>
+                  <textarea
+                    value={item.question}
+                    onChange={(e) => handleItemChange(index, 'question', e.target.value)}
+                    required
+                    rows={3}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '0.375rem',
+                      fontSize: '0.875rem',
+                      resize: 'vertical'
+                    }}
+                    placeholder="Enter the assessment question or statement"
+                  />
+                </div>
+
+                {/* Level */}
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+                    Level *
+                  </label>
+                  <select
+                    value={item.level}
+                    onChange={(e) => handleItemChange(index, 'level', e.target.value)}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '0.375rem',
+                      fontSize: '0.875rem'
+                    }}
+                  >
+                    <option value="">Select competency level</option>
+                    {levels.map((level) => (
+                      <option key={level} value={level}>
+                        {level.charAt(0).toUpperCase() + level.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Summary */}
+          <div style={{ 
+            marginBottom: '2rem',
+            padding: '1rem',
+            backgroundColor: '#f0f9ff',
+            border: '1px solid #bae6fd',
+            borderRadius: '0.375rem'
+          }}>
+            <h4 style={{ fontSize: '0.875rem', fontWeight: '600', marginBottom: '0.5rem', color: '#0369a1' }}>
+              Summary
+            </h4>
+            <p style={{ fontSize: '0.875rem', color: '#0369a1', marginBottom: '0.5rem' }}>
+              <strong>Trait:</strong> {formData.name || 'Not specified'}
+            </p>
+            <p style={{ fontSize: '0.875rem', color: '#0369a1', marginBottom: '0.5rem' }}>
+              <strong>Category:</strong> {formData.category || 'Not specified'}
+            </p>
+            <p style={{ fontSize: '0.875rem', color: '#0369a1', marginBottom: '0.5rem' }}>
+              <strong>Total Questions:</strong> {formData.items.length}
+            </p>
+            <p style={{ fontSize: '0.875rem', color: '#0369a1' }}>
+              <strong>Level Distribution:</strong> {
+                levels.map(level => {
+                  const count = formData.items.filter(item => item.level === level).length;
+                  return count > 0 ? `${level.charAt(0).toUpperCase() + level.slice(1)}: ${count}` : null;
+                }).filter(Boolean).join(', ') || 'None selected'
+              }
+            </p>
           </div>
 
           {/* Action Buttons */}

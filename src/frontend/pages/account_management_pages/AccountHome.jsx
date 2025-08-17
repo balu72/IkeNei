@@ -372,7 +372,7 @@ const AccountHome = () => {
                   fontWeight: '600',
                   color: '#374151'
                 }}>
-                  View Report
+                  Report
                 </th>
               </tr>
             </thead>
@@ -436,19 +436,38 @@ const AccountHome = () => {
                         </span>
                       </td>
                       <td style={{ padding: '1rem' }}>
-                        <span style={{
-                          backgroundColor: subject.status === 'active' ? '#dcfce7' : 
-                                         subject.status === 'inactive' ? '#fee2e2' : '#fef3c7',
-                          color: subject.status === 'active' ? '#166534' : 
-                                 subject.status === 'inactive' ? '#dc2626' : '#d97706',
-                          padding: '0.25rem 0.75rem',
-                          borderRadius: '1rem',
-                          fontSize: '0.75rem',
-                          fontWeight: '500',
-                          textTransform: 'capitalize'
-                        }}>
-                          {subject.status || 'Active'}
-                        </span>
+                        {(() => {
+                          // Find if there's a survey run for this subject
+                          const surveyRun = dashboardData.surveys.find(survey => 
+                            survey.subject_id === subject.id
+                          );
+                          
+                          const runStatus = surveyRun?.run_status || 'not_started';
+                          
+                          // Define status colors and labels
+                          const statusConfig = {
+                            'not_started': { bg: '#f3f4f6', color: '#374151', label: 'Not Started' },
+                            'in_progress': { bg: '#fef3c7', color: '#d97706', label: 'In Progress' },
+                            'completed': { bg: '#dcfce7', color: '#166534', label: 'Completed' },
+                            'paused': { bg: '#fee2e2', color: '#dc2626', label: 'Paused' },
+                            'cancelled': { bg: '#fee2e2', color: '#dc2626', label: 'Cancelled' }
+                          };
+                          
+                          const config = statusConfig[runStatus] || statusConfig['not_started'];
+                          
+                          return (
+                            <span style={{
+                              backgroundColor: config.bg,
+                              color: config.color,
+                              padding: '0.25rem 0.75rem',
+                              borderRadius: '1rem',
+                              fontSize: '0.75rem',
+                              fontWeight: '500'
+                            }}>
+                              {config.label}
+                            </span>
+                          );
+                        })()}
                       </td>
                       <td style={{ padding: '1rem' }}>
                         {subject.status === 'completed' ? (

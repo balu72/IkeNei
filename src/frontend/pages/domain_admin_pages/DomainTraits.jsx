@@ -154,7 +154,7 @@ const DomainTraits = () => {
       {/* Traits Table */}
       <div>
         <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem' }}>
-          All Traits (Total Traits: {traitsData.length}, Categories: {[...new Set(traitsData.map(t => t.category))].length})
+          Traits Overview
         </h2>
         
         <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
@@ -265,6 +265,27 @@ const DomainTraits = () => {
         </div>
       </div>
 
+      {/* Summary Stats */}
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+        gap: '1rem',
+        marginTop: '2rem'
+      }}>
+        <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>
+          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#10b981', marginBottom: '0.5rem' }}>
+            {traitsData.length}
+          </div>
+          <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Total Traits</p>
+        </div>
+        
+        <div className="card" style={{ textAlign: 'center', padding: '1rem' }}>
+          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#3b82f6', marginBottom: '0.5rem' }}>
+            {[...new Set(traitsData.map(t => t.category))].length}
+          </div>
+          <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Categories</p>
+        </div>
+      </div>
 
       {/* Edit Trait Modal */}
       {showEditModal && editingTrait && (
